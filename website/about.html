@@ -72,6 +72,37 @@
 
 <hr>
 
+<h2>When Prices Change</h2>
+
+<p>The 25% markup is fixed forever. But the underlying infrastructure costs can change. Here's our policy:</p>
+
+<h3>Prices Go UP If:</h3>
+<ul>
+<li><strong>Provider raises prices</strong> - If Contabo/Hetzner/etc increase VPS costs, I pass that through (still at cost + 25%)</li>
+<li><strong>Backup storage costs increase</strong> - If Wasabi S3 pricing goes up</li>
+<li><strong>Inflation adjustment</strong> - Once per year, max 3-5%, only if provider costs increase</li>
+</ul>
+
+<h3>Prices Go DOWN If:</h3>
+<ul>
+<li><strong>We switch to owned hardware</strong> - Your price drops 30-40% (see roadmap below)</li>
+<li><strong>Provider lowers prices</strong> - Savings passed to you immediately</li>
+<li><strong>We get volume discounts</strong> - Shared with customers</li>
+</ul>
+
+<h3>You Always Know Why</h3>
+<p>Every invoice shows the exact cost breakdown. If your price changes, you'll see:</p>
+<ul>
+<li>What changed (VPS cost, backup storage, etc.)</li>
+<li>Old cost vs new cost</li>
+<li>Proof (screenshot of provider invoice)</li>
+<li>30 days notice before any increase</li>
+</ul>
+
+<p><strong>No surprises. Ever.</strong></p>
+
+<hr>
+
 <h2>Long-Term Vision: Our Own Hardware</h2>
 
 <p>Right now, I rent VPS servers from providers like Contabo and Hetzner. That's where most of your monthly cost goes.</p>
@@ -212,6 +243,37 @@
 </ul>
 
 <p>All bootstrapped. All focused on practical tools that solve real problems.</p>
+
+<hr>
+
+<h2>Easy Exit Strategy</h2>
+
+<p><strong>You're never trapped.</strong> Here's how easy it is to leave:</p>
+
+<h3>Export Your Data (Anytime)</h3>
+<ul>
+<li><strong>Full database dump</strong> - pg_dump provided on request (or you can run it yourself)</li>
+<li><strong>Direct database access</strong> - You have superuser credentials, export whenever you want</li>
+<li><strong>Backup access</strong> - Download any of your backups from the past 30 days</li>
+</ul>
+
+<h3>Migration Assistance</h3>
+<ul>
+<li><strong>Migration guide</strong> - Step-by-step instructions to move to AWS/GCP/self-hosted</li>
+<li><strong>Connection string format</strong> - Standard PostgreSQL, works with any provider</li>
+<li><strong>No lock-in</strong> - No proprietary extensions or custom configurations</li>
+<li><strong>Keep database running</strong> - We'll keep it live during your migration (no rush)</li>
+</ul>
+
+<h3>Cancellation</h3>
+<ul>
+<li><strong>No contracts</strong> - Cancel anytime with 7 days notice</li>
+<li><strong>Prorated refund</strong> - Unused days refunded automatically</li>
+<li><strong>Data retained 30 days</strong> - In case you need to come back or forgot something</li>
+<li><strong>No hard feelings</strong> - Seriously. I'd rather you leave happy than stay unhappy.</li>
+</ul>
+
+<p><strong>Your data is YOUR data.</strong> I'm just hosting it.</p>
 
 <hr>
 
