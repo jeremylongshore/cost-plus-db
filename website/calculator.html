@@ -3,374 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Database Calculator - CostPlusDB</title>
-  <meta name="description" content="Configure your PostgreSQL database and see transparent, real-time pricing.">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Calculator - CostPlusDB</title>
 
-  <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/monospace-base.css">
-  <link rel="stylesheet" href="/css/costplusdb-theme.css">
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
 </head>
 <body>
 
-  <nav>
-    <strong>COSTPLUSDB</strong>
-    <a href="/">HOME</a>
-    <a href="/calculator.html">CALCULATOR</a>
-    <a href="/about.html">ABOUT</a>
-    <a href="/transparency/">TRANSPARENCY</a>
-  </nav>
-
-  <main>
-
-    <h1>Configure Your Database</h1>
-
-    <p>
-      Adjust the options below and watch the price update in real-time.
-      <strong>We show you our exact costs.</strong> No hidden fees.
-    </p>
-
-    <hr>
-
-    <h2>Tier Selection</h2>
-
-    <p>Choose a preset configuration or customize below:</p>
-
-    <div class="grid">
-      <button onclick="selectTier('shared')" id="btn-shared">SHARED</button>
-      <button onclick="selectTier('dedicated')" id="btn-dedicated">DEDICATED</button>
-      <button onclick="selectTier('pro')" id="btn-pro">PRO</button>
-      <button onclick="selectTier('enterprise')" id="btn-enterprise">ENTERPRISE</button>
-    </div>
-
-    <hr>
-
-    <h2>Configuration</h2>
-
-    <label for="ram">RAM (GB)</label>
-    <select id="ram" onchange="updatePrice()">
-      <option value="2">2 GB (Shared)</option>
-      <option value="4">4 GB</option>
-      <option value="8" selected>8 GB (Dedicated)</option>
-      <option value="16">16 GB (Pro)</option>
-      <option value="32">32 GB (Enterprise)</option>
-      <option value="64">64 GB (Custom)</option>
-    </select>
-
-    <label for="storage">Storage (GB)</label>
-    <select id="storage" onchange="updatePrice()">
-      <option value="20">20 GB</option>
-      <option value="50">50 GB</option>
-      <option value="100">100 GB</option>
-      <option value="200" selected>200 GB</option>
-      <option value="400">400 GB</option>
-      <option value="800">800 GB</option>
-      <option value="1000">1 TB</option>
-    </select>
-
-    <label for="provider">Infrastructure Provider</label>
-    <select id="provider" onchange="updatePrice()">
-      <option value="contabo" selected>Contabo (Default - Best Value)</option>
-      <option value="hetzner">Hetzner (Premium EU)</option>
-      <option value="digitalocean">DigitalOcean (Global)</option>
-      <option value="aws">AWS (Enterprise Compliance)</option>
-    </select>
-
-    <label for="region">Region</label>
-    <select id="region" onchange="updatePrice()">
-      <option value="default" selected>Default (Germany / US East)</option>
-      <option value="eu-central">EU Central (GDPR)</option>
-      <option value="us-east">US East</option>
-      <option value="us-west">US West</option>
-      <option value="asia">Asia Pacific</option>
-    </select>
-
-    <hr>
-
-    <h2>Add-ons (Optional)</h2>
-
-    <details>
-      <summary>Advanced Options</summary>
-
-      <fieldset>
-        <label>
-          <input type="checkbox" id="addon-ha" onchange="updatePrice()">
-          High Availability (Multi-region failover) - <strong>+$99/mo</strong>
-        </label>
-        <label>
-          <input type="checkbox" id="addon-replicas" onchange="updatePrice()">
-          Read Replicas (1 replica) - <strong>+$15/mo</strong>
-        </label>
-        <label>
-          <input type="checkbox" id="addon-vpn" onchange="updatePrice()">
-          VPN Access (Private network) - <strong>+$15/mo</strong>
-        </label>
-        <label>
-          <input type="checkbox" id="addon-compliance" onchange="updatePrice()">
-          Compliance Package (HIPAA/SOC2/PCI-DSS) - <strong>+$100/mo</strong>
-        </label>
-      </fieldset>
-
-    </details>
-
-    <hr>
-
-    <h2>💰 Your Pricing (Live)</h2>
-
-    <div class="price-box">
-      <p><strong>OUR INFRASTRUCTURE COSTS:</strong></p>
-
-      <div class="price-row">
-        <span>VPS (<span id="provider-name">Contabo</span>, <span id="ram-display">8GB</span> RAM):</span>
-        <span id="cost-vps">$12.00</span>
-      </div>
-
-      <div class="price-row">
-        <span>Backups (Wasabi S3, <span id="storage-display">200GB</span>):</span>
-        <span id="cost-backup">$1.00</span>
-      </div>
-
-      <div class="price-row">
-        <span>Monitoring (Betterstack):</span>
-        <span id="cost-monitoring">$1.00</span>
-      </div>
-
-      <div class="price-row" id="cost-addon-row" style="display: none;">
-        <span>Add-ons:</span>
-        <span id="cost-addons">$0.00</span>
-      </div>
-
-      <div class="price-row" style="border-top: 2px solid rgba(255,255,255,0.4); padding-top: calc(var(--line-height) / 2); margin-top: calc(var(--line-height) / 2);">
-        <span><strong>TOTAL OUR COST:</strong></span>
-        <span id="cost-total">$14.00</span>
-      </div>
-
-      <div class="price-row">
-        <span>Our Markup (25%):</span>
-        <span id="cost-markup">$3.50</span>
-      </div>
-
-      <div class="price-row total">
-        <span>YOUR MONTHLY PRICE:</span>
-        <span id="price-total">$17.50</span>
-      </div>
-
-      <div class="price-row savings">
-        <span>AWS RDS Equivalent:</span>
-        <span id="price-aws">$280.00</span>
-      </div>
-
-      <div class="price-row savings">
-        <span>YOU SAVE:</span>
-        <span id="price-savings">$262.50</span>
-      </div>
-    </div>
-
-    <details>
-      <summary>How did we calculate this?</summary>
-      <p>Every number above is based on real infrastructure costs:</p>
-      <ul>
-        <li><strong>VPS costs</strong>: Actual pricing from provider websites (Contabo, Hetzner, DO, AWS)</li>
-        <li><strong>Backup costs</strong>: Wasabi S3 storage ($0.0059/GB/month) + egress</li>
-        <li><strong>Monitoring</strong>: Betterstack Pro plan ($1/month per database)</li>
-        <li><strong>AWS comparison</strong>: db.t3.medium (2vCPU/8GB) or equivalent RDS pricing</li>
-      </ul>
-      <p>
-        See our <a href="/transparency/cost-breakdown.html">full cost breakdown spreadsheet</a>.
-      </p>
-    </details>
-
-    <hr>
-
-    <h2>Sign Up</h2>
-
-    <p>
-      Once you're happy with your configuration, enter your email and we'll send you a payment link within 1-2 hours.
-    </p>
-
-    <form name="database-request"
-          method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field">
-
-      <!-- Honeypot for spam protection -->
-      <p class="hidden">
-        <label>Don't fill this out: <input name="bot-field"></label>
-      </p>
-
-      <label for="email">Email Address *</label>
-      <input type="email" id="email" name="email" required
-             placeholder="you@example.com">
-
-      <label for="company">Company Name (optional)</label>
-      <input type="text" id="company" name="company"
-             placeholder="Your Company LLC">
-
-      <label for="notes">Additional Notes</label>
-      <textarea id="notes" name="notes" rows="3"
-                placeholder="Any special requirements or questions?"></textarea>
-
-      <input type="hidden" id="config-data" name="config">
-
-      <button type="submit" class="btn-primary">
-        Request Database for <span id="button-price">$17.50/month</span>
-      </button>
-
-      <p class="text-small text-muted">
-        We'll email you within 1-2 hours with payment link and provisioning details.
-      </p>
-    </form>
-
-    <hr>
-
-    <p class="text-center">
-      Questions? Email <a href="mailto:hello@intentsolutions.io">hello@intentsolutions.io</a>
-    </p>
-
-  </main>
-
-  <footer>
-    <p class="text-small">
-      <strong>COSTPLUSDB</strong> - Database hosting at cost + 25%
-    </p>
-    <p class="text-small text-muted">
-      &copy; 2025 intent solutions io |
-      <a href="/privacy.html">Privacy</a> |
-      <a href="/terms.html">Terms</a>
-    </p>
-  </footer>
-
-  <script>
-    // Pricing calculator logic
-    const COSTS = {
-      vps: {
-        contabo: {
-          2: 6, 4: 8, 8: 12, 16: 20, 32: 36, 64: 60
-        },
-        hetzner: {
-          2: 10, 4: 15, 8: 25, 16: 40, 32: 70, 64: 120
-        },
-        digitalocean: {
-          2: 12, 4: 18, 8: 32, 16: 56, 32: 96, 64: 160
-        },
-        aws: {
-          2: 30, 4: 50, 8: 73, 16: 120, 32: 200, 64: 350
-        }
-      },
-      backup_per_gb: 0.0059,
-      monitoring: 1.00,
-      addons: {
-        ha: 99,
-        replicas: 15,
-        vpn: 15,
-        compliance: 100
-      },
-      aws_comparison: {
-        2: 60, 4: 140, 8: 280, 16: 480, 32: 820, 64: 1400
-      }
-    };
-
-    const TIER_CONFIGS = {
-      shared: { ram: 2, storage: 20, provider: 'contabo' },
-      dedicated: { ram: 8, storage: 200, provider: 'contabo' },
-      pro: { ram: 16, storage: 400, provider: 'contabo' },
-      enterprise: { ram: 32, storage: 800, provider: 'hetzner' }
-    };
-
-    function selectTier(tier) {
-      const config = TIER_CONFIGS[tier];
-      document.getElementById('ram').value = config.ram;
-      document.getElementById('storage').value = config.storage;
-      document.getElementById('provider').value = config.provider;
-      updatePrice();
-
-      // Visual feedback
-      document.querySelectorAll('[id^="btn-"]').forEach(btn => {
-        btn.style.background = 'rgba(255,255,255,0.05)';
-      });
-      document.getElementById('btn-' + tier).style.background = 'rgba(255,255,255,0.15)';
-    }
-
-    function updatePrice() {
-      const ram = parseInt(document.getElementById('ram').value);
-      const storage = parseInt(document.getElementById('storage').value);
-      const provider = document.getElementById('provider').value;
-
-      // Get add-ons
-      const addonHa = document.getElementById('addon-ha').checked;
-      const addonReplicas = document.getElementById('addon-replicas').checked;
-      const addonVpn = document.getElementById('addon-vpn').checked;
-      const addonCompliance = document.getElementById('addon-compliance').checked;
-
-      // Calculate costs
-      const vpsCost = COSTS.vps[provider][ram] || 0;
-      const backupCost = Math.max(1, storage * COSTS.backup_per_gb);
-      const monitoringCost = COSTS.monitoring;
-
-      let addonsCost = 0;
-      if (addonHa) addonsCost += COSTS.addons.ha;
-      if (addonReplicas) addonsCost += COSTS.addons.replicas;
-      if (addonVpn) addonsCost += COSTS.addons.vpn;
-      if (addonCompliance) addonsCost += COSTS.addons.compliance;
-
-      const totalCost = vpsCost + backupCost + monitoringCost + addonsCost;
-      const markup = totalCost * 0.25;
-      const yourPrice = totalCost + markup;
-
-      // AWS comparison
-      const awsPrice = COSTS.aws_comparison[ram] || (yourPrice * 15);
-      const savings = awsPrice - yourPrice;
-
-      // Update display
-      document.getElementById('provider-name').textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
-      document.getElementById('ram-display').textContent = ram + 'GB';
-      document.getElementById('storage-display').textContent = storage + 'GB';
-
-      document.getElementById('cost-vps').textContent = '$' + vpsCost.toFixed(2);
-      document.getElementById('cost-backup').textContent = '$' + backupCost.toFixed(2);
-      document.getElementById('cost-monitoring').textContent = '$' + monitoringCost.toFixed(2);
-
-      if (addonsCost > 0) {
-        document.getElementById('cost-addon-row').style.display = 'flex';
-        document.getElementById('cost-addons').textContent = '$' + addonsCost.toFixed(2);
-      } else {
-        document.getElementById('cost-addon-row').style.display = 'none';
-      }
-
-      document.getElementById('cost-total').textContent = '$' + totalCost.toFixed(2);
-      document.getElementById('cost-markup').textContent = '$' + markup.toFixed(2);
-      document.getElementById('price-total').textContent = '$' + yourPrice.toFixed(2);
-      document.getElementById('price-aws').textContent = '$' + awsPrice.toFixed(2);
-      document.getElementById('price-savings').textContent = '$' + savings.toFixed(2);
-
-      document.getElementById('button-price').textContent = '$' + yourPrice.toFixed(2) + '/month';
-
-      // Save config to hidden field
-      const config = {
-        ram, storage, provider,
-        region: document.getElementById('region').value,
-        addons: {
-          ha: addonHa,
-          replicas: addonReplicas,
-          vpn: addonVpn,
-          compliance: addonCompliance
-        },
-        pricing: {
-          ourCost: totalCost,
-          markup: markup,
-          yourPrice: yourPrice
-        }
-      };
-      document.getElementById('config-data').value = JSON.stringify(config);
-    }
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', () => {
-      selectTier('dedicated'); // Default to dedicated tier
-    });
-
-    // Form is handled by Netlify Forms automatically
-    // No JavaScript needed - Netlify processes the form on submission
-  </script>
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Database Calculator</h1>
+      <span class="subtitle">Real-time transparent pricing</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+</ul>
+</nav>
+
+<h2>Configure Your Database</h2>
+
+<p>Adjust the options below and watch the price update in real-time. We show you our exact costs.</p>
+
+<hr>
+
+<h2>Quick Tiers</h2>
+
+<div class="grid">
+<button onclick="selectTier('shared')">SHARED</button>
+<button onclick="selectTier('dedicated')">DEDICATED</button>
+<button onclick="selectTier('pro')">PRO</button>
+<button onclick="selectTier('enterprise')">ENTERPRISE</button>
+</div>
+
+<hr>
+
+<h2>Configuration</h2>
+
+<label for="ram">RAM (GB)</label>
+<select id="ram" onchange="updatePrice()">
+<option value="2">2 GB (Shared)</option>
+<option value="4">4 GB</option>
+<option value="8" selected>8 GB (Dedicated)</option>
+<option value="16">16 GB (Pro)</option>
+<option value="32">32 GB (Enterprise)</option>
+<option value="64">64 GB (Custom)</option>
+</select>
+
+<label for="storage">Storage (GB)</label>
+<select id="storage" onchange="updatePrice()">
+<option value="20">20 GB</option>
+<option value="50">50 GB</option>
+<option value="100">100 GB</option>
+<option value="200" selected>200 GB</option>
+<option value="400">400 GB</option>
+<option value="800">800 GB</option>
+<option value="1000">1 TB</option>
+</select>
+
+<label for="provider">Infrastructure Provider</label>
+<select id="provider" onchange="updatePrice()">
+<option value="contabo" selected>Contabo (Default - Best Value)</option>
+<option value="hetzner">Hetzner (Premium EU)</option>
+<option value="digitalocean">DigitalOcean (Global)</option>
+<option value="aws">AWS (Enterprise Compliance)</option>
+</select>
+
+<label for="region">Region</label>
+<select id="region" onchange="updatePrice()">
+<option value="default" selected>Default (Germany / US East)</option>
+<option value="eu-central">EU Central (GDPR)</option>
+<option value="us-east">US East</option>
+<option value="us-west">US West</option>
+<option value="asia">Asia Pacific</option>
+</select>
+
+<details>
+<summary>Advanced Options</summary>
+
+<label>
+<input type="checkbox" id="addon-ha" onchange="updatePrice()">
+High Availability - <strong>+$99/mo</strong>
+</label>
+
+<label>
+<input type="checkbox" id="addon-replicas" onchange="updatePrice()">
+Read Replicas - <strong>+$15/mo</strong>
+</label>
+
+<label>
+<input type="checkbox" id="addon-vpn" onchange="updatePrice()">
+VPN Access - <strong>+$15/mo</strong>
+</label>
+
+<label>
+<input type="checkbox" id="addon-compliance" onchange="updatePrice()">
+Compliance Package - <strong>+$100/mo</strong>
+</label>
+
+</details>
+
+<hr>
+
+<h2>Your Pricing (Live)</h2>
+
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPS (<span id="provider-name">Contabo</span>, <span id="ram-display">8GB</span>)</td>
+<td id="cost-vps">$12.00</td>
+</tr>
+<tr>
+<td>Backups (<span id="storage-display">200GB</span>)</td>
+<td id="cost-backup">$1.00</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td id="cost-monitoring">$1.00</td>
+</tr>
+<tr id="cost-addon-row" class="hidden">
+<td>Add-ons</td>
+<td id="cost-addons">$0.00</td>
+</tr>
+<tr>
+<td><strong>TOTAL OUR COST</strong></td>
+<td><strong id="cost-total">$14.00</strong></td>
+</tr>
+<tr>
+<td>Our Markup (25%)</td>
+<td id="cost-markup">$3.50</td>
+</tr>
+<tr>
+<td><strong>YOUR MONTHLY PRICE</strong></td>
+<td><strong id="price-total">$17.50</strong></td>
+</tr>
+<tr>
+<td>AWS RDS Equivalent</td>
+<td id="price-aws">$280.00</td>
+</tr>
+<tr>
+<td><strong>YOU SAVE</strong></td>
+<td><strong id="price-savings">$262.50</strong></td>
+</tr>
+</tbody>
+</table>
+
+<details>
+<summary>How did we calculate this?</summary>
+<ul>
+<li><strong>VPS costs</strong>: Actual pricing from provider websites</li>
+<li><strong>Backup costs</strong>: Wasabi S3 storage ($0.0059/GB/month)</li>
+<li><strong>Monitoring</strong>: Betterstack Pro ($1/month per database)</li>
+<li><strong>AWS comparison</strong>: db.t3.medium or equivalent RDS pricing</li>
+</ul>
+<p>See our <a href="/transparency/cost-breakdown.html">full cost breakdown</a>.</p>
+</details>
+
+<hr>
+
+<h2>Request Database</h2>
+
+<p>Once you're happy with your configuration, submit your request and we'll email you within 1-2 hours with payment details.</p>
+
+<form name="database-request" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+
+<p class="hidden">
+<label>Don't fill this out: <input name="bot-field"></label>
+</p>
+
+<label for="email">Email Address *</label>
+<input type="email" id="email" name="email" required>
+
+<label for="company">Company Name (optional)</label>
+<input type="text" id="company" name="company">
+
+<label for="notes">Additional Notes</label>
+<textarea id="notes" name="notes" rows="3"></textarea>
+
+<input type="hidden" id="config-data" name="config">
+
+<button type="submit">
+Request Database for <span id="button-price">$17.50/month</span>
+</button>
+
+<p>We'll email you within 1-2 hours with payment link and provisioning details.</p>
+
+</form>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+<p>&copy; 2025 intent solutions io | <a href="/privacy.html">Privacy</a> | <a href="/terms.html">Terms</a></p>
+</footer>
+
+<script>
+const COSTS = {
+  vps: {
+    contabo: { 2: 6, 4: 8, 8: 12, 16: 20, 32: 36, 64: 60 },
+    hetzner: { 2: 10, 4: 15, 8: 25, 16: 40, 32: 70, 64: 120 },
+    digitalocean: { 2: 12, 4: 18, 8: 32, 16: 56, 32: 96, 64: 160 },
+    aws: { 2: 30, 4: 50, 8: 73, 16: 120, 32: 200, 64: 350 }
+  },
+  backup_per_gb: 0.0059,
+  monitoring: 1.00,
+  addons: { ha: 99, replicas: 15, vpn: 15, compliance: 100 },
+  aws_comparison: { 2: 60, 4: 140, 8: 280, 16: 480, 32: 820, 64: 1400 }
+};
+
+const TIER_CONFIGS = {
+  shared: { ram: 2, storage: 20, provider: 'contabo' },
+  dedicated: { ram: 8, storage: 200, provider: 'contabo' },
+  pro: { ram: 16, storage: 400, provider: 'contabo' },
+  enterprise: { ram: 32, storage: 800, provider: 'hetzner' }
+};
+
+function selectTier(tier) {
+  const config = TIER_CONFIGS[tier];
+  document.getElementById('ram').value = config.ram;
+  document.getElementById('storage').value = config.storage;
+  document.getElementById('provider').value = config.provider;
+  updatePrice();
+}
+
+function updatePrice() {
+  const ram = parseInt(document.getElementById('ram').value);
+  const storage = parseInt(document.getElementById('storage').value);
+  const provider = document.getElementById('provider').value;
+
+  const addonHa = document.getElementById('addon-ha').checked;
+  const addonReplicas = document.getElementById('addon-replicas').checked;
+  const addonVpn = document.getElementById('addon-vpn').checked;
+  const addonCompliance = document.getElementById('addon-compliance').checked;
+
+  const vpsCost = COSTS.vps[provider][ram] || 0;
+  const backupCost = Math.max(1, storage * COSTS.backup_per_gb);
+  const monitoringCost = COSTS.monitoring;
+
+  let addonsCost = 0;
+  if (addonHa) addonsCost += COSTS.addons.ha;
+  if (addonReplicas) addonsCost += COSTS.addons.replicas;
+  if (addonVpn) addonsCost += COSTS.addons.vpn;
+  if (addonCompliance) addonsCost += COSTS.addons.compliance;
+
+  const totalCost = vpsCost + backupCost + monitoringCost + addonsCost;
+  const markup = totalCost * 0.25;
+  const yourPrice = totalCost + markup;
+  const awsPrice = COSTS.aws_comparison[ram] || (yourPrice * 15);
+  const savings = awsPrice - yourPrice;
+
+  document.getElementById('provider-name').textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
+  document.getElementById('ram-display').textContent = ram + 'GB';
+  document.getElementById('storage-display').textContent = storage + 'GB';
+  document.getElementById('cost-vps').textContent = '$' + vpsCost.toFixed(2);
+  document.getElementById('cost-backup').textContent = '$' + backupCost.toFixed(2);
+  document.getElementById('cost-monitoring').textContent = '$' + monitoringCost.toFixed(2);
+
+  if (addonsCost > 0) {
+    document.getElementById('cost-addon-row').classList.remove('hidden');
+    document.getElementById('cost-addons').textContent = '$' + addonsCost.toFixed(2);
+  } else {
+    document.getElementById('cost-addon-row').classList.add('hidden');
+  }
+
+  document.getElementById('cost-total').textContent = '$' + totalCost.toFixed(2);
+  document.getElementById('cost-markup').textContent = '$' + markup.toFixed(2);
+  document.getElementById('price-total').textContent = '$' + yourPrice.toFixed(2);
+  document.getElementById('price-aws').textContent = '$' + awsPrice.toFixed(2);
+  document.getElementById('price-savings').textContent = '$' + savings.toFixed(2);
+  document.getElementById('button-price').textContent = '$' + yourPrice.toFixed(2) + '/month';
+
+  const config = {
+    ram, storage, provider,
+    region: document.getElementById('region').value,
+    addons: { ha: addonHa, replicas: addonReplicas, vpn: addonVpn, compliance: addonCompliance },
+    pricing: { ourCost: totalCost, markup: markup, yourPrice: yourPrice }
+  };
+  document.getElementById('config-data').value = JSON.stringify(config);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  selectTier('dedicated');
+});
+</script>
 
 </body>
 </html>

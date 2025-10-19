@@ -1,0 +1,83 @@
+/**
+ * CostPlusDB Theme
+ *
+ * Based on The Monospace Web by Oskar Wickström
+ * https://github.com/owickstrom/the-monospace-web
+ *
+ * Using OG Courier font by Darren Embry
+ * https://github.com/dse/font-og-courier
+ */
+
+/* OG Courier Font */
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-BoldItalic.woff2') format('woff2');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Override colors and font */
+:root {
+  --font-family: 'OG Courier', 'Courier New', monospace;
+  --background-color: #0f62fe;
+  --text-color: #ffffff;
+  --text-color-alt: rgba(255, 255, 255, 0.7);
+  --background-color-alt: #0353e9;
+}
+
+/* Force theme (no dark mode detection) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0f62fe;
+    --text-color: #ffffff;
+    --text-color-alt: rgba(255, 255, 255, 0.7);
+    --background-color-alt: #0353e9;
+  }
+}
+
+html {
+  background: var(--background-color);
+}
+
+body {
+  background: var(--background-color);
+  color: var(--text-color);
+}
+
+a:link, a:visited {
+  color: var(--text-color);
+}
+
+/* Utility classes */
+.hidden {
+  display: none;
+}
+
+.text-center {
+  text-align: center;
+}
