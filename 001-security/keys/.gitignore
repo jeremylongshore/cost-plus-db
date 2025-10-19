@@ -1,0 +1,4 @@
+# NEVER commit encryption keys, passphrases, or credentials to git!
+*
+!.gitignore
+!README.md

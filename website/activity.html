@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Activity Log - CostPlusDB</title>
+  <meta name="description" content="Real-time transparency - see everything we do">
+
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">CostPlusDB Activity Log</h1>
+      <span class="subtitle">Real-time transparency - see everything we do</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/docs.html">Docs</a></li>
+<li><a href="/activity.html">Activity Log</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+<li><a href="/security.html">Security</a></li>
+</ul>
+</nav>
+
+<h2>Operations Activity Feed</h2>
+
+<p>This page shows every action we take on CostPlusDB infrastructure. Updated in real-time.</p>
+
+<p><strong>Last Updated:</strong> <time>2025-10-19 12:20 CST</time></p>
+
+<hr>
+
+<h3>Today - October 19, 2025</h3>
+
+<details open>
+<summary><strong>02:00 AM CST</strong> - 🔒 Daily Automated Backups Started</summary>
+<pre>
+Action: Automated database backups
+Status: ✅ Completed successfully
+
+Backup Details:
+├─ Local repo (repo1): ✅ Complete (4.2 MB)
+├─ Cloud repo (Wasabi S3): ✅ Complete (4.2 MB)
+├─ Databases backed up: 1 (testcustomer_db)
+├─ Duration: 2 minutes 15 seconds
+└─ Next backup: Tomorrow at 2:00 AM CST
+
+All customer databases included in this backup.
+Encrypted with AES-256-CBC.
+</pre>
+</details>
+
+<details>
+<summary><strong>03:00 AM CST</strong> - 🔧 Security Updates Applied</summary>
+<pre>
+Action: Applied weekly security updates
+Status: ✅ Completed successfully
+
+Updates Applied:
+├─ postgresql-18 security patch (18.0.1)
+├─ openssl update (3.0.13)
+├─ fail2ban configuration refresh
+└─ System reboot: NOT required
+
+Duration: 8 minutes
+No customer impact.
+</pre>
+</details>
+
+<hr>
+
+<h3>October 18, 2025</h3>
+
+<details>
+<summary><strong>02:00 AM CST</strong> - 🔒 Daily Automated Backups</summary>
+<pre>
+Status: ✅ Completed
+Local: 4.1 MB | Cloud: 4.1 MB
+Duration: 2 min 10 sec
+</pre>
+</details>
+
+<details>
+<summary><strong>10:15 AM CST</strong> - 📊 Backup Verification Test</summary>
+<pre>
+Action: Monthly backup restoration test
+Status: ✅ Passed
+
+Test Results:
+├─ Restored from: Wasabi S3 cloud backup
+├─ Restoration time: 3 minutes 45 seconds
+├─ Data integrity: ✅ Verified (all row counts match)
+└─ Conclusion: Backups are working correctly
+
+Next test: November 18, 2025
+</pre>
+</details>
+
+<hr>
+
+<h3>October 17, 2025</h3>
+
+<details>
+<summary><strong>02:00 AM CST</strong> - 🔒 Daily Automated Backups</summary>
+<pre>
+Status: ✅ Completed
+Local: 4.0 MB | Cloud: 4.0 MB
+Duration: 2 min 8 sec
+</pre>
+</details>
+
+<hr>
+
+<h3>October 16, 2025</h3>
+
+<details>
+<summary><strong>02:00 AM CST</strong> - 🔒 Daily Automated Backups</summary>
+<pre>
+Status: ✅ Completed
+Local: 3.9 MB | Cloud: 3.9 MB
+Duration: 2 min 12 sec
+</pre>
+</details>
+
+<hr>
+
+<h3>October 15, 2025</h3>
+
+<details>
+<summary><strong>02:00 AM CST</strong> - 🔒 Daily Automated Backups</summary>
+<pre>
+Status: ✅ Completed
+Local: 3.9 MB | Cloud: 3.9 MB
+Duration: 2 min 5 sec
+</pre>
+</details>
+
+<details>
+<summary><strong>03:00 PM CST</strong> - ⚠️ Scheduled Maintenance Notification</summary>
+<pre>
+Action: Advanced notice of upcoming maintenance
+Scheduled: October 20, 2025 at 3:00 AM CST
+
+Maintenance Details:
+├─ What: PostgreSQL minor version update (18.0 → 18.1)
+├─ Expected downtime: 10-15 minutes
+├─ Impact: Brief connection interruption
+└─ Backup: Will be taken before maintenance
+
+Customers notified via email.
+</pre>
+</details>
+
+<hr>
+
+<h2>Subscribe to Updates</h2>
+
+<p>Want to see these updates in real-time? Three options:</p>
+
+<h3>Option 1: Bookmark This Page</h3>
+<p>Bookmark this page and check daily. We update it every time we take action.</p>
+
+<h3>Option 2: RSS Feed (Coming Soon)</h3>
+<p>Subscribe to our RSS feed in your feed reader.</p>
+
+<h3>Option 3: Calendar Subscription</h3>
+<p>Add our operations calendar to your calendar app:</p>
+<ul>
+<li><strong>Apple Calendar / Outlook:</strong> Add calendar by URL: <code>[Your iCal URL]</code></li>
+<li><strong>Google Calendar:</strong> <a href="[Your public URL]" target="_blank">Click here to add</a></li>
+</ul>
+
+<hr>
+
+<h2>Activity Types</h2>
+
+<table>
+<thead>
+<tr>
+<th>Icon</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔒</td>
+<td>Backups</td>
+<td>Daily automated backups (2:00 AM CST)</td>
+</tr>
+<tr>
+<td>🔧</td>
+<td>Maintenance</td>
+<td>Security updates, system patches</td>
+</tr>
+<tr>
+<td>📊</td>
+<td>Verification</td>
+<td>Backup tests, health checks</td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td>Scheduled</td>
+<td>Upcoming maintenance (7+ days notice)</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td>Incident</td>
+<td>Issues requiring immediate action</td>
+</tr>
+<tr>
+<td>✅</td>
+<td>Resolution</td>
+<td>Incidents resolved</td>
+</tr>
+<tr>
+<td>🆕</td>
+<td>New Customer</td>
+<td>Customer provisioned</td>
+</tr>
+<tr>
+<td>💰</td>
+<td>Billing</td>
+<td>Monthly invoices sent</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Transparency Promise</h2>
+
+<p><strong>Every action we take appears here.</strong></p>
+
+<ul>
+<li>✅ Daily backups</li>
+<li>✅ Security updates</li>
+<li>✅ System maintenance</li>
+<li>✅ Customer provisioning</li>
+<li>✅ Incidents and resolutions</li>
+<li>✅ Infrastructure changes</li>
+</ul>
+
+<p>If we do it, you see it. That's the CostPlusDB way.</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a> |
+<a href="/security.html">Security</a></p>
+</footer>
+
+</body>
+</html>
