@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Cost Calculations - CostPlusDB</title>
+  <meta name="description" content="Detailed cost calculation examples showing exactly how we price">
+
+  <link rel="stylesheet" href="../src/reset.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <link rel="stylesheet" href="../src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Cost Calculations</h1>
+      <span class="subtitle">Detailed pricing examples</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/transparency/">← Back</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+</ul>
+</nav>
+
+<h2>Calculation Methodology</h2>
+
+<ul>
+<li><strong>Base Tier Price:</strong> Fixed (e.g., $89 for Dedicated)</li>
+<li><strong>Infrastructure Upgrade:</strong> Customer Price = Our Cost × 1.25 (added to base)</li>
+<li><strong>Add-ons:</strong> Customer Price = Our Cost × 1.25</li>
+<li><strong>Total:</strong> Sum of base + upgrades + add-ons</li>
+<li><strong>Savings Comparison:</strong> Based on equivalent AWS RDS or similar managed DB pricing (~$140-280/month for base specs)</li>
+</ul>
+
+<hr>
+
+<h2>Example 1: Bootstrapped Startup</h2>
+<p><strong>Scenario:</strong> A solo developer needs a production PostgreSQL DB for a SaaS app. Uses default Contabo infrastructure.</p>
+
+<h3>Calculation</h3>
+<ol>
+<li>Base: Dedicated Tier = $89 (includes management, backups, support)</li>
+<li>Infrastructure: Contabo (default) – Our Cost = $10 → Customer Price = $0 add-on (included in base)</li>
+<li>Add-ons: None</li>
+<li><strong>Total Monthly:</strong> $89</li>
+</ol>
+
+<h3>Invoice Breakdown</h3>
+<pre>
+Base: Dedicated Tier                                $89.00
+Infrastructure (Contabo): Our Cost $10 → Included    $0.00
+Total:                                              $89.00
+Savings vs. AWS:                                    $51.00
+</pre>
+
+<p><strong>Our Margin:</strong> Base (85% after $10 infra + $1 overhead = $78 profit) + 25% on any future add-ons</p>
+<p><strong>Comparison:</strong> AWS RDS equivalent ~$140/month. <strong>Savings: $51/month (36% cheaper)</strong></p>
+
+<hr>
+
+<h2>Example 2: EU SaaS Company</h2>
+<p><strong>Scenario:</strong> A bootstrapped team in Europe needs GDPR-compliant hosting in Finland.</p>
+
+<h3>Calculation</h3>
+<ol>
+<li>Base: Dedicated Tier = $89</li>
+<li>Infrastructure Upgrade: Hetzner – Our Cost = $10.65 → Customer Price = $13.31 (add-on: +$13.31)</li>
+<li>Region Selection: EU (Finland) – Our Cost = $8 → Customer Price = $10</li>
+<li><strong>Total Monthly:</strong> $89 + $13.31 + $10 = $112.31</li>
+</ol>
+
+<h3>Invoice Breakdown</h3>
+<pre>
+Base: Dedicated Tier                                $89.00
+Infrastructure (Hetzner): Our Cost $10.65 → $13.31  +$13.31
+Region (EU Finland): Our Cost $8 → $10             +$10.00
+Total:                                             $112.31
+Savings vs. AWS EU:                                $87.69
+</pre>
+
+<p><strong>Our Margin:</strong> 25% on upgrades ($2.66) + 25% on region ($2) + base 85%</p>
+<p><strong>Comparison:</strong> AWS RDS EU ~$200/month. <strong>Savings: $87.69/month (44% cheaper)</strong></p>
+
+<hr>
+
+<h2>Example 3: Growing Startup</h2>
+<p><strong>Scenario:</strong> A high-traffic app needs scaling with Contabo default.</p>
+
+<h3>Calculation</h3>
+<ol>
+<li>Base: Pro Tier = $129</li>
+<li>Infrastructure: Contabo (default) – $0 add-on</li>
+<li>High Availability: Our Cost = $20 → Customer Price = $25</li>
+<li>2× Read Replicas: Our Cost = $20 → Customer Price = $25</li>
+<li>Extra 200GB Storage: Our Cost = $4 → Customer Price = $5</li>
+<li><strong>Total Monthly:</strong> $129 + $25 + $25 + $5 = $184</li>
+</ol>
+
+<h3>Invoice Breakdown</h3>
+<pre>
+Base: Pro Tier                                      $129.00
+High Availability: Our Cost $20 → $25              +$25.00
+2× Read Replicas: Our Cost $20 → $25               +$25.00
+Extra 200GB: Our Cost $4 → $5                      +$5.00
+Total:                                             $184.00
+Savings vs. AWS:                                   $316.00
+</pre>
+
+<p><strong>Our Margin:</strong> 25% on all add-ons + base 84%</p>
+<p><strong>Comparison:</strong> AWS with replicas ~$500/month. <strong>Savings: $316/month (63% cheaper)</strong></p>
+
+<hr>
+
+<h2>Example 4: Healthcare Startup</h2>
+<p><strong>Scenario:</strong> HIPAA-compliant setup with global reach.</p>
+
+<h3>Calculation</h3>
+<ol>
+<li>Base: Enterprise Tier = $149</li>
+<li>Infrastructure Upgrade: AWS – Our Cost = $86 → Customer Price = $107.50 (add-on: +$107.50)</li>
+<li>Compliance Package: Our Cost = $80 → Customer Price = $100</li>
+<li>VPN Access: Our Cost = $12 → Customer Price = $15</li>
+<li>Extra 300GB Storage: Our Cost = $24 → Customer Price = $30</li>
+<li><strong>Total Monthly:</strong> $149 + $107.50 + $100 + $15 + $30 = $401.50</li>
+</ol>
+
+<h3>Invoice Breakdown</h3>
+<pre>
+Base: Enterprise Tier                               $149.00
+Infrastructure (AWS): Our Cost $86 → $107.50       +$107.50
+Compliance: Our Cost $80 → $100                    +$100.00
+VPN: Our Cost $12 → $15                            +$15.00
+Extra 300GB: Our Cost $24 → $30                    +$30.00
+Total:                                             $401.50
+Savings vs. AWS:                                   $548.50
+</pre>
+
+<p><strong>Our Margin:</strong> 25% on all add-ons + base 80%</p>
+<p><strong>Comparison:</strong> AWS RDS + compliance ~$950/month. <strong>Savings: $548.50/month (58% cheaper)</strong></p>
+
+<hr>
+
+<h2>Example 5: Enterprise CTO</h2>
+<p><strong>Scenario:</strong> Brand-conscious team with global needs.</p>
+
+<h3>Calculation</h3>
+<ol>
+<li>Base: Pro Tier = $129</li>
+<li>Infrastructure Upgrade: DigitalOcean – Our Cost = $48 → Customer Price = $60 (add-on: +$60)</li>
+<li>Custom Monitoring: Our Cost = $50 → Customer Price = $62.50</li>
+<li><strong>Total Monthly:</strong> $129 + $60 + $62.50 = $251.50</li>
+</ol>
+
+<h3>Invoice Breakdown</h3>
+<pre>
+Base: Pro Tier                                      $129.00
+Infrastructure (DO): Our Cost $48 → $60            +$60.00
+Custom Monitoring: Our Cost $50 → $62.50           +$62.50
+Total:                                             $251.50
+Savings vs. DO Managed:                            $48.50
+</pre>
+
+<p><strong>Our Margin:</strong> 25% on upgrades + 25% on monitoring + base 84%</p>
+<p><strong>Comparison:</strong> DigitalOcean Managed DB ~$300/month. <strong>Savings: $48.50/month (16% cheaper)</strong></p>
+
+<hr>
+
+<h2>Formula Reference</h2>
+
+<p>For quick calculations:</p>
+
+<pre>
+Total = Base Tier + Σ(Infrastructure Upgrades × 1.25) + Σ(Add-ons × 1.25)
+
+Our Margin = (Customer Price - Our Cost) / Customer Price × 100%
+</pre>
+
+<hr>
+
+<h2>Cost Components by Provider</h2>
+
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Our Base Cost</th>
+<th>Storage Cost/GB</th>
+<th>Network Cost/GB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contabo</td>
+<td>$10/month</td>
+<td>$0.02</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Hetzner</td>
+<td>$10.65/month</td>
+<td>$0.02</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>DigitalOcean</td>
+<td>$48/month</td>
+<td>$0.10</td>
+<td>$0.01</td>
+</tr>
+<tr>
+<td>AWS</td>
+<td>$86/month</td>
+<td>$0.08</td>
+<td>$0.09</td>
+</tr>
+<tr>
+<td>GCP</td>
+<td>$98/month</td>
+<td>$0.10</td>
+<td>$0.12</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Transparency Commitment</h2>
+
+<p>Every invoice shows:</p>
+<ul>
+<li>Base tier cost</li>
+<li>Each infrastructure component with our cost and your price</li>
+<li>Each add-on with our cost and your price</li>
+<li>Total comparison to equivalent managed service</li>
+<li>Your monthly savings</li>
+</ul>
+
+<h2>Custom Quotes</h2>
+
+<p>For configurations not listed above:</p>
+<ol>
+<li>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> with your requirements</li>
+<li>We'll provide exact provider costs + 25% markup</li>
+<li>No hidden fees, no surprises</li>
+<li>All quotes valid for 30 days</li>
+</ol>
+
+<hr>
+
+<p class="text-muted">
+<strong>Last Updated:</strong> October 19, 2025<br>
+<strong>Version:</strong> 1.0
+</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a></p>
+</footer>
+
+</body>
+</html>

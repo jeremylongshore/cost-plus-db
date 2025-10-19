@@ -101,11 +101,54 @@ The SOPs in `005-DR-SOPS-postgresql-operations.md` define the complete operation
 - **Security**: UFW firewall, fail2ban, SSH key authentication only
 - **Naming Convention**: References to "FairDB" in SOPs should be understood as "CostPlusDB" (rebranding in progress)
 
-## Development
+## Website Development
 
-**Current State**: The project is in the planning/documentation phase.
+The `website/` directory contains a static website built with vanilla HTML/CSS/JavaScript:
+
+### Local Development
+
+```bash
+cd website
+python3 -m http.server 8000
+# Open http://localhost:8000
+```
+
+### Deployment
+
+The site is configured for Netlify deployment with automatic GitHub integration:
+- Base directory: `website`
+- Publish directory: `.` (relative to base)
+- Deploy on push to `main` branch
+
+Configuration is in `website/netlify.toml` including security headers, redirects, and form handling.
+
+### Website Structure
+
+- **Static Pages**: `index.html`, `calculator.html`, `about.html`, `privacy.html`, `terms.html`
+- **CSS**: Located in `src/` directory (`reset.css`, `index.css`, `theme.css`)
+- **Pricing Calculator**: Inline JavaScript in `calculator.html` with hardcoded pricing tiers
+- **Forms**: Netlify Forms integration (no backend required)
+- **Transparency Section**: `transparency/index.html` links to business documentation
+
+### Updating Pricing
+
+To update pricing in the calculator:
+1. Edit the JavaScript in `website/calculator.html`
+2. Look for the tier configurations and cost constants
+3. Tiers are: Shared ($49), Dedicated ($89), Pro ($129), Enterprise ($149)
+4. After editing, test locally before deploying
+
+### Design System
+
+- Based on [The Monospace Web](https://github.com/owickstrom/the-monospace-web) framework
+- Uses system fonts (monospace)
+- Custom theme colors defined in `src/theme.css`
+- Responsive tables and character-based layout
+
+## Backend Development
+
+**Current State**: The `backend/` and `scripts/` directories are empty placeholders.
 
 **Future Development**: Once SOPs are finalized and infrastructure is operational:
 - `backend/` - Will contain customer provisioning automation, billing, and API services
 - `scripts/` - Will contain operational automation scripts referenced in SOPs
-- `website/` - Will contain marketing site and customer dashboard

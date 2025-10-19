@@ -88,7 +88,7 @@ Wait 30-60 seconds for first deploy to complete.
 3. Choose: **"Email notification"**
 4. Configure:
    ```
-   Email to notify: hello@intentsolutions.io
+   Email to notify: jeremy@intentsolutions.io
    Form: database-request
    ```
 5. **Save**
@@ -100,7 +100,7 @@ Now when someone submits the calculator form, you get an email instantly!
 1. Go to: `https://costplusdb.netlify.app/calculator.html`
 2. Fill out the form with test data
 3. Submit
-4. Check your email at `hello@intentsolutions.io`
+4. Check your email at `jeremy@intentsolutions.io`
 5. Check Netlify dashboard: **Forms** → You'll see the submission
 
 ---
@@ -209,7 +209,7 @@ python3 -m http.server 8000
 
 1. **Customer fills out:** Calculator form on your site
 2. **Netlify receives:** Form data automatically
-3. **You get email:** Instant notification at `hello@intentsolutions.io`
+3. **You get email:** Instant notification at `jeremy@intentsolutions.io`
 4. **Customer sees:** Thank you page
 5. **You review:**
    - Check Netlify Forms dashboard
@@ -222,6 +222,8 @@ python3 -m http.server 8000
 Subject: New form submission - database-request
 
 From: Netlify
+
+To: jeremy@intentsolutions.io
 
 email: customer@example.com
 company: Acme Corp

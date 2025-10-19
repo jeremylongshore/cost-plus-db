@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Business Overview - CostPlusDB</title>
+  <meta name="description" content="Complete business plan and philosophy">
+
+  <link rel="stylesheet" href="../src/reset.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <link rel="stylesheet" href="../src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Business Overview</h1>
+      <span class="subtitle">Our plan, values, and vision</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/transparency/">← Back</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+</ul>
+</nav>
+
+<h2>CostPlusDB: Transparent, Affordable, Managed PostgreSQL</h2>
+
+<p><strong>Version:</strong> 1.0 | <strong>Last Updated:</strong> October 2025</p>
+
+<hr>
+
+<h2>Executive Summary</h2>
+
+<p>CostPlusDB is a managed PostgreSQL database service built on radical transparency. We show customers exactly what we pay for infrastructure and charge cost + 25%. No hidden fees, no surprise bills.</p>
+
+<h3>The Problem</h3>
+<p>Major cloud providers mark up database hosting by 500-2000%:</p>
+<ul>
+<li>AWS RDS charges $280/month for $12 of infrastructure (2,233% markup)</li>
+<li>Google Cloud SQL charges $275/month for the same (2,192% markup)</li>
+<li>Customers can't see the actual costs and have no choice but to pay</li>
+</ul>
+
+<h3>Our Solution</h3>
+<p>Transparent cost-plus pricing:</p>
+<ul>
+<li>Show exact infrastructure costs on every invoice</li>
+<li>Fixed 25% markup on all variable costs</li>
+<li>Customer choice of infrastructure provider</li>
+<li>Fixed-price tiers for simplicity ($49, $89, $129, $149/month)</li>
+</ul>
+
+<hr>
+
+<h2>Business Model</h2>
+
+<h3>Revenue Streams</h3>
+<ol>
+<li><strong>Base Tiers (Fixed Pricing):</strong> $49-149/month with 80-96% margins (high because we're transparent on add-ons)</li>
+<li><strong>Infrastructure Upgrades:</strong> 25% markup on premium providers (Hetzner, DigitalOcean, AWS)</li>
+<li><strong>Enterprise Add-ons:</strong> 25% markup on HA, replicas, compliance, VPN</li>
+<li><strong>One-time Services:</strong> Managed migrations ($200-1000)</li>
+</ol>
+
+<h3>Target Market</h3>
+<ul>
+<li><strong>Primary:</strong> Bootstrapped startups and indie developers (90% of customers)</li>
+<li><strong>Secondary:</strong> Small businesses moving off AWS to reduce costs (10%)</li>
+<li><strong>Customer Profile:</strong> Technical founders, budget-conscious CTOs, long-term thinkers</li>
+</ul>
+
+<h3>Competitive Advantage</h3>
+<ol>
+<li><strong>Transparency:</strong> Only managed DB provider showing exact costs</li>
+<li><strong>Price:</strong> 40-70% cheaper than AWS/Google/Azure</li>
+<li><strong>Simplicity:</strong> Solo operator, direct support, no corporate bureaucracy</li>
+<li><strong>Trust:</strong> All SOPs and business docs public on GitHub</li>
+</ol>
+
+<hr>
+
+<h2>Technical Architecture</h2>
+
+<h3>Infrastructure Stack</h3>
+<ul>
+<li><strong>Compute:</strong> Contabo VPS (default), Hetzner, DigitalOcean, AWS/GCP (optional)</li>
+<li><strong>Database:</strong> PostgreSQL 13-16, configurable by customer</li>
+<li><strong>Backups:</strong> pgBackRest + Wasabi S3 (30-day retention, 7-day PITR)</li>
+<li><strong>Monitoring:</strong> Betterstack for uptime/performance alerts</li>
+<li><strong>Security:</strong> UFW firewall, fail2ban, SSH key auth only, TLS/SSL enforced</li>
+<li><strong>Connection Pooling:</strong> pgBouncer for efficient connections</li>
+</ul>
+
+<h3>Service Levels</h3>
+<ul>
+<li><strong>Uptime SLA:</strong> 99.9% (measured monthly, not 99.999%)</li>
+<li><strong>Support SLA:</strong> 4-hour response (M-F, 9am-6pm ET), email only</li>
+<li><strong>Backup Schedule:</strong> Daily automated, tested monthly</li>
+<li><strong>Security Patches:</strong> Applied within 7 days of release</li>
+</ul>
+
+<hr>
+
+<h2>Growth Plan</h2>
+
+<h3>Phase 1: Bootstrap (Month 0-12)</h3>
+<ul>
+<li><strong>Goal:</strong> 20-50 customers, $5-15k MRR</li>
+<li><strong>Focus:</strong> Manual operations, build SOPs, refine pricing</li>
+<li><strong>Infrastructure:</strong> Rent VPS from Contabo/Hetzner</li>
+<li><strong>Profit Use:</strong> Save 100% for hardware purchase</li>
+</ul>
+
+<h3>Phase 2: Own Hardware (Month 12-18)</h3>
+<ul>
+<li><strong>Goal:</strong> Purchase 2 dedicated servers, colocation in US datacenter</li>
+<li><strong>Investment:</strong> $8,000 upfront + $200/month colo fees</li>
+<li><strong>Benefit:</strong> Reduce infrastructure costs 50%, pass savings to customers</li>
+<li><strong>Capacity:</strong> 50-100 databases on owned hardware</li>
+</ul>
+
+<h3>Phase 3: Multi-Region (Month 18-36)</h3>
+<ul>
+<li><strong>Goal:</strong> Add EU or Asia datacenter</li>
+<li><strong>Offer:</strong> High availability across regions</li>
+<li><strong>Pricing:</strong> Still 25% markup, just lower base costs</li>
+</ul>
+
+<hr>
+
+<h2>Financial Model</h2>
+
+<h3>Customer Acquisition</h3>
+<ul>
+<li><strong>Cost:</strong> $0 (no paid ads, organic only)</li>
+<li><strong>Channels:</strong> Hacker News, Reddit, Twitter, word of mouth</li>
+<li><strong>Growth Rate:</strong> 5-10 customers/month (slow, sustainable)</li>
+</ul>
+
+<h3>Unit Economics (Dedicated Tier Example)</h3>
+<pre>
+Customer pays:           $89/month
+Our costs:
+  - Infrastructure:      $10
+  - Backup storage:      $1
+  - Monitoring:          $1
+  - Support (amortized): $5
+  - Total:               $17
+
+Gross profit:            $72/month (81% margin)
+LTV (24 months):         $1,728
+CAC:                     $0
+LTV/CAC:                 Infinite
+</pre>
+
+<h3>Break-Even Analysis</h3>
+<ul>
+<li><strong>Fixed Costs:</strong> $500/month (tools, domain, LLC, insurance)</li>
+<li><strong>Break-Even:</strong> 7 customers on Dedicated tier</li>
+<li><strong>Sustainability:</strong> 20 customers = $1,440/month profit (covers part-time labor)</li>
+</ul>
+
+<hr>
+
+<h2>Competitive Analysis</h2>
+
+<h3>vs. AWS RDS</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>AWS RDS</th>
+<th>CostPlusDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8GB RAM, 200GB</td>
+<td>$280/month</td>
+<td>$89/month</td>
+</tr>
+<tr>
+<td>Pricing transparency</td>
+<td>Hidden costs</td>
+<td>Show exact costs</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>Paid ($100+)</td>
+<td>Included</td>
+</tr>
+<tr>
+<td>Uptime SLA</td>
+<td>99.95%</td>
+<td>99.9%</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Enterprise</td>
+<td>Bootstrappers</td>
+</tr>
+</tbody>
+</table>
+
+<h3>vs. Heroku Postgres</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Heroku</th>
+<th>CostPlusDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8GB RAM, 200GB</td>
+<td>$250/month</td>
+<td>$89/month</td>
+</tr>
+<tr>
+<td>Fork/follow</td>
+<td>Easy</td>
+<td>Manual (future)</td>
+</tr>
+<tr>
+<td>Dev friendly</td>
+<td>Very</td>
+<td>Moderately</td>
+</tr>
+<tr>
+<td>Infrastructure choice</td>
+<td>None</td>
+<td>5 providers</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Risk Mitigation</h2>
+
+<h3>Technical Risks</h3>
+<ol>
+<li><strong>VPS failure:</strong> Mitigation: Daily backups, documented restore procedure, tested monthly</li>
+<li><strong>Security breach:</strong> Mitigation: SOPs for hardening, automatic security patches, incident response plan</li>
+<li><strong>Data loss:</strong> Mitigation: Multi-region backup redundancy, 30-day retention, PITR</li>
+</ol>
+
+<h3>Business Risks</h3>
+<ol>
+<li><strong>Low customer volume:</strong> Mitigation: Low fixed costs, can run profitably at 20 customers</li>
+<li><strong>Support burden:</strong> Mitigation: Careful customer selection, 4-hour SLA, email only</li>
+<li><strong>Infrastructure cost spikes:</strong> Mitigation: 30-day notice policy for price changes, transparent pricing</li>
+</ol>
+
+<hr>
+
+<h2>Customer Selection Criteria</h2>
+
+<h3>Good Fit</h3>
+<ul>
+<li>Technical founders who understand PostgreSQL</li>
+<li>Budget-conscious, not price-shopping</li>
+<li>Value transparency and honesty</li>
+<li>Long-term thinkers (2+ year horizon)</li>
+<li>Comfortable with email support</li>
+</ul>
+
+<h3>Not a Good Fit</h3>
+<ul>
+<li>Enterprise 99.999% SLA requirements</li>
+<li>Need 24/7 phone support</li>
+<li>Require hand-holding on PostgreSQL basics</li>
+<li>Will churn for $5/month savings</li>
+<li>Compliance-heavy (HIPAA/SOC2) until Month 12+</li>
+</ul>
+
+<p><strong>Note:</strong> I reserve the right to decline customers to maintain service quality and support SLA.</p>
+
+<hr>
+
+<h2>Long-Term Vision</h2>
+
+<p>Build a sustainable, honest database hosting company that:</p>
+<ul>
+<li>Operates on owned hardware (not rented VPS)</li>
+<li>Employs 1-2 people (not a venture-backed team)</li>
+<li>Serves 200-500 customers profitably</li>
+<li>Maintains 25% markup forever</li>
+<li>Publishes all financials and operations docs publicly</li>
+<li>Demonstrates that <strong>transparency and profitability can coexist</strong></li>
+</ul>
+
+<hr>
+
+<p><strong>Questions?</strong> Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a></p>
+</footer>
+
+</body>
+</html>

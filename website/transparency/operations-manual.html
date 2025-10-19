@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Operations Manual - CostPlusDB</title>
+  <meta name="description" content="Standard operating procedures for running CostPlusDB">
+
+  <link rel="stylesheet" href="../src/reset.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <link rel="stylesheet" href="../src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Operations Manual</h1>
+      <span class="subtitle">Standard operating procedures</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/transparency/">← Back</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+</ul>
+</nav>
+
+<h2>CostPlusDB Standard Operating Procedures</h2>
+
+<p><strong>Version:</strong> 1.0 | <strong>Last Updated:</strong> October 19, 2025</p>
+
+<p>This is a summary of our operations manual. For the complete detailed SOPs, see the <a href="https://github.com/jeremylongshore/cost-plus-db/blob/main/000-docs/005-DR-SOPS-postgresql-operations.md">full document on GitHub</a>.</p>
+
+<hr>
+
+<h2>SOP Index</h2>
+
+<h3>Pre-Launch (Setup Phase)</h3>
+<ul>
+<li><strong>SOP-001:</strong> VPS Initial Setup & Hardening</li>
+<li><strong>SOP-002:</strong> PostgreSQL Installation & Configuration</li>
+<li><strong>SOP-003:</strong> Backup System Setup & Verification</li>
+<li><strong>SOP-004:</strong> Monitoring Stack Deployment</li>
+<li><strong>SOP-005:</strong> SSL/TLS Certificate Setup</li>
+</ul>
+
+<h3>Daily Operations</h3>
+<ul>
+<li><strong>SOP-101:</strong> Morning Health Check Routine</li>
+<li><strong>SOP-102:</strong> New Customer Onboarding (Manual Process)</li>
+<li><strong>SOP-103:</strong> Customer Database Provisioning</li>
+<li><strong>SOP-104:</strong> Support Ticket Response Workflow</li>
+<li><strong>SOP-105:</strong> Daily Backup Verification</li>
+</ul>
+
+<h3>Incident Response</h3>
+<ul>
+<li><strong>SOP-201:</strong> P0 - Database Down (Critical)</li>
+<li><strong>SOP-202:</strong> P1 - Degraded Performance</li>
+<li><strong>SOP-203:</strong> P0 - Disk Space Emergency</li>
+<li><strong>SOP-204:</strong> Backup Restoration Procedure</li>
+<li><strong>SOP-205:</strong> Security Incident Response</li>
+<li><strong>SOP-206:</strong> Customer Data Breach Protocol</li>
+</ul>
+
+<h3>Weekly/Monthly Maintenance</h3>
+<ul>
+<li><strong>SOP-301:</strong> Weekly Security Patches</li>
+<li><strong>SOP-302:</strong> Monthly Backup Restoration Test</li>
+<li><strong>SOP-303:</strong> Monthly Financial Reconciliation</li>
+<li><strong>SOP-304:</strong> Monthly Customer Health Review</li>
+</ul>
+
+<h3>Emergency Procedures</h3>
+<ul>
+<li><strong>SOP-401:</strong> Total VPS Failure - Customer Migration</li>
+<li><strong>SOP-402:</strong> Mass Security Incident Response</li>
+<li><strong>SOP-403:</strong> Customer Cancellation & Data Deletion</li>
+<li><strong>SOP-404:</strong> Emergency Shutdown Procedure</li>
+</ul>
+
+<h3>Change Management</h3>
+<ul>
+<li><strong>SOP-501:</strong> PostgreSQL Version Upgrade</li>
+<li><strong>SOP-502:</strong> Configuration Change Protocol</li>
+<li><strong>SOP-503:</strong> Adding New VPS to Fleet</li>
+</ul>
+
+<hr>
+
+<h2>Key Infrastructure Details</h2>
+
+<h3>VPS Setup & Security</h3>
+<ul>
+<li><strong>OS:</strong> Ubuntu 24.04 LTS (latest stable)</li>
+<li><strong>Firewall:</strong> UFW (Uncomplicated Firewall) - only PostgreSQL port + SSH allowed</li>
+<li><strong>Intrusion Prevention:</strong> fail2ban with aggressive SSH protection</li>
+<li><strong>SSH:</strong> Key authentication only, password auth disabled, root login disabled</li>
+<li><strong>Updates:</strong> Unattended security updates enabled, manual review for major changes</li>
+</ul>
+
+<h3>PostgreSQL Configuration</h3>
+<ul>
+<li><strong>Version:</strong> 16 (latest stable), customer can choose 13-16</li>
+<li><strong>SSL/TLS:</strong> Enforced on all connections, self-signed or Let's Encrypt</li>
+<li><strong>Connection Pooling:</strong> pgBouncer for efficient connection management</li>
+<li><strong>Authentication:</strong> md5 or scram-sha-256, unique password per customer</li>
+<li><strong>Logging:</strong> Enabled for slow queries, errors, and connections</li>
+</ul>
+
+<h3>Backup System</h3>
+<ul>
+<li><strong>Tool:</strong> pgBackRest (industry-standard PostgreSQL backup tool)</li>
+<li><strong>Storage:</strong> Wasabi S3-compatible storage (cheaper than AWS S3)</li>
+<li><strong>Schedule:</strong> Daily full backups at 2am UTC</li>
+<li><strong>Retention:</strong> 30 days of daily backups</li>
+<li><strong>PITR:</strong> Point-in-time recovery for last 7 days</li>
+<li><strong>Testing:</strong> Monthly restoration test to verify backups work</li>
+</ul>
+
+<h3>Monitoring Stack</h3>
+<ul>
+<li><strong>Uptime:</strong> Betterstack (5-minute checks)</li>
+<li><strong>Performance:</strong> PostgreSQL stats tracking (pg_stat_statements)</li>
+<li><strong>Alerts:</strong> Email/SMS for downtime, high CPU, disk space &lt; 20%</li>
+<li><strong>Logs:</strong> Centralized syslog for all servers</li>
+</ul>
+
+<hr>
+
+<h2>Sample SOP: Morning Health Check (SOP-101)</h2>
+
+<p><strong>Purpose:</strong> Verify all customer databases are healthy before the business day starts</p>
+<p><strong>Time Required:</strong> 10-15 minutes</p>
+<p><strong>Frequency:</strong> Daily (M-F, 8am ET)</p>
+
+<h3>Checklist</h3>
+<ol>
+<li>Check Betterstack dashboard for any downtime alerts</li>
+<li>SSH into each VPS and run health check script</li>
+<li>Verify last night's backups completed successfully</li>
+<li>Check disk space on all servers (alert if &lt; 30%)</li>
+<li>Review PostgreSQL logs for errors</li>
+<li>Check support inbox for any overnight tickets</li>
+<li>Document any issues in operations log</li>
+</ol>
+
+<h3>Expected Output</h3>
+<pre>
+✅ All 3 VPS servers responding
+✅ 15/15 customer databases online
+✅ Backups completed: 15/15 successful
+✅ Disk space: 45-80% used (healthy range)
+✅ No errors in PostgreSQL logs
+✅ 0 open support tickets
+</pre>
+
+<p>If any check fails, escalate to appropriate incident SOP.</p>
+
+<hr>
+
+<h2>Sample SOP: Database Down (SOP-201)</h2>
+
+<p><strong>Priority:</strong> P0 (Critical - Drop everything)</p>
+<p><strong>Response Time:</strong> Immediate</p>
+
+<h3>Triage Steps</h3>
+<ol>
+<li>Confirm the database is actually down (not network issue)</li>
+<li>Check if it's just one database or entire VPS</li>
+<li>Email customer immediately: "Investigating database outage, will update in 15 minutes"</li>
+<li>Check PostgreSQL logs for crash reason</li>
+<li>Attempt to restart PostgreSQL service</li>
+<li>If restart fails, check disk space / memory</li>
+<li>If VPS is unresponsive, contact provider support</li>
+<li>If database is corrupted, restore from latest backup</li>
+</ol>
+
+<h3>Communication Template</h3>
+<pre>
+Subject: [INCIDENT] Database outage - investigating
+
+Hi [Customer],
+
+We detected that your database is currently down.
+
+Status: Investigating
+Started: [Time]
+ETA: Restoring within 30 minutes
+
+We're working on it right now and will update you
+every 15 minutes until resolved.
+
+- Jeremy
+</pre>
+
+<h3>Resolution Steps</h3>
+<ol>
+<li>Once database is back online, verify connections work</li>
+<li>Check data integrity (run sample queries)</li>
+<li>Email customer with root cause analysis</li>
+<li>Document incident in operations log</li>
+<li>If downtime &gt; 1 hour, apply SLA credit (pro-rated refund)</li>
+</ol>
+
+<hr>
+
+<h2>Sample SOP: Customer Onboarding (SOP-102)</h2>
+
+<p><strong>Purpose:</strong> Seamlessly onboard new paying customers</p>
+<p><strong>Time Required:</strong> 30-45 minutes</p>
+
+<h3>Pre-Provisioning</h3>
+<ol>
+<li>Receive payment confirmation from Stripe</li>
+<li>Review customer's requirements (RAM, storage, provider)</li>
+<li>Verify VPS capacity exists (or provision new VPS if needed)</li>
+<li>Add customer to operations spreadsheet</li>
+</ol>
+
+<h3>Database Provisioning (SOP-103)</h3>
+<ol>
+<li>SSH into appropriate VPS</li>
+<li>Create new PostgreSQL database and user</li>
+<li>Generate strong random password (save in password manager)</li>
+<li>Configure pgBouncer for connection pooling</li>
+<li>Add to backup schedule</li>
+<li>Add to monitoring alerts</li>
+<li>Test connection from external client</li>
+</ol>
+
+<h3>Customer Welcome Email</h3>
+<pre>
+Subject: Welcome to CostPlusDB - Your database is ready!
+
+Hi [Customer],
+
+Your PostgreSQL database is provisioned and ready to use.
+
+Connection Details:
+Host: [hostname].costplusdb.dev
+Port: 5432
+Database: [dbname]
+User: [username]
+Password: [secure_password]
+
+SSL: Required (enforce in connection string)
+
+Example connection string:
+postgresql://[user]:[pass]@[host]:5432/[db]?sslmode=require
+
+Support: jeremy@intentsolutions.io (4-hour SLA, M-F 9-6 ET)
+Monitoring: You'll be added to uptime notifications
+
+Questions? Reply to this email.
+
+Thanks for choosing transparent pricing!
+- Jeremy
+</pre>
+
+<hr>
+
+<h2>Transparency Commitment</h2>
+
+<p>These SOPs are the actual procedures I follow to run CostPlusDB. They're not marketing fluff - they're living documents I update as I learn.</p>
+
+<p><strong>Why publish these?</strong></p>
+<ul>
+<li>You deserve to know how your database is managed</li>
+<li>Transparency builds trust</li>
+<li>Accountability - if I publish my SOPs, I have to follow them</li>
+<li>Help other solo operators learn from my process</li>
+</ul>
+
+<p>For the full detailed SOPs (2000+ lines), see the <a href="https://github.com/jeremylongshore/cost-plus-db/blob/main/000-docs/005-DR-SOPS-postgresql-operations.md">complete operations manual on GitHub</a>.</p>
+
+<hr>
+
+<p><strong>Questions about our operations?</strong> Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a></p>
+</footer>
+
+</body>
+</html>

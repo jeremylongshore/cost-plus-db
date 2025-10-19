@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Pricing Structure - CostPlusDB</title>
+  <meta name="description" content="Complete pricing structure and business philosophy">
+
+  <link rel="stylesheet" href="../src/reset.css">
+  <link rel="stylesheet" href="../src/index.css">
+  <link rel="stylesheet" href="../src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Pricing Structure</h1>
+      <span class="subtitle">Complete pricing & business philosophy</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/transparency/">← Back</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+</ul>
+</nav>
+
+<h2>Core Business Philosophy</h2>
+
+<h3>Radical Transparency</h3>
+<p>We show you <strong>exactly</strong> what we pay for infrastructure. You pay our cost + 25%. That's it.</p>
+
+<h3>Why Cost-Plus?</h3>
+<ul>
+<li>❌ AWS marks up 5-20x (charges $280 for $12 of infrastructure)</li>
+<li>❌ Traditional SaaS hides costs behind "tiers"</li>
+<li>✅ We believe you deserve to know what you're paying for</li>
+<li>✅ 25% markup is fair, sustainable, and honest</li>
+</ul>
+
+<h3>Our Values</h3>
+<ol>
+<li><strong>Transparency over tricks</strong> - Show all costs on every invoice</li>
+<li><strong>Fair margins</strong> - 25% markup is sustainable for us, fair for you</li>
+<li><strong>No BS pricing</strong> - No hidden fees, no surprise charges</li>
+<li><strong>Customer choice</strong> - Pick your infrastructure provider</li>
+<li><strong>Human support</strong> - Solo founder who actually responds</li>
+</ol>
+
+<hr>
+
+<h2>Standard Tiers (Fixed Pricing)</h2>
+
+<p>All tiers include Contabo infrastructure by default.</p>
+
+<pre>
+┌─────────────┬─────────────┬─────────────┬─────────────┐
+│   SHARED    │  DEDICATED  │     PRO     │ ENTERPRISE  │
+│  $49/month  │  $89/month  │ $129/month  │ $149/month  │
+├─────────────┼─────────────┼─────────────┼─────────────┤
+│ 2GB RAM     │ 8GB RAM     │ 16GB RAM    │ 32GB RAM    │
+│ 20GB storage│ 200GB       │ 400GB       │ 800GB       │
+│ Shared CPU  │ 4 vCPU      │ 6 vCPU      │ 8 vCPU      │
+│ 10 databases│ Dedicated   │ Dedicated   │ Dedicated   │
+│ per VPS     │ VPS         │ VPS         │ VPS         │
+└─────────────┴─────────────┴─────────────┴─────────────┘
+</pre>
+
+<h3>All Tiers Include</h3>
+<ul>
+<li>✅ PostgreSQL 13-16 (your choice)</li>
+<li>✅ Daily backups (30-day retention)</li>
+<li>✅ Point-in-time recovery (7 days)</li>
+<li>✅ Multi-region backup redundancy</li>
+<li>✅ 24/7 monitoring (Betterstack)</li>
+<li>✅ Email support (4-hour SLA, M-F 9am-6pm ET)</li>
+<li>✅ TLS/SSL encryption</li>
+<li>✅ Firewall protection</li>
+<li>✅ Connection pooling (pgBouncer)</li>
+<li>✅ No surprise charges</li>
+</ul>
+
+<h3>Enterprise Tier Also Includes</h3>
+<ul>
+<li>✅ Private Slack Connect channel (+$10/mo our cost)</li>
+<li>✅ Data Processing Agreement (DPA template)</li>
+<li>✅ Audit logs</li>
+<li>✅ Priority support (1-hour response)</li>
+</ul>
+
+<h3>Our Margins on Standard Tiers</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Our Cost</th>
+<th>Your Price</th>
+<th>Our Margin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shared</td>
+<td>$2/mo</td>
+<td>$49/mo</td>
+<td>96%</td>
+</tr>
+<tr>
+<td>Dedicated</td>
+<td>$12/mo</td>
+<td>$89/mo</td>
+<td>87%</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>$20/mo</td>
+<td>$129/mo</td>
+<td>84%</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>$30/mo</td>
+<td>$149/mo</td>
+<td>80%</td>
+</tr>
+</tbody>
+</table>
+
+<p><em>High margins because we show exact costs on add-ons below</em></p>
+
+<hr>
+
+<h2>Infrastructure Upgrades (Cost + 25%)</h2>
+
+<p>Choose your infrastructure provider. We show you what we pay.</p>
+
+<h3>Provider Comparison</h3>
+
+<details>
+<summary><strong>Contabo (Default - Included)</strong></summary>
+<ul>
+<li>Location: Germany / US</li>
+<li>Our cost: $12/month</li>
+<li>Your price: Included in base tier</li>
+<li>Best for: Budget-conscious, excellent value</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>Hetzner (+$20/month)</strong></summary>
+<ul>
+<li>Location: Germany / Finland / US</li>
+<li>Our cost: $47/month</li>
+<li>Your price: +$20/month (cost × 0.43 markup)</li>
+<li>Best for: Developer favorite, EU compliance</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>DigitalOcean (+$40/month)</strong></summary>
+<ul>
+<li>Location: 14 regions worldwide</li>
+<li>Our cost: $62/month</li>
+<li>Your price: +$40/month (cost × 0.65 markup)</li>
+<li>Best for: Enterprise trust, global reach</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>AWS (Cost + 25%)</strong></summary>
+<ul>
+<li>Location: Global</li>
+<li>Our cost: $73-120/month (varies by region)</li>
+<li>Your price: Our cost × 1.25</li>
+<li>Example: $73 → $91/month extra</li>
+<li>Best for: Maximum compliance (HIPAA, SOC 2)</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>GCP (Cost + 25%)</strong></summary>
+<ul>
+<li>Location: Global</li>
+<li>Our cost: $73-95/month (varies)</li>
+<li>Your price: Our cost × 1.25</li>
+<li>Best for: Google Cloud integration</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>Region Selection (+$10/month)</strong></summary>
+<ul>
+<li>Choose specific datacenter</li>
+<li>EU (GDPR compliance)</li>
+<li>US West/East</li>
+<li>Asia Pacific</li>
+</ul>
+</details>
+
+<p><strong>Launch Timeline:</strong></p>
+<ul>
+<li><strong>Day 1:</strong> Contabo + Hetzner available</li>
+<li><strong>Month 2-3:</strong> Add DigitalOcean</li>
+<li><strong>Month 4-6:</strong> Add AWS/GCP</li>
+</ul>
+
+<hr>
+
+<h2>Enterprise Add-Ons (Cost + 25%)</h2>
+
+<p>For customers who need Google/AWS-level features.</p>
+
+<table>
+<thead>
+<tr>
+<th>Add-On</th>
+<th>Our Cost</th>
+<th>Your Price</th>
+<th>Availability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High Availability (Auto-Failover)</td>
+<td>$79/mo</td>
+<td>$99/mo</td>
+<td>Month 6+</td>
+</tr>
+<tr>
+<td>Read Replicas</td>
+<td>$12-30/mo</td>
+<td>$15-38/mo</td>
+<td>Month 3+</td>
+</tr>
+<tr>
+<td>Extra Storage (+200GB)</td>
+<td>$4/mo</td>
+<td>$5/mo</td>
+<td>Day 1</td>
+</tr>
+<tr>
+<td>VPN Access (WireGuard)</td>
+<td>$12/mo</td>
+<td>$15/mo</td>
+<td>Month 2+</td>
+</tr>
+<tr>
+<td>Compliance Package</td>
+<td>$80/mo</td>
+<td>$100/mo</td>
+<td>Month 12+</td>
+</tr>
+<tr>
+<td>Managed Migration (&lt;10GB)</td>
+<td>$160</td>
+<td>$200</td>
+<td>Day 1</td>
+</tr>
+<tr>
+<td>Custom Monitoring</td>
+<td>$40/mo</td>
+<td>$50/mo</td>
+<td>Day 1</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Transparency Commitment</h2>
+
+<p>Every invoice shows:</p>
+<ul>
+<li>Base tier cost</li>
+<li>Each infrastructure component with our cost and your price</li>
+<li>Each add-on with our cost and your price</li>
+<li>Total comparison to equivalent managed service</li>
+<li>Your monthly savings</li>
+</ul>
+
+<p><strong>Questions?</strong> Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+
+<hr>
+
+<p class="text-muted">
+<strong>Last Updated:</strong> October 19, 2025<br>
+<strong>Version:</strong> 1.0
+</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a></p>
+</footer>
+
+</body>
+</html>

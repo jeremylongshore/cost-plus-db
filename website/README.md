@@ -222,7 +222,7 @@ pandoc ../000-docs/005-DR-SOPS-postgresql-operations.md \
    - Enable HTTPS (automatic)
 5. **Form notifications** (optional):
    - Site settings → Forms → Notifications
-   - Email: `hello@intentsolutions.io`
+   - Email: `jeremy@intentsolutions.io`
 
 ### DNS Configuration
 
@@ -309,7 +309,7 @@ Both are credited in page footers.
 ## 📧 Contact
 
 **Jeremy Longshore**
-Email: hello@intentsolutions.io
+Email: jeremy@intentsolutions.io
 GitHub: [jeremylongshore](https://github.com/jeremylongshore)
 Website: [jeremylongshore.com](https://jeremylongshore.com)
 
