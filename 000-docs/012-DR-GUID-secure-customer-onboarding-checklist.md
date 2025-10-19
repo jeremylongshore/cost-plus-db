@@ -562,10 +562,16 @@ Jeremy"
     - Query optimization for security
     - Application-level security advice
 
-12. **Dedicated Security Support** - +$300/mo
-    - 1-hour SLA for security issues (vs 4-hour base)
-    - Private Slack channel for security questions
-    - Proactive security monitoring reviews
+12. **Dedicated Support (Slack Channel)** - +$300/mo
+    - Direct Slack channel access to Jeremy
+    - Response within minutes (not hours)
+    - Security questions, incidents, general support
+    - M-F 9am-6pm ET (best-effort outside hours)
+    - Base tier: Email with 4-hour response (M-F 9am-6pm ET)
+
+**What's an SLA?** Service Level Agreement - the maximum time we promise to respond.
+- 4-hour SLA = we respond within 4 hours (usually faster)
+- Minute-response = typically within 5-15 minutes via Slack
 
 ---
 
