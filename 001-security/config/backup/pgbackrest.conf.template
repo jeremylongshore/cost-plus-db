@@ -1,0 +1,77 @@
+# pgBackRest Configuration Template for CostPlusDB
+# =================================================
+#
+# Installation Location: /etc/pgbackrest/pgbackrest.conf
+#
+# This configuration enables encrypted backups with both local and S3 storage
+#
+# Before using:
+#   1. Replace BUCKET_NAME with your actual S3 bucket name
+#   2. Replace ACCESS_KEY and SECRET_KEY with your S3 credentials
+#   3. Replace ENCRYPTION_PASSPHRASE with a strong passphrase
+#   4. Set proper permissions: sudo chmod 640 /etc/pgbackrest/pgbackrest.conf
+#   5. Set ownership: sudo chown postgres:postgres /etc/pgbackrest/pgbackrest.conf
+#
+
+[global]
+# Repository configuration
+repo1-type=posix
+repo1-path=/var/lib/pgbackrest
+repo1-retention-full=2
+repo1-retention-diff=4
+repo1-retention-archive=14
+
+# Encryption (AES-256-CBC)
+repo1-cipher-type=aes-256-cbc
+repo1-cipher-pass=ENCRYPTION_PASSPHRASE
+
+# Optional: S3/Wasabi cloud storage (uncomment to enable)
+# repo2-type=s3
+# repo2-path=/pgbackrest
+# repo2-s3-bucket=BUCKET_NAME
+# repo2-s3-endpoint=s3.wasabisys.com
+# repo2-s3-region=us-east-1
+# repo2-s3-key=ACCESS_KEY
+# repo2-s3-key-secret=SECRET_KEY
+# repo2-retention-full=4
+# repo2-retention-diff=8
+# repo2-retention-archive=30
+# repo2-cipher-type=aes-256-cbc
+# repo2-cipher-pass=ENCRYPTION_PASSPHRASE
+
+# Logging
+log-level-console=info
+log-level-file=debug
+log-level-stderr=warn
+log-path=/var/log/pgbackrest
+log-timestamp=y
+
+# Process settings
+process-max=2
+archive-async=y
+
+# Compression
+compress-type=gz
+compress-level=6
+
+[main]
+# PostgreSQL cluster configuration
+pg1-path=/var/lib/postgresql/16/main
+pg1-port=5433
+pg1-socket-path=/var/run/postgresql
+pg1-user=postgres
+
+# Recovery settings
+recovery-option=standby_mode=on
+
+# Backup settings
+start-fast=y
+stop-auto=y
+delta=y
+
+# Archive settings
+archive-push-queue-max=1GB
+archive-get-queue-max=1GB
+
+# Performance tuning
+buffer-size=8MB

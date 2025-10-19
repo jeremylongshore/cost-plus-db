@@ -1,0 +1,135 @@
+# CostPlusDB Security Directory .gitignore
+# ==========================================
+#
+# Prevents sensitive files from being committed to git
+# CRITICAL: Do not modify without security team approval
+
+# Encryption keys and passphrases (NEVER COMMIT)
+keys/api-tokens/*
+keys/backup-encryption/*
+keys/ssl-ca/*.key
+keys/ssl-ca/*.pem
+keys/**/*passphrase*
+keys/**/*secret*
+keys/**/*private*
+
+# Keep directory structure but ignore files
+!keys/api-tokens/.gitkeep
+!keys/backup-encryption/.gitkeep
+!keys/ssl-ca/.gitkeep
+
+# Credentials and passwords (NEVER COMMIT)
+**/credentials.txt
+**/passwords.txt
+**/*password*
+**/*credential*
+**/*secret*
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx
+
+# Customer data (NEVER COMMIT)
+customer-security/customers/*
+!customer-security/customers/.gitkeep
+
+# Logs (contain sensitive information)
+logs/**/*.log
+logs/**/*.txt
+!logs/**/.gitkeep
+
+# Backup files (may contain sensitive data)
+backups/**/*.sql
+backups/**/*.sql.gz
+backups/**/*.dump
+backups/**/*.tar.gz
+!backups/**/.gitkeep
+
+# Scan results (may contain vulnerabilities)
+scans/**/*.txt
+scans/**/*.json
+scans/**/*.xml
+scans/**/*.html
+!scans/**/.gitkeep
+
+# Incident reports with sensitive details
+compliance/reports/*incident*
+compliance/reports/*breach*
+!compliance/reports/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Sensitive configuration
+config/**/*.local
+config/**/*-production.*
+
+# Status files (contain environment-specific info)
+.security-status
+
+# GPG and SSH keys (NEVER COMMIT)
+*.gpg
+*.asc
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Certificate private keys (NEVER COMMIT)
+*.csr
+*.crt.key
+server.key
+client.key
+
+# Database dumps (may contain customer data)
+*.dump
+*.sql.gz
+
+# Keep these important files
+!README.md
+!.gitignore
+!*.md
+!*.template
+!*.example
+
+# Keep configuration templates (without sensitive data)
+!config/**/*.template
+!config/**/*.example
+!config/**/*.sh
+!config/**/*.conf.template
+
+# Keep alert templates
+!alerts/templates/**/*.html
+!alerts/templates/**/*.json
+!alerts/rules/**/*.yaml
+
+# Keep documentation
+!documentation/**/*.md
+!runbooks/**/*.md
+!compliance/policies/**/*.md
+
+# Keep scripts (but verify no hardcoded secrets)
+!scripts/**/*.sh
+!scripts/**/*.py
+
+# Keep tools
+!tools/**/*.sh
+!tools/**/*.py

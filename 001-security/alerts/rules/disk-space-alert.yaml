@@ -1,0 +1,141 @@
+# CostPlusDB Alert Rules Configuration
+# ======================================
+#
+# Disk Space Alert
+# Monitors disk usage and triggers alerts before running out of space
+#
+
+alert_name: disk_space_warning
+description: Alert when disk space usage exceeds threshold
+enabled: true
+severity: medium
+
+# Trigger conditions
+conditions:
+  metric: disk_usage_percent
+  warning_threshold: 70
+  critical_threshold: 85
+  window: 5m
+  aggregation: current
+
+# Monitored paths
+monitored_paths:
+  - path: /var/lib/postgresql
+    name: postgresql_data
+    critical_threshold: 85
+    warning_threshold: 70
+
+  - path: /var/lib/pgbackrest
+    name: backup_repository
+    critical_threshold: 90
+    warning_threshold: 75
+
+  - path: /var/log/postgresql
+    name: postgresql_logs
+    critical_threshold: 90
+    warning_threshold: 80
+
+  - path: /
+    name: root_filesystem
+    critical_threshold: 90
+    warning_threshold: 80
+
+# Alert channels
+notifications:
+  - type: email
+    recipients:
+      - admin@costplusdb.com
+      - ops@costplusdb.com
+    template: /home/admincostplus/projects/costplusdb/001-security/alerts/templates/email-templates/disk-space-alert.html
+
+  - type: slack
+    webhook: ${SLACK_OPS_WEBHOOK}
+    channel: "#ops-alerts"
+
+  - type: log
+    path: /home/admincostplus/projects/costplusdb/001-security/logs/alerts/disk-space-alerts.log
+
+# Alert metadata
+metadata:
+  category: infrastructure
+  compliance_required: false
+  auto_response: true
+
+# Automated response actions
+auto_actions:
+  - action: cleanup_old_logs
+    enabled: true
+    conditions:
+      usage_percent: 85
+      path: /var/log/postgresql
+    script: /home/admincostplus/projects/costplusdb/001-security/scripts/maintenance/cleanup-logs.sh
+
+  - action: rotate_backups
+    enabled: true
+    conditions:
+      usage_percent: 90
+      path: /var/lib/pgbackrest
+    script: /home/admincostplus/projects/costplusdb/001-security/scripts/maintenance/rotate-old-backups.sh
+
+  - action: notify_critical
+    enabled: true
+    conditions:
+      usage_percent: 95
+
+# Escalation rules
+escalation:
+  - level: 1
+    wait_time: 30m
+    recipients:
+      - oncall@costplusdb.com
+    threshold: 85
+
+  - level: 2
+    wait_time: 1h
+    recipients:
+      - ops-lead@costplusdb.com
+    threshold: 90
+
+  - level: 3
+    wait_time: 2h
+    recipients:
+      - cto@costplusdb.com
+    threshold: 95
+
+# Alert suppression
+suppression:
+  enabled: true
+  window: 30m
+  max_alerts_per_hour: 2
+
+# Monitoring
+check_interval: 10m
+retry_on_failure: 3
+
+# Alert lifecycle
+alert_lifecycle:
+  auto_resolve: true
+  resolve_after: 1h
+  require_acknowledgement: false
+
+# Remediation guides
+remediation:
+  - threshold: 70-80
+    actions:
+      - "Review and archive old PostgreSQL logs"
+      - "Review backup retention policy"
+      - "Consider increasing disk size"
+
+  - threshold: 80-90
+    actions:
+      - "Immediately clean up old logs"
+      - "Rotate old backups to S3/Wasabi"
+      - "Check for large temporary files"
+      - "Plan disk expansion"
+
+  - threshold: 90+
+    actions:
+      - "CRITICAL: Execute emergency cleanup"
+      - "Stop non-essential services if needed"
+      - "Expand disk immediately"
+      - "Notify all customers of potential impact"

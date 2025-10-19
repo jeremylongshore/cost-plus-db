@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CostPlusDB Service Alert - Database Down</title>
+    <style>
+        body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; background-color: #1a1a1a; color: #00ff00; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #000; border: 2px solid #ff0000; padding: 20px; }
+        .header { background-color: #ff0000; color: #fff; padding: 15px; margin: -20px -20px 20px -20px; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .critical { color: #ff0000; font-weight: bold; }
+        .status { background-color: #2a2a2a; border-left: 4px solid #ff0000; padding: 10px; margin: 15px 0; }
+        .timestamp { color: #ffff00; }
+        .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #333; font-size: 12px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠ CRITICAL ALERT: DATABASE DOWN</h1>
+        </div>
+
+        <p class="critical">SEVERITY: CRITICAL (P0)</p>
+
+        <div class="status">
+            <p><strong>Incident ID:</strong> [INCIDENT_ID]</p>
+            <p><strong>Database:</strong> [DATABASE_NAME]</p>
+            <p><strong>Customer:</strong> [CUSTOMER_NAME]</p>
+            <p class="timestamp"><strong>Detection Time:</strong> [TIMESTAMP]</p>
+            <p><strong>Status:</strong> <span class="critical">DATABASE OFFLINE</span></p>
+        </div>
+
+        <h3>Immediate Actions Required:</h3>
+        <ol>
+            <li>SSH into server: ssh user@[SERVER_IP]</li>
+            <li>Check service: systemctl status postgresql@16-main</li>
+            <li>Review logs: tail -100 /var/log/postgresql/postgresql-16-main.log</li>
+            <li>Notify customer within 5 minutes</li>
+            <li>Escalate if not resolved within 15 minutes</li>
+        </ol>
+
+        <h3>Quick Diagnostics:</h3>
+        <pre>
+# Check if PostgreSQL is running
+sudo systemctl is-active postgresql@16-main
+
+# Check recent errors
+sudo journalctl -u postgresql@16-main -n 50
+
+# Try to restart
+sudo systemctl restart postgresql@16-main
+
+# Verify listening
+sudo netstat -tlnp | grep 5433
+        </pre>
+
+        <h3>Customer Notification Template:</h3>
+        <p style="background-color: #2a2a2a; padding: 10px; border-left: 4px solid #ffff00;">
+            Subject: CRITICAL: Database [DATABASE_NAME] Currently Offline<br><br>
+
+            Hi [CUSTOMER_NAME],<br><br>
+
+            We detected that your database is currently offline. Our team is actively investigating and working to restore service immediately.<br><br>
+
+            Detected: [TIMESTAMP]<br>
+            Status: Investigating<br>
+            Next Update: Within 15 minutes<br><br>
+
+            We apologize for the disruption and will keep you updated every 15 minutes until resolved.
+        </p>
+
+        <h3>Escalation Path:</h3>
+        <ul>
+            <li><strong>0-15 min:</strong> Primary on-call: [ONCALL_PRIMARY]</li>
+            <li><strong>15-30 min:</strong> Escalate to: [ONCALL_SECONDARY]</li>
+            <li><strong>30+ min:</strong> Emergency escalation: [EMERGENCY_CONTACT]</li>
+        </ul>
+
+        <div class="footer">
+            <p>This is an automated P0 critical alert.</p>
+            <p>Response SLA: 5 minutes acknowledgement, 15 minutes resolution target</p>
+            <p>Alert generated: [ALERT_TIMESTAMP]</p>
+        </div>
+    </div>
+</body>
+</html>

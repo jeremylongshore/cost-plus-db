@@ -1,0 +1,145 @@
+;; PgBouncer Configuration for CostPlusDB
+;; ======================================
+;;
+;; This is a template configuration file for PgBouncer connection pooling
+;; Copy to /etc/pgbouncer/pgbouncer.ini and customize for your environment
+;;
+;; Installation:
+;;   1. sudo apt install pgbouncer
+;;   2. sudo cp pgbouncer.ini.template /etc/pgbouncer/pgbouncer.ini
+;;   3. Edit /etc/pgbouncer/pgbouncer.ini with your settings
+;;   4. Create userlist.txt with authentication details
+;;   5. sudo systemctl restart pgbouncer
+;;
+
+[databases]
+;; Database connection strings
+;; Format: dbname = host=hostname port=port dbname=dbname
+;;
+;; Example customer databases:
+;; customer1_db = host=127.0.0.1 port=5433 dbname=customer1_db
+;; customer2_db = host=127.0.0.1 port=5433 dbname=customer2_db
+
+;; Fallback database (wildcard for all databases)
+* = host=127.0.0.1 port=5433
+
+[pgbouncer]
+;; Administrative settings
+
+;; Listen address and port
+listen_addr = 0.0.0.0
+listen_port = 6432
+
+;; Unix socket (optional)
+unix_socket_dir = /var/run/postgresql
+
+;; Authentication
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+
+;; Administrator users (can access pgbouncer console)
+admin_users = postgres, costplusdb_admin
+
+;; User statistics
+stats_users = postgres, costplusdb_admin
+
+;; Connection pooling mode
+;; - session: client connects and uses same server connection (safest)
+;; - transaction: server connection released after each transaction (efficient)
+;; - statement: server connection released after each statement (most efficient, dangerous)
+pool_mode = transaction
+
+;; Connection pool size
+;; max_client_conn: maximum number of client connections
+;; default_pool_size: how many server connections per database+user pair
+;; min_pool_size: minimum pool size (idle connections kept alive)
+;; reserve_pool_size: additional connections for sudden load
+max_client_conn = 200
+default_pool_size = 20
+min_pool_size = 5
+reserve_pool_size = 5
+
+;; Connection limits per database
+;; max_db_connections: maximum connections per database
+;; max_user_connections: maximum connections per user
+max_db_connections = 50
+max_user_connections = 50
+
+;; Timeouts (in seconds)
+;; server_idle_timeout: close server connection after idle time
+;; server_lifetime: close server connection after lifetime
+;; server_connect_timeout: timeout for connecting to PostgreSQL
+;; server_login_retry: retry interval if connection fails
+server_idle_timeout = 600
+server_lifetime = 3600
+server_connect_timeout = 15
+server_login_retry = 15
+
+;; Query timeouts
+;; query_timeout: cancel query if it takes longer
+;; query_wait_timeout: cancel query if waiting for connection too long
+query_timeout = 0
+query_wait_timeout = 120
+
+;; Client timeouts
+;; client_idle_timeout: disconnect idle clients
+;; client_login_timeout: timeout for client login
+client_idle_timeout = 0
+client_login_timeout = 60
+
+;; DNS settings
+;; dns_max_ttl: how long to cache DNS lookups
+;; dns_zone_check_period: how often to check DNS zone
+dns_max_ttl = 15
+dns_zone_check_period = 0
+
+;; TLS/SSL settings (optional - PostgreSQL already uses SSL)
+;; Uncomment to enable SSL between client and pgBouncer
+;client_tls_sslmode = prefer
+;client_tls_cert_file = /etc/pgbouncer/server.crt
+;client_tls_key_file = /etc/pgbouncer/server.key
+;client_tls_protocols = tlsv1.2,tlsv1.3
+;client_tls_ciphers = HIGH:MEDIUM:+3DES:!aNULL
+
+;; PostgreSQL server TLS settings
+server_tls_sslmode = require
+server_tls_protocols = tlsv1.2,tlsv1.3
+server_tls_ciphers = HIGH:MEDIUM:+3DES:!aNULL
+
+;; Logging
+logfile = /var/log/pgbouncer/pgbouncer.log
+pidfile = /var/run/pgbouncer/pgbouncer.pid
+
+;; Log verbosity
+;; 0 = only errors
+;; 1 = normal operations
+;; 2 = verbose (includes client connections)
+log_connections = 1
+log_disconnections = 1
+log_pooler_errors = 1
+
+;; Log level
+;; ERROR, WARNING, INFO, DEBUG
+verbose = 0
+
+;; Application name passthrough (useful for monitoring)
+application_name_add_host = 1
+
+;; Ignore startup parameters (allow more clients)
+ignore_startup_parameters = extra_float_digits
+
+;; Performance tuning
+pkt_buf = 4096
+sbuf_loopcnt = 5
+max_packet_size = 2147483647
+
+;; Dangerous settings (keep disabled)
+disable_pqexec = 0
+autodb_idle_timeout = 3600
+
+;; Stats
+stats_period = 60
+
+;; Console access (for pgbouncer console commands)
+;; Connect with: psql -p 6432 -U postgres pgbouncer
+;; Commands: SHOW POOLS; SHOW CLIENTS; SHOW STATS;

@@ -1,0 +1,98 @@
+# CostPlusDB Alert Rules Configuration
+# ======================================
+#
+# Failed Login Threshold Alert
+# Monitors PostgreSQL authentication failures and triggers alerts
+#
+
+alert_name: failed_login_threshold
+description: Alert when failed login attempts exceed threshold
+enabled: true
+severity: high
+
+# Trigger conditions
+conditions:
+  metric: postgresql_failed_logins
+  threshold: 10
+  window: 1h  # 1 hour
+  aggregation: count
+
+# Alert channels
+notifications:
+  - type: email
+    recipients:
+      - security@costplusdb.com
+      - admin@costplusdb.com
+    template: /home/admincostplus/projects/costplusdb/001-security/alerts/templates/email-templates/failed-login-alert.html
+
+  - type: slack
+    webhook: ${SLACK_SECURITY_WEBHOOK}
+    channel: "#security-alerts"
+    template: /home/admincostplus/projects/costplusdb/001-security/alerts/templates/slack-templates/failed-login-alert.json
+
+  - type: log
+    path: /home/admincostplus/projects/costplusdb/001-security/logs/alerts/failed-login-alerts.log
+
+# Alert metadata
+metadata:
+  category: authentication
+  compliance_required: true
+  auto_response: true
+
+# Automated response actions
+auto_actions:
+  - action: block_ip
+    enabled: false  # Enable after testing
+    conditions:
+      failed_attempts: 20
+      window: 1h
+
+  - action: notify_customer
+    enabled: true
+    conditions:
+      severity: critical
+
+  - action: create_incident
+    enabled: true
+    conditions:
+      threshold_multiplier: 2  # 2x threshold = auto-incident
+
+# Escalation rules
+escalation:
+  - level: 1
+    wait_time: 5m
+    recipients:
+      - oncall@costplusdb.com
+
+  - level: 2
+    wait_time: 15m
+    recipients:
+      - security-lead@costplusdb.com
+
+  - level: 3
+    wait_time: 30m
+    recipients:
+      - cto@costplusdb.com
+
+# Alert suppression (prevent alert fatigue)
+suppression:
+  enabled: true
+  window: 15m  # Don't re-alert within 15 minutes
+  max_alerts_per_hour: 4
+
+# Alert enrichment
+enrichment:
+  include_logs: true
+  log_lines: 50
+  include_ip_geolocation: true
+  include_threat_intelligence: false  # Future enhancement
+
+# Monitoring
+check_interval: 5m  # Check every 5 minutes
+retry_on_failure: 3
+
+# Alert lifecycle
+alert_lifecycle:
+  auto_resolve: true
+  resolve_after: 1h  # Auto-resolve if no new failures for 1 hour
+  require_acknowledgement: true

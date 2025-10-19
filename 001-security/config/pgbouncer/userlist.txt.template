@@ -1,0 +1,29 @@
+# PgBouncer User Authentication File
+# ===================================
+#
+# Format: "username" "password"
+# Password format: SCRAM-SHA-256 hashed password
+#
+# To generate SCRAM-SHA-256 password hash:
+#   1. Connect to PostgreSQL:
+#      sudo -u postgres psql -p 5433
+#   2. Get password hash:
+#      SELECT rolpassword FROM pg_authid WHERE rolname = 'username';
+#   3. Copy the SCRAM-SHA-256$... string here
+#
+# Example entries:
+# "postgres" "SCRAM-SHA-256$4096:abc123...xyz789"
+# "customer1_user" "SCRAM-SHA-256$4096:def456...uvw012"
+#
+# IMPORTANT: Keep this file secure!
+# sudo chown postgres:postgres /etc/pgbouncer/userlist.txt
+# sudo chmod 600 /etc/pgbouncer/userlist.txt
+#
+# Template entries (replace with actual hashes):
+
+# System users
+"postgres" "SCRAM-SHA-256$4096:REPLACE_WITH_ACTUAL_HASH"
+"costplusdb_admin" "SCRAM-SHA-256$4096:REPLACE_WITH_ACTUAL_HASH"
+
+# Customer users (add one line per customer)
+# "customer_user" "SCRAM-SHA-256$4096:REPLACE_WITH_ACTUAL_HASH"

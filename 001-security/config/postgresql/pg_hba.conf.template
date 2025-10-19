@@ -1,0 +1,50 @@
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+# CostPlusDB Security Configuration
+#
+# This file controls: which hosts are allowed to connect, how clients
+# are authenticated, which PostgreSQL user names they can use, which
+# databases they can access.
+#
+# SECURITY REQUIREMENTS:
+# - SSL/TLS required for all remote connections
+# - scram-sha-256 authentication (most secure)
+# - Local connections use peer authentication
+# - No password authentication without SSL
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Local connections (Unix domain sockets)
+# Trust postgres user locally for maintenance
+local   all             postgres                                peer
+
+# Local connections for costplusdb admin
+local   all             costplusdb                              peer
+
+# IPv4 local connections (localhost)
+host    all             all             127.0.0.1/32            scram-sha-256
+
+# IPv6 local connections (localhost)
+host    all             all             ::1/128                 scram-sha-256
+
+# Remote connections - SSL REQUIRED
+# Customer database connections (SSL mandatory)
+hostssl all             all             0.0.0.0/0               scram-sha-256
+
+# Reject all non-SSL remote connections
+hostnossl all           all             0.0.0.0/0               reject
+
+# Special case: Replication connections
+# Uncomment and configure if using PostgreSQL streaming replication
+# local   replication     postgres                                peer
+# hostssl replication     replication     <replica-ip>/32         scram-sha-256
+
+# NOTES:
+# 1. Reload PostgreSQL after editing: sudo systemctl reload postgresql
+# 2. SSL certificates must be configured in postgresql.conf
+# 3. Users must be created with: CREATE USER ... PASSWORD '...'
+# 4. Test connections: psql "host=<ip> sslmode=require user=<user> dbname=<db>"
+#
+# AUDIT TRAIL:
+# All connection attempts are logged to PostgreSQL log files
+# Failed authentication attempts trigger fail2ban rules

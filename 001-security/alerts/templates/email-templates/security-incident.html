@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CostPlusDB Security Notification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #d32f2f;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .severity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .severity-critical {
+            background-color: #ff5252;
+            color: white;
+        }
+        .severity-high {
+            background-color: #ff9800;
+            color: white;
+        }
+        .incident-details {
+            background-color: #f9f9f9;
+            border-left: 4px solid #d32f2f;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .incident-details h3 {
+            margin-top: 0;
+            color: #d32f2f;
+        }
+        .actions-taken {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .actions-taken h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .customer-action {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .customer-action h3 {
+            margin-top: 0;
+            color: #e65100;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666;
+        }
+        .contact-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .incident-id {
+            font-family: 'Courier New', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Security Incident Notification</h1>
+            <span class="severity-badge severity-critical">CRITICAL INCIDENT</span>
+        </div>
+
+        <p>Dear Valued Customer,</p>
+
+        <p>We are writing to inform you of a security incident that may have affected your CostPlusDB database. We take the security of your data very seriously and are committed to transparency in all our operations.</p>
+
+        <div class="incident-details">
+            <h3>Incident Details</h3>
+            <p><strong>Incident ID:</strong> <span class="incident-id">[INCIDENT_ID]</span></p>
+            <p><strong>Detection Time:</strong> [DETECTION_TIME]</p>
+            <p><strong>Affected Database:</strong> [DATABASE_NAME]</p>
+            <p><strong>Nature of Incident:</strong></p>
+            <p>[INCIDENT_DESCRIPTION]</p>
+        </div>
+
+        <div class="actions-taken">
+            <h3>✓ Actions We've Taken</h3>
+            <p>Our security team has immediately implemented the following measures:</p>
+            <ul>
+                <li>Isolated the affected database to prevent further unauthorized access</li>
+                <li>Terminated all active connections and rotated database credentials</li>
+                <li>Blocked the source IP address(es) at our firewall</li>
+                <li>Enhanced monitoring and logging for your database</li>
+                <li>Initiated a full security audit and investigation</li>
+            </ul>
+        </div>
+
+        <div class="customer-action">
+            <h3>⚠️ What You Should Do</h3>
+            <p>We recommend taking the following steps to protect your data:</p>
+            <ul>
+                <li><strong>Update your credentials:</strong> New database credentials have been generated and will be sent separately via secure channel</li>
+                <li><strong>Review your application logs:</strong> Check for any unusual activity or data access patterns</li>
+                <li><strong>Update your connection strings:</strong> Use the new credentials provided</li>
+                <li><strong>Monitor your systems:</strong> Watch for any unusual behavior in your applications</li>
+            </ul>
+        </div>
+
+        <h3>What Data Was Affected?</h3>
+        <p>[DATA_IMPACT_DESCRIPTION]</p>
+        <p><em>Note: Our investigation is ongoing, and we will provide updates as more information becomes available.</em></p>
+
+        <h3>Timeline of Events</h3>
+        <ul>
+            <li><strong>[TIME_1]:</strong> Incident detected by our monitoring systems</li>
+            <li><strong>[TIME_2]:</strong> Emergency response team activated</li>
+            <li><strong>[TIME_3]:</strong> Database isolated and credentials rotated</li>
+            <li><strong>[TIME_4]:</strong> Customer notification initiated</li>
+        </ul>
+
+        <div class="contact-info">
+            <h3>Contact Information</h3>
+            <p>Our security team is available 24/7 to address your concerns:</p>
+            <p>
+                <strong>Security Team:</strong> security@costplusdb.com<br>
+                <strong>Emergency Hotline:</strong> +1-XXX-XXX-XXXX<br>
+                <strong>Support Portal:</strong> <a href="https://costplusdb.com/support">costplusdb.com/support</a>
+            </p>
+            <p>
+                <a href="[INCIDENT_REPORT_URL]" class="button">View Detailed Incident Report</a>
+            </p>
+        </div>
+
+        <h3>Our Commitment to Security</h3>
+        <p>At CostPlusDB, security is not just a feature—it's our foundation. This incident demonstrates why we maintain:</p>
+        <ul>
+            <li>24/7 security monitoring and intrusion detection</li>
+            <li>Automated incident response procedures</li>
+            <li>Complete audit logs of all database activities</li>
+            <li>Regular security audits and penetration testing</li>
+            <li>Transparent communication with our customers</li>
+        </ul>
+
+        <p>We are conducting a thorough investigation to understand how this incident occurred and implementing additional safeguards to prevent similar incidents in the future. We will share a detailed post-incident report within [TIMEFRAME].</p>
+
+        <p>We sincerely apologize for any inconvenience or concern this incident may have caused. Your trust is paramount to us, and we are committed to earning and maintaining it through our actions.</p>
+
+        <p>If you have any questions or concerns, please do not hesitate to contact our security team.</p>
+
+        <p>
+            Sincerely,<br>
+            <strong>The CostPlusDB Security Team</strong>
+        </p>
+
+        <div class="footer">
+            <p><strong>Reference:</strong> Incident ID <span class="incident-id">[INCIDENT_ID]</span></p>
+            <p>This notification was sent in accordance with our security incident response procedures and applicable data protection regulations.</p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                CostPlusDB - Transparent, Affordable Database Hosting<br>
+                <a href="https://costplusdb.com">costplusdb.com</a> | <a href="https://costplusdb.com/security">Security Information</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+{
+  "text": "🚨 Security Alert: [ALERT_TYPE]",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "🔒 Security Alert",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Severity:*\n[SEVERITY]"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Incident ID:*\n`[INCIDENT_ID]`"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Database:*\n[DATABASE_NAME]"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Time:*\n[TIMESTAMP]"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Alert Type:* [ALERT_TYPE]\n*Description:* [DESCRIPTION]"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*🎯 Immediate Actions:*\n• Check incident report\n• Review security logs\n• Verify database status\n• Notify customer if required"
+      }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*📊 Details:*\n```[DETAILS]```"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "View Logs",
+            "emoji": true
+          },
+          "style": "primary",
+          "url": "[LOG_URL]",
+          "action_id": "view_logs"
+        },
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Incident Report",
+            "emoji": true
+          },
+          "url": "[REPORT_URL]",
+          "action_id": "view_report"
+        },
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "Acknowledge",
+            "emoji": true
+          },
+          "style": "danger",
+          "action_id": "acknowledge_alert"
+        }
+      ]
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "Alert generated at [ALERT_TIMESTAMP] | Auto-resolved: [AUTO_RESOLVE_TIME]"
+        }
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "color": "#d32f2f",
+      "fields": [
+        {
+          "title": "Source IP",
+          "value": "[SOURCE_IP]",
+          "short": true
+        },
+        {
+          "title": "Event Count",
+          "value": "[EVENT_COUNT]",
+          "short": true
+        },
+        {
+          "title": "Customer Impact",
+          "value": "[CUSTOMER_IMPACT]",
+          "short": true
+        },
+        {
+          "title": "Auto-Response",
+          "value": "[AUTO_RESPONSE_STATUS]",
+          "short": true
+        }
+      ],
+      "footer": "CostPlusDB Security Monitoring",
+      "footer_icon": "https://costplusdb.com/favicon.ico",
+      "ts": "[TIMESTAMP_EPOCH]"
+    }
+  ]
+}
