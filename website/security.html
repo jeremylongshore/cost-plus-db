@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Security - CostPlusDB</title>
+  <meta name="description" content="Security practices and standards we follow">
+
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Security</h1>
+      <span class="subtitle">How we protect your data</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+<li><a href="/security.html">Security</a></li>
+</ul>
+</nav>
+
+<h2>Security First</h2>
+
+<p>Security isn't an afterthought at CostPlusDB. It's built into everything we do, from server hardening to transparent operations.</p>
+
+<hr>
+
+<h2>Our Security Practices</h2>
+
+<h3>Server Hardening</h3>
+<ul>
+<li>✅ SSH key authentication only (Ed25519 encryption)</li>
+<li>✅ Root login disabled</li>
+<li>✅ Custom SSH port (non-default)</li>
+<li>✅ Firewall (UFW) with minimal open ports</li>
+<li>✅ fail2ban intrusion prevention</li>
+<li>✅ Automatic security updates</li>
+<li>✅ NTP time synchronization</li>
+<li>✅ Log rotation and monitoring</li>
+</ul>
+
+<h3>PostgreSQL Security</h3>
+<ul>
+<li>✅ SSL/TLS enforced on all connections</li>
+<li>✅ scram-sha-256 password encryption</li>
+<li>✅ Customer database isolation</li>
+<li>✅ Connection pooling (pgBouncer)</li>
+<li>✅ Connection logging enabled</li>
+<li>✅ Separate users per customer</li>
+<li>✅ Principle of least privilege</li>
+</ul>
+
+<h3>Backup Security</h3>
+<ul>
+<li>✅ Encrypted backups with pgBackRest</li>
+<li>✅ Multi-region redundancy (Wasabi S3)</li>
+<li>✅ 30-day retention</li>
+<li>✅ Point-in-time recovery (7 days)</li>
+<li>✅ Monthly restoration testing</li>
+</ul>
+
+<h3>Monitoring & Response</h3>
+<ul>
+<li>✅ 24/7 uptime monitoring (Betterstack)</li>
+<li>✅ Automated alerts for issues</li>
+<li>✅ Daily backup verification</li>
+<li>✅ Weekly security patches</li>
+<li>✅ Incident response procedures documented</li>
+</ul>
+
+<hr>
+
+<h2>Security Standards We Follow</h2>
+
+<p>We don't reinvent the wheel. We follow industry-proven security standards and best practices:</p>
+
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/imthenachoman/How-To-Secure-A-Linux-Server">Linux Server Security Guide</a></td>
+<td>Comprehensive server hardening procedures</td>
+</tr>
+<tr>
+<td><a href="https://infosec.mozilla.org/guidelines/openssh">Mozilla OpenSSH Guidelines</a></td>
+<td>SSH configuration best practices</td>
+</tr>
+<tr>
+<td><a href="https://www.postgresql.org/docs/current/security.html">PostgreSQL Security</a></td>
+<td>Official database security documentation</td>
+</tr>
+<tr>
+<td><a href="https://www.cisecurity.org/cis-benchmarks/">CIS Benchmarks</a></td>
+<td>Industry-standard security configurations</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Transparency</h2>
+
+<p>Unlike most database providers, we publish our security procedures publicly:</p>
+
+<details>
+<summary><strong>Why publish security procedures?</strong></summary>
+<ul>
+<li><strong>Accountability:</strong> If we publish our SOPs, we have to follow them</li>
+<li><strong>Trust:</strong> You can verify we're doing what we say</li>
+<li><strong>Education:</strong> Help other solo operators learn secure practices</li>
+<li><strong>Peer Review:</strong> Security experts can spot gaps and help us improve</li>
+</ul>
+</details>
+
+<p>View our complete security procedures:</p>
+<ul>
+<li><a href="/transparency/operations-manual.html">Operations Manual</a> - SOPs we follow</li>
+<li><a href="https://github.com/jeremylongshore/cost-plus-db">GitHub Repository</a> - Full documentation (requires access)</li>
+</ul>
+
+<hr>
+
+<h2>What We Don't Do</h2>
+
+<p>Honest security means admitting what we can't provide:</p>
+
+<table>
+<thead>
+<tr>
+<th>What</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99.999% uptime SLA</td>
+<td>Unrealistic for bootstrapped service. We guarantee 99.9%</td>
+</tr>
+<tr>
+<td>24/7 phone support</td>
+<td>Solo operator. Email support with 4-hour SLA (business hours)</td>
+</tr>
+<tr>
+<td>HIPAA compliance (now)</td>
+<td>Requires legal review. Available Month 12+ only</td>
+</tr>
+<tr>
+<td>SOC 2 certification</td>
+<td>Expensive audit process. Following standards without certification</td>
+</tr>
+<tr>
+<td>Penetration testing</td>
+<td>Can't afford external pentest. Following documented hardening instead</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Incident Response</h2>
+
+<p>If something goes wrong, here's what happens:</p>
+
+<h3>P0: Database Down (Critical)</h3>
+<ol>
+<li>Automatic alert to operator (SMS + email)</li>
+<li>Email to customer within 5 minutes</li>
+<li>Investigation and fix in progress</li>
+<li>Updates every 15 minutes until resolved</li>
+<li>Post-mortem report within 24 hours</li>
+<li>SLA credit if downtime > 1 hour (pro-rated refund)</li>
+</ol>
+
+<h3>Security Incident</h3>
+<ol>
+<li>Isolate affected systems immediately</li>
+<li>Email all affected customers within 1 hour</li>
+<li>Forensic analysis</li>
+<li>Remediation and hardening</li>
+<li>Detailed incident report to customers</li>
+<li>Public disclosure (if data breach)</li>
+</ol>
+
+<p><strong>View our complete incident response procedures:</strong> <a href="/transparency/operations-manual.html">Operations Manual</a></p>
+
+<hr>
+
+<h2>Reporting Security Issues</h2>
+
+<p>Found a security vulnerability? Please report it responsibly:</p>
+
+<h3>How to Report</h3>
+<ol>
+<li><strong>Email:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></li>
+<li><strong>Subject:</strong> "SECURITY: [brief description]"</li>
+<li><strong>Include:</strong>
+  <ul>
+    <li>Description of the vulnerability</li>
+    <li>Steps to reproduce</li>
+    <li>Potential impact</li>
+    <li>Suggested fix (if you have one)</li>
+  </ul>
+</li>
+</ol>
+
+<h3>What to Expect</h3>
+<ul>
+<li><strong>Acknowledgment:</strong> Within 24 hours</li>
+<li><strong>Assessment:</strong> Within 72 hours</li>
+<li><strong>Fix:</strong> Critical issues within 7 days, others within 30 days</li>
+<li><strong>Credit:</strong> We'll credit you (if you want) in our security changelog</li>
+</ul>
+
+<p><strong>Please do NOT:</strong></p>
+<ul>
+<li>Post publicly before we've had a chance to fix</li>
+<li>Attempt to access customer data</li>
+<li>Use automated vulnerability scanners without permission</li>
+</ul>
+
+<hr>
+
+<h2>Security Audit History</h2>
+
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Type</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-10-19</td>
+<td>Internal Security Audit</td>
+<td>Rating: 75/100 (Good) - 12 improvements identified</td>
+</tr>
+<tr>
+<td>Future</td>
+<td>External Pentest</td>
+<td>Planned once revenue supports cost</td>
+</tr>
+<tr>
+<td>Monthly</td>
+<td>Automated Scans (Lynis)</td>
+<td>Ongoing</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Security Credits</h2>
+
+<p>Our security practices are based on proven industry guides and open-source standards. We're grateful to the security community for sharing their knowledge:</p>
+
+<ul>
+<li><strong><a href="https://github.com/imthenachoman/How-To-Secure-A-Linux-Server">How To Secure A Linux Server</a></strong> by <a href="https://github.com/imthenachoman">imthenachoman</a> - Comprehensive Linux server hardening guide (CC-BY-SA License)</li>
+<li><strong><a href="https://infosec.mozilla.org/guidelines/openssh">Mozilla OpenSSH Security Guidelines</a></strong> - SSH configuration best practices</li>
+<li><strong><a href="https://www.cisecurity.org/">Center for Internet Security (CIS)</a></strong> - Security benchmarks and standards</li>
+<li><strong><a href="https://www.postgresql.org/">PostgreSQL Global Development Group</a></strong> - Database security documentation</li>
+</ul>
+
+<p>Standing on the shoulders of giants. 🙏</p>
+
+<hr>
+
+<h2>Questions?</h2>
+
+<p>
+<strong>Security concerns:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a><br>
+<strong>General inquiries:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a>
+</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io |
+<a href="/privacy.html">Privacy</a> |
+<a href="/terms.html">Terms</a> |
+<a href="/security.html">Security</a></p>
+</footer>
+
+</body>
+</html>
