@@ -6,6 +6,61 @@
 
 ---
 
+## Launch Strategy: Quality Over Quantity
+
+### Limited Initial Rollout (Month 0-3)
+
+**MAXIMUM 5 CUSTOMERS for initial launch.**
+
+**Why Only 5?**
+- **Execution is everything** - I will not sacrifice quality for quantity
+- **Learn from each customer** - Refine processes, catch issues early
+- **Maintain 4-hour support SLA** - Can't do that with 50 customers
+- **Build reputation on excellence** - 5 happy customers > 50 mediocre experiences
+- **Solo operator reality** - I'm doing setup, support, monitoring myself
+
+**What This Means:**
+
+```
+If someone requests onboarding and we're at 5 customers:
+
+"Hi [Name],
+
+Thanks for your interest in CostPlusDB!
+
+We're currently at capacity for our initial rollout (5 customers max).
+This is intentional - I'm focused on execution quality, not growth speed.
+
+I'm adding customers slowly as I refine operations and ensure existing
+customers get excellent service.
+
+Options:
+1. Join the waitlist - I'll reach out when a slot opens (usually 2-4 weeks)
+2. If you need immediate access, I can refer you to [alternative provider]
+
+I appreciate your patience. Building this right is more important than
+building it fast.
+
+Best,
+Jeremy"
+```
+
+**Expansion Timeline:**
+- **Month 0-3:** Max 5 customers (learn, refine, document)
+- **Month 4-6:** Expand to 10-15 customers (processes proven)
+- **Month 7-12:** Expand to 25-50 customers (automation in place)
+- **Month 12+:** Remove cap, scale carefully
+
+**Philosophy:**
+- Execution > Growth
+- Quality > Quantity
+- Happy customers > Revenue targets
+- Sustainable > Fast
+
+**If a customer can't wait:** That's okay. Refer them elsewhere. Don't compromise quality.
+
+---
+
 ## Pre-Onboarding: Customer Qualification
 
 ### Step 1: Initial Contact & Verification (5 min)
