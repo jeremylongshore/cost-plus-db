@@ -52,25 +52,12 @@
 
 <h2>Configuration</h2>
 
-<label for="ram">RAM (GB)</label>
-<select id="ram" onchange="updatePrice()">
-<option value="2">2 GB (Shared)</option>
-<option value="4">4 GB</option>
-<option value="8" selected>8 GB (Dedicated)</option>
-<option value="16">16 GB (Pro)</option>
-<option value="32">32 GB (Enterprise)</option>
-<option value="64">64 GB (Custom)</option>
-</select>
-
-<label for="storage">Storage (GB)</label>
-<select id="storage" onchange="updatePrice()">
-<option value="20">20 GB</option>
-<option value="50">50 GB</option>
-<option value="100">100 GB</option>
-<option value="200" selected>200 GB</option>
-<option value="400">400 GB</option>
-<option value="800">800 GB</option>
-<option value="1000">1 TB</option>
+<label for="tier">Base Tier</label>
+<select id="tier" onchange="selectTierFromDropdown()">
+<option value="shared">Shared - $49/mo (2GB RAM, 20GB storage)</option>
+<option value="dedicated" selected>Dedicated - $89/mo (8GB RAM, 200GB storage)</option>
+<option value="pro">Pro - $129/mo (16GB RAM, 400GB storage)</option>
+<option value="enterprise">Enterprise - $149/mo (32GB RAM, 800GB storage)</option>
 </select>
 
 <label for="provider">Infrastructure Provider</label>
@@ -123,37 +110,41 @@ Compliance Package - <strong>+$100/mo</strong>
 <thead>
 <tr>
 <th>Item</th>
-<th>Cost</th>
+<th>Price</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>VPS (<span id="provider-name">Contabo</span>, <span id="ram-display">8GB</span>)</td>
-<td id="cost-vps">$12.00</td>
+<td><strong>Base Tier</strong> (<span id="tier-name">Dedicated</span>: <span id="tier-specs">8GB RAM, 200GB storage</span>)</td>
+<td><strong id="price-base">$89.00</strong></td>
 </tr>
-<tr>
-<td>Backups (<span id="storage-display">200GB</span>)</td>
-<td id="cost-backup">$1.00</td>
+<tr id="upgrade-provider-row" class="hidden">
+<td>Infrastructure Upgrade (<span id="upgrade-provider-name">Hetzner</span>)</td>
+<td id="price-provider-upgrade">+$20.00</td>
 </tr>
-<tr>
-<td>Monitoring</td>
-<td id="cost-monitoring">$1.00</td>
+<tr id="upgrade-region-row" class="hidden">
+<td>Region Selection (<span id="upgrade-region-name">EU Central</span>)</td>
+<td id="price-region-upgrade">+$10.00</td>
 </tr>
-<tr id="cost-addon-row" class="hidden">
-<td>Add-ons</td>
-<td id="cost-addons">$0.00</td>
+<tr id="addons-ha-row" class="hidden">
+<td>High Availability</td>
+<td id="price-ha">+$99.00</td>
 </tr>
-<tr>
-<td><strong>TOTAL OUR COST</strong></td>
-<td><strong id="cost-total">$14.00</strong></td>
+<tr id="addons-replicas-row" class="hidden">
+<td>Read Replicas</td>
+<td id="price-replicas">+$15.00</td>
 </tr>
-<tr>
-<td>Our Markup (25%)</td>
-<td id="cost-markup">$3.50</td>
+<tr id="addons-vpn-row" class="hidden">
+<td>VPN Access</td>
+<td id="price-vpn">+$15.00</td>
+</tr>
+<tr id="addons-compliance-row" class="hidden">
+<td>Compliance Package</td>
+<td id="price-compliance">+$100.00</td>
 </tr>
 <tr>
 <td><strong>YOUR MONTHLY PRICE</strong></td>
-<td><strong id="price-total">$17.50</strong></td>
+<td><strong id="price-total">$89.00</strong></td>
 </tr>
 <tr>
 <td>AWS RDS Equivalent</td>
@@ -161,20 +152,20 @@ Compliance Package - <strong>+$100/mo</strong>
 </tr>
 <tr>
 <td><strong>YOU SAVE</strong></td>
-<td><strong id="price-savings">$262.50</strong></td>
+<td><strong id="price-savings">$191.00</strong></td>
 </tr>
 </tbody>
 </table>
 
 <details>
-<summary>How did we calculate this?</summary>
+<summary>How we price</summary>
 <ul>
-<li><strong>VPS costs</strong>: Actual pricing from provider websites</li>
-<li><strong>Backup costs</strong>: Wasabi S3 storage ($0.0059/GB/month)</li>
-<li><strong>Monitoring</strong>: Betterstack Pro ($1/month per database)</li>
-<li><strong>AWS comparison</strong>: db.t3.medium or equivalent RDS pricing</li>
+<li><strong>Base tiers</strong>: Fixed flat rates (Shared $49, Dedicated $89, Pro $129, Enterprise $149)</li>
+<li><strong>Infrastructure upgrades</strong>: Cost + 25% for Hetzner/DigitalOcean/AWS</li>
+<li><strong>Add-ons</strong>: Cost + 25% for HA, replicas, VPN, compliance</li>
+<li><strong>Region selection</strong>: +$10/month for specific datacenter choice</li>
 </ul>
-<p>See our <a href="/transparency/cost-breakdown.html">full cost breakdown</a>.</p>
+<p>See our <a href="/transparency/">transparency docs</a> for exact cost breakdowns.</p>
 </details>
 
 <hr>
@@ -216,92 +207,181 @@ Request Database for <span id="button-price">$17.50/month</span>
 </footer>
 
 <script>
-const COSTS = {
-  vps: {
-    contabo: { 2: 6, 4: 8, 8: 12, 16: 20, 32: 36, 64: 60 },
-    hetzner: { 2: 10, 4: 15, 8: 25, 16: 40, 32: 70, 64: 120 },
-    digitalocean: { 2: 12, 4: 18, 8: 32, 16: 56, 32: 96, 64: 160 },
-    aws: { 2: 30, 4: 50, 8: 73, 16: 120, 32: 200, 64: 350 }
+// Flat-rate tier pricing
+const TIERS = {
+  shared: {
+    name: 'Shared',
+    price: 49,
+    ram: 2,
+    storage: 20,
+    specs: '2GB RAM, 20GB storage',
+    awsComparison: 60
   },
-  backup_per_gb: 0.0059,
-  monitoring: 1.00,
-  addons: { ha: 99, replicas: 15, vpn: 15, compliance: 100 },
-  aws_comparison: { 2: 60, 4: 140, 8: 280, 16: 480, 32: 820, 64: 1400 }
+  dedicated: {
+    name: 'Dedicated',
+    price: 89,
+    ram: 8,
+    storage: 200,
+    specs: '8GB RAM, 200GB storage',
+    awsComparison: 280
+  },
+  pro: {
+    name: 'Pro',
+    price: 129,
+    ram: 16,
+    storage: 400,
+    specs: '16GB RAM, 400GB storage',
+    awsComparison: 480
+  },
+  enterprise: {
+    name: 'Enterprise',
+    price: 149,
+    ram: 32,
+    storage: 800,
+    specs: '32GB RAM, 800GB storage',
+    awsComparison: 820
+  }
 };
 
-const TIER_CONFIGS = {
-  shared: { ram: 2, storage: 20, provider: 'contabo' },
-  dedicated: { ram: 8, storage: 200, provider: 'contabo' },
-  pro: { ram: 16, storage: 400, provider: 'contabo' },
-  enterprise: { ram: 32, storage: 800, provider: 'hetzner' }
+// Infrastructure upgrade pricing (cost + 25%)
+const PROVIDER_UPGRADES = {
+  contabo: { name: 'Contabo', price: 0 }, // Default, included in base
+  hetzner: { name: 'Hetzner', price: 20 },
+  digitalocean: { name: 'DigitalOcean', price: 40 },
+  aws: { name: 'AWS', price: 91 }
 };
 
-function selectTier(tier) {
-  const config = TIER_CONFIGS[tier];
-  document.getElementById('ram').value = config.ram;
-  document.getElementById('storage').value = config.storage;
-  document.getElementById('provider').value = config.provider;
+// Region upgrade pricing
+const REGION_UPGRADE_PRICE = 10;
+
+// Add-on pricing (cost + 25%)
+const ADDONS = {
+  ha: 99,
+  replicas: 15,
+  vpn: 15,
+  compliance: 100
+};
+
+function selectTier(tierName) {
+  document.getElementById('tier').value = tierName;
+  document.getElementById('provider').value = 'contabo'; // Reset to default
+  updatePrice();
+}
+
+function selectTierFromDropdown() {
+  const tierName = document.getElementById('tier').value;
   updatePrice();
 }
 
 function updatePrice() {
-  const ram = parseInt(document.getElementById('ram').value);
-  const storage = parseInt(document.getElementById('storage').value);
+  const tierName = document.getElementById('tier').value;
+  const tier = TIERS[tierName];
   const provider = document.getElementById('provider').value;
+  const region = document.getElementById('region').value;
 
   const addonHa = document.getElementById('addon-ha').checked;
   const addonReplicas = document.getElementById('addon-replicas').checked;
   const addonVpn = document.getElementById('addon-vpn').checked;
   const addonCompliance = document.getElementById('addon-compliance').checked;
 
-  const vpsCost = COSTS.vps[provider][ram] || 0;
-  const backupCost = Math.max(1, storage * COSTS.backup_per_gb);
-  const monitoringCost = COSTS.monitoring;
+  // Base tier price
+  let totalPrice = tier.price;
 
-  let addonsCost = 0;
-  if (addonHa) addonsCost += COSTS.addons.ha;
-  if (addonReplicas) addonsCost += COSTS.addons.replicas;
-  if (addonVpn) addonsCost += COSTS.addons.vpn;
-  if (addonCompliance) addonsCost += COSTS.addons.compliance;
+  // Update tier display
+  document.getElementById('tier-name').textContent = tier.name;
+  document.getElementById('tier-specs').textContent = tier.specs;
+  document.getElementById('price-base').textContent = '$' + tier.price.toFixed(2);
 
-  const totalCost = vpsCost + backupCost + monitoringCost + addonsCost;
-  const markup = totalCost * 0.25;
-  const yourPrice = totalCost + markup;
-  const awsPrice = COSTS.aws_comparison[ram] || (yourPrice * 15);
-  const savings = awsPrice - yourPrice;
-
-  document.getElementById('provider-name').textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
-  document.getElementById('ram-display').textContent = ram + 'GB';
-  document.getElementById('storage-display').textContent = storage + 'GB';
-  document.getElementById('cost-vps').textContent = '$' + vpsCost.toFixed(2);
-  document.getElementById('cost-backup').textContent = '$' + backupCost.toFixed(2);
-  document.getElementById('cost-monitoring').textContent = '$' + monitoringCost.toFixed(2);
-
-  if (addonsCost > 0) {
-    document.getElementById('cost-addon-row').classList.remove('hidden');
-    document.getElementById('cost-addons').textContent = '$' + addonsCost.toFixed(2);
+  // Infrastructure upgrade
+  const providerUpgrade = PROVIDER_UPGRADES[provider];
+  if (providerUpgrade.price > 0) {
+    document.getElementById('upgrade-provider-row').classList.remove('hidden');
+    document.getElementById('upgrade-provider-name').textContent = providerUpgrade.name;
+    document.getElementById('price-provider-upgrade').textContent = '+$' + providerUpgrade.price.toFixed(2);
+    totalPrice += providerUpgrade.price;
   } else {
-    document.getElementById('cost-addon-row').classList.add('hidden');
+    document.getElementById('upgrade-provider-row').classList.add('hidden');
   }
 
-  document.getElementById('cost-total').textContent = '$' + totalCost.toFixed(2);
-  document.getElementById('cost-markup').textContent = '$' + markup.toFixed(2);
-  document.getElementById('price-total').textContent = '$' + yourPrice.toFixed(2);
+  // Region upgrade
+  if (region !== 'default') {
+    document.getElementById('upgrade-region-row').classList.remove('hidden');
+    const regionNames = {
+      'eu-central': 'EU Central',
+      'us-east': 'US East',
+      'us-west': 'US West',
+      'asia': 'Asia Pacific'
+    };
+    document.getElementById('upgrade-region-name').textContent = regionNames[region];
+    document.getElementById('price-region-upgrade').textContent = '+$' + REGION_UPGRADE_PRICE.toFixed(2);
+    totalPrice += REGION_UPGRADE_PRICE;
+  } else {
+    document.getElementById('upgrade-region-row').classList.add('hidden');
+  }
+
+  // Add-ons
+  if (addonHa) {
+    document.getElementById('addons-ha-row').classList.remove('hidden');
+    totalPrice += ADDONS.ha;
+  } else {
+    document.getElementById('addons-ha-row').classList.add('hidden');
+  }
+
+  if (addonReplicas) {
+    document.getElementById('addons-replicas-row').classList.remove('hidden');
+    totalPrice += ADDONS.replicas;
+  } else {
+    document.getElementById('addons-replicas-row').classList.add('hidden');
+  }
+
+  if (addonVpn) {
+    document.getElementById('addons-vpn-row').classList.remove('hidden');
+    totalPrice += ADDONS.vpn;
+  } else {
+    document.getElementById('addons-vpn-row').classList.add('hidden');
+  }
+
+  if (addonCompliance) {
+    document.getElementById('addons-compliance-row').classList.remove('hidden');
+    totalPrice += ADDONS.compliance;
+  } else {
+    document.getElementById('addons-compliance-row').classList.add('hidden');
+  }
+
+  // Final calculations
+  const awsPrice = tier.awsComparison;
+  const savings = awsPrice - totalPrice;
+
+  document.getElementById('price-total').textContent = '$' + totalPrice.toFixed(2);
   document.getElementById('price-aws').textContent = '$' + awsPrice.toFixed(2);
   document.getElementById('price-savings').textContent = '$' + savings.toFixed(2);
-  document.getElementById('button-price').textContent = '$' + yourPrice.toFixed(2) + '/month';
+  document.getElementById('button-price').textContent = '$' + totalPrice.toFixed(2) + '/month';
 
+  // Save config to form
   const config = {
-    ram, storage, provider,
-    region: document.getElementById('region').value,
-    addons: { ha: addonHa, replicas: addonReplicas, vpn: addonVpn, compliance: addonCompliance },
-    pricing: { ourCost: totalCost, markup: markup, yourPrice: yourPrice }
+    tier: tierName,
+    tierSpecs: tier.specs,
+    provider: provider,
+    region: region,
+    addons: {
+      ha: addonHa,
+      replicas: addonReplicas,
+      vpn: addonVpn,
+      compliance: addonCompliance
+    },
+    pricing: {
+      basePrice: tier.price,
+      providerUpgrade: providerUpgrade.price,
+      regionUpgrade: (region !== 'default' ? REGION_UPGRADE_PRICE : 0),
+      totalPrice: totalPrice
+    }
   };
   document.getElementById('config-data').value = JSON.stringify(config);
 }
 
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  selectTier('dedicated');
+  updatePrice();
 });
 </script>
 
