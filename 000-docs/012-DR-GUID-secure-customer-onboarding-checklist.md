@@ -425,36 +425,138 @@ Jeremy"
 
 ---
 
-## Summary: Minimum Viable Security Checklist
+## Summary: Base Security vs Add-On Security
 
-**Customer Onboarding (Every Customer):**
-1. ✅ Verify email and identity
-2. ✅ Detect enterprise customers (charge appropriately)
-3. ✅ Payment verification
-4. ✅ Security model acknowledgment
-5. ✅ Secure server hardening
-6. ✅ PostgreSQL security configuration
-7. ✅ Encrypted backups setup
-8. ✅ Secure credential delivery
-9. ✅ Monitoring enabled
-10. ✅ 24-hour check-in
+### **INCLUDED IN BASE PRICE (All Tiers: $49/$89/$129/$149)**
 
-**Enterprise Customer Additions:**
-11. ✅ Compliance documentation (if needed)
-12. ✅ Private Slack channel
-13. ✅ Custom work scoping and pricing
+**Standard Security (Good Enough for 90% of Customers):**
+1. ✅ Server hardening: SSH keys, firewall, fail2ban, auto-updates
+2. ✅ PostgreSQL security: SSL/TLS enforced, strong passwords, isolated databases
+3. ✅ Daily encrypted backups (30-day retention, Wasabi S3)
+4. ✅ Point-in-time recovery (7 days)
+5. ✅ Uptime monitoring (alerts if down)
+6. ✅ Connection logging
+7. ✅ Email support (4-hour SLA, M-F 9am-6pm ET)
 
-**Ongoing:**
-14. ✅ Weekly security log review
-15. ✅ Monthly backup restoration test
-16. ✅ Scope creep protection (price custom work at $150/hour)
+**This is solid, reasonable, minimal security. Most customers won't need more.**
+
+---
+
+### **SECURITY ADD-ONS (This is where you make money)**
+
+**Infrastructure Security Add-Ons (Cost + 25%):**
+
+1. **VPN Access** - +$15/mo
+   - Private VPN tunnel to database
+   - Customer's application connects only via VPN
+   - Additional firewall isolation
+
+2. **IP Whitelisting** - Free (included)
+   - Restrict database access to specific IPs
+   - Basic security, no extra cost
+
+3. **Read Replicas (HA)** - +$99/mo
+   - Multi-region failover
+   - Load balancing
+   - 99.95% uptime SLA (vs 99.9% base)
+
+4. **Private Network (VPC)** - +$25/mo
+   - Dedicated private network
+   - Isolated from other customers
+   - Advanced network security
+
+5. **DDoS Protection** - +$50/mo
+   - Cloudflare enterprise DDoS mitigation
+   - Rate limiting
+   - Advanced threat detection
+
+**Compliance & Audit Add-Ons (Your Time = $150/hour OR monthly packages):**
+
+6. **Compliance Package** - +$100/mo
+   - DPA (Data Processing Agreement)
+   - Security questionnaire responses
+   - Audit logs with 1-year retention (vs 30-day base)
+   - Quarterly security reports
+   - **Does NOT include:** HIPAA/SOC2 certification (available Month 12+)
+
+7. **HIPAA Compliance** - +$200/mo (Month 12+, requires legal review)
+   - BAA (Business Associate Agreement)
+   - HIPAA-compliant infrastructure
+   - Enhanced audit logging
+   - Encrypted backups with compliance documentation
+
+8. **SOC 2 Assistance** - +$150/mo OR project-based pricing
+   - Help with SOC 2 audit preparation
+   - Documentation for your auditors
+   - **Not** a SOC 2 certification (you can't afford the audit yet)
+
+**Advanced Security Add-Ons (Your Time):**
+
+9. **Custom Firewall Rules** - $150 one-time setup
+   - Non-standard firewall configurations
+   - Application-specific rules
+   - Advanced iptables setup
+
+10. **Penetration Testing** - $500 one-time (external service cost + 25%)
+    - Hire external pentester
+    - Pass through cost + 25%
+    - Remediation included
+
+11. **Security Consulting** - $150/hour
+    - Schema design security review
+    - Query optimization for security
+    - Application-level security advice
+
+12. **Dedicated Security Support** - +$300/mo
+    - 1-hour SLA for security issues (vs 4-hour base)
+    - Private Slack channel for security questions
+    - Proactive security monitoring reviews
+
+---
+
+### **Pricing Philosophy**
+
+**Base Tiers ($49/$89/$129/$149):**
+- Includes: Reasonable, standard security that protects 90% of customers
+- You're not cutting corners, this is good security
+- Most indie devs/startups won't need more
+
+**Add-Ons (Where You Make Money):**
+- Infrastructure add-ons: Cost + 25% (VPN, HA, VPC, DDoS)
+- Compliance packages: Monthly fees cover your time + overhead
+- Custom work: $150/hour for your time
 
 **Philosophy:**
-- Secure by default
-- Transparent pricing (cost + 25% for infra, $150/hour for time)
-- Protect your time (charge for enterprise needs, decline bad fits)
-- No surprises (set expectations upfront)
+- Don't upsell security they don't need
+- But if they WANT extra security, charge for it
+- Compliance/audit work = your time is valuable
+- Enterprise customers who need custom security = $$$ add-ons
+
+---
+
+### **Customer Onboarding Checklist (Streamlined)**
+
+**Every Customer Gets:**
+1. ✅ Email verification (prevent fraud)
+2. ✅ Payment verification
+3. ✅ Standard security provisioning (included in base price)
+4. ✅ Secure credential delivery
+5. ✅ Monitoring setup
+6. ✅ 24-hour check-in
+
+**If Customer Wants More Security:**
+7. ✅ Assess which add-ons they need
+8. ✅ Quote add-on pricing (cost + 25% OR $150/hour)
+9. ✅ Get written approval
+10. ✅ Implement and invoice transparently
+
+**Scope Creep Protection:**
+- Base security = included, no nickel-and-diming
+- Extra security = add-ons, charge appropriately
+- Custom work = $150/hour, estimated upfront
 
 ---
 
 **This is your shield against getting fucked over by enterprise customers.** 🛡️
+
+**You provide good security in the base price. You make money when they want MORE.**
