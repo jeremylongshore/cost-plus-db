@@ -35,7 +35,7 @@ All keys and passphrases are stored **on the server only**, not in the git repos
 - Creation date
 
 ### PostgreSQL SSL Certificates
-**Location:** `/var/lib/postgresql/18/main/ssl/`
+**Location:** `/var/lib/postgresql/16/main/ssl/`
 **Permissions:** `600` for keys, `644` for certs
 **Files:**
 - `server.key` - Private key
@@ -68,13 +68,13 @@ All keys and passphrases are stored **on the server only**, not in the git repos
 **Renewal date:** 2026-10-19
 **Process:**
 ```bash
-cd /var/lib/postgresql/18/main/ssl
+cd /var/lib/postgresql/16/main/ssl
 sudo openssl genrsa -out server.key 2048
 sudo openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Texas/L=Houston/O=CostPlusDB/OU=Database/CN=costplusdb.com"
 sudo openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 sudo chown postgres:postgres server.*
 sudo chmod 600 server.key
-sudo pg_ctlcluster 18 main restart
+sudo pg_ctlcluster 16 main restart
 ```
 
 ---
@@ -111,7 +111,7 @@ sudo pg_ctlcluster 18 main restart
 
 **Recovery steps:**
 1. Provision new VPS
-2. Install PostgreSQL 18
+2. Install PostgreSQL 16
 3. Install pgBackRest
 4. Configure pgBackRest with saved passphrase
 5. Restore from Wasabi S3: `sudo -u postgres pgbackrest --stanza=main --repo=2 restore`

@@ -119,7 +119,7 @@ Be transparent:
 "Let me be clear about what you're getting and what you're NOT getting:
 
 **What you GET:**
-- PostgreSQL 18 (latest stable), fully managed
+- PostgreSQL 16 (latest stable), fully managed
 - Daily encrypted backups to Wasabi S3 cloud (7-day point-in-time recovery)
 - 99.9% uptime SLA (measured monthly, pro-rated refund if we miss)
 - Email support, 4-hour response time (business hours)
@@ -184,7 +184,7 @@ Any questions?"
 ## Services Provided
 
 CostPlusDB ("Provider") will provide:
-- PostgreSQL 18 managed database hosting
+- PostgreSQL 16 managed database hosting
 - Daily encrypted backups with 7-day point-in-time recovery
 - 99.9% uptime SLA (measured monthly)
 - Email support (4-hour response time, business hours: Mon-Fri 9 AM - 5 PM CST)
@@ -303,7 +303,7 @@ Once payment received:
 - [ ] Run provisioning script: `SUDO_PASS='[password]' ./provision-customer-database.sh [customer_name]`
 - [ ] Verify database created: `sudo -u postgres psql -p 5433 -c "\l" | grep [customer_name]`
 - [ ] Test connection with provided credentials
-- [ ] Verify SSL enforced: `sudo cat /etc/postgresql/18/main/pg_hba.conf | grep [customer_name]`
+- [ ] Verify SSL enforced: `sudo cat /etc/postgresql/16/main/pg_hba.conf | grep [customer_name]`
 
 **[Day 0] Send Welcome Email**
 (See template below)
@@ -329,7 +329,7 @@ Once payment received:
 ```
 Hi [Name],
 
-Welcome to CostPlusDB! Your PostgreSQL 18 database is ready.
+Welcome to CostPlusDB! Your PostgreSQL 16 database is ready.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CONNECTION DETAILS

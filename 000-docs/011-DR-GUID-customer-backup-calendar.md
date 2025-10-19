@@ -353,7 +353,7 @@ Description:
 Title: ⚠️ Scheduled Maintenance: PostgreSQL Security Update
 Time: 2025-10-26 at 3:00 AM - 3:30 AM CST
 Description:
-  Applying PostgreSQL 18.1 security update.
+  Applying PostgreSQL 16.4 security update.
 
   Expected downtime: 10-15 minutes
   Impact: Brief connection interruption

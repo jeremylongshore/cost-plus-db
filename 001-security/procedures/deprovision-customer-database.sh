@@ -54,7 +54,7 @@ sudo -u postgres psql -p $POSTGRES_PORT -c "DROP USER IF EXISTS $DB_USER;"
 
 # Remove pg_hba.conf entry
 echo "Removing pg_hba.conf entry..."
-sudo sed -i "/hostssl.*$DB_NAME.*$DB_USER/d" /etc/postgresql/18/main/pg_hba.conf
+sudo sed -i "/hostssl.*$DB_NAME.*$DB_USER/d" /etc/postgresql/16/main/pg_hba.conf
 
 # Reload PostgreSQL
 echo "Reloading PostgreSQL configuration..."

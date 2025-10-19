@@ -18,7 +18,7 @@ All 5 critical security items have been implemented. Your Contabo server is now 
 **Status:** ✅ Complete
 
 **What was done:**
-- Generated proper SSL certificates (server.crt, server.key) in `/var/lib/postgresql/18/main/ssl/`
+- Generated proper SSL certificates (server.crt, server.key) in `/var/lib/postgresql/16/main/ssl/`
 - Configured PostgreSQL to use new certificates (not snakeoil)
 - Enforced TLSv1.2 minimum protocol version
 - Updated pg_hba.conf to require SSL for all remote connections (`hostssl`)
@@ -29,7 +29,7 @@ All 5 critical security items have been implemented. Your Contabo server is now 
 sudo -u postgres psql -p 5433 -c "SHOW ssl; SHOW ssl_cert_file; SHOW ssl_min_protocol_version;"
 # Output:
 # ssl: on
-# ssl_cert_file: /var/lib/postgresql/18/main/ssl/server.crt
+# ssl_cert_file: /var/lib/postgresql/16/main/ssl/server.crt
 # ssl_min_protocol_version: TLSv1.2
 ```
 
@@ -127,12 +127,12 @@ sudo -u postgres pgbackrest --stanza=main info
 **Status:** ✅ Complete
 
 **What was done:**
-- Updated PostgreSQL 16 → PostgreSQL 18 across all pages
+- Updated PostgreSQL 16 → PostgreSQL 16 across all pages
 - Created documentation hub page: `/docs.html`
   - FAQ-style with expandable sections
   - Brief summaries + links to detailed docs
 - Added "Docs" link to navigation on all pages
-- Updated references from "PostgreSQL 13-16 (your choice)" to "PostgreSQL 18 (latest stable)"
+- Updated references from "PostgreSQL 13-16 (your choice)" to "PostgreSQL 16 (latest stable)"
 
 **Files updated:**
 - `website/index.html`
@@ -237,7 +237,7 @@ sudo -u postgres psql -p 5433 -c "DROP DATABASE IF EXISTS testcustomer_db;"
 sudo -u postgres psql -p 5433 -c "DROP USER IF EXISTS testcustomer_user;"
 
 # Remove pg_hba.conf entry
-sudo sed -i '/testcustomer/d' /etc/postgresql/18/main/pg_hba.conf
+sudo sed -i '/testcustomer/d' /etc/postgresql/16/main/pg_hba.conf
 sudo -u postgres psql -p 5433 -c "SELECT pg_reload_conf();"
 ```
 
@@ -247,7 +247,7 @@ sudo -u postgres psql -p 5433 -c "SELECT pg_reload_conf();"
 
 | Item | Status | Details |
 |------|--------|---------|
-| PostgreSQL 18 | ✅ Running | Port 5433, SSL enforced |
+| PostgreSQL 16 | ✅ Running | Port 5433, SSL enforced |
 | SSL/TLS | ✅ Configured | TLSv1.2+, proper certs |
 | fail2ban | ✅ Active | Protecting port 5433 |
 | Local Backups | ✅ Working | `/var/lib/pgbackrest` |
@@ -255,7 +255,7 @@ sudo -u postgres psql -p 5433 -c "SELECT pg_reload_conf();"
 | Daily Backups | ✅ Scheduled | 2 AM CST via cron |
 | Provisioning | ✅ Ready | Scripts tested |
 | Documentation | ✅ Complete | Onboarding + migration |
-| Website | ✅ Updated | PostgreSQL 18, docs page |
+| Website | ✅ Updated | PostgreSQL 16, docs page |
 
 ---
 
@@ -401,7 +401,7 @@ Dedicated tier customer sees: **$89/month** (pricing from calculator)
 **If server dies and you need to restore:**
 
 1. Provision new VPS
-2. Install PostgreSQL 18
+2. Install PostgreSQL 16
 3. Install pgBackRest
 4. Use encryption passphrase from backup
 5. Restore from Wasabi:

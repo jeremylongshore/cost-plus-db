@@ -45,7 +45,7 @@ This folder contains all security-related documentation, audits, implementation 
 **Location on Server:**
 - Encryption passphrase: `/root/pgbackrest-keys/encryption-passphrase.txt`
 - Customer credentials: `/root/customer-credentials/`
-- SSL certificates: `/var/lib/postgresql/18/main/ssl/`
+- SSL certificates: `/var/lib/postgresql/16/main/ssl/`
 
 ⚠️ **NEVER commit these to git!**
 
@@ -159,7 +159,7 @@ sudo -u postgres pgbackrest --stanza=main info
 sudo -u postgres psql -p 5433 -c "SELECT datname, datdba::regrole AS owner FROM pg_database WHERE datname NOT IN ('postgres', 'template0', 'template1');"
 
 # Check pg_hba.conf entries
-sudo cat /etc/postgresql/18/main/pg_hba.conf | grep hostssl
+sudo cat /etc/postgresql/16/main/pg_hba.conf | grep hostssl
 ```
 
 ---
@@ -232,7 +232,7 @@ Before going live, remove test customer:
 ```bash
 sudo -u postgres psql -p 5433 -c "DROP DATABASE IF EXISTS testcustomer_db;"
 sudo -u postgres psql -p 5433 -c "DROP USER IF EXISTS testcustomer_user;"
-sudo sed -i '/testcustomer/d' /etc/postgresql/18/main/pg_hba.conf
+sudo sed -i '/testcustomer/d' /etc/postgresql/16/main/pg_hba.conf
 sudo -u postgres psql -p 5433 -c "SELECT pg_reload_conf();"
 ```
 

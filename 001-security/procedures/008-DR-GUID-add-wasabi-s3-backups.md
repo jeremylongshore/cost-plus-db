@@ -83,7 +83,7 @@ log-level-console=info
 log-level-file=debug
 
 [main]
-pg1-path=/var/lib/postgresql/18/main
+pg1-path=/var/lib/postgresql/16/main
 pg1-port=5433
 pg1-socket-path=/var/run/postgresql
 ```
@@ -150,7 +150,7 @@ Your Price: $17.99 × 1.25 = $22.49/month
 If Wasabi causes issues, you can disable it:
 
 1. Comment out `repo2-*` lines in `/etc/pgbackrest.conf`
-2. Restart PostgreSQL: `sudo pg_ctlcluster 18 main restart`
+2. Restart PostgreSQL: `sudo pg_ctlcluster 16 main restart`
 3. Backups will continue to local only
 
 ## Monitoring

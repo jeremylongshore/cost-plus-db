@@ -76,7 +76,7 @@ EOF
 # Add pg_hba.conf entry for remote SSL connections
 echo "Adding pg_hba.conf entry..."
 PG_HBA_ENTRY="hostssl  $DB_NAME  $DB_USER  0.0.0.0/0  scram-sha-256"
-echo "$PG_HBA_ENTRY" | echo $SUDO_PASS | sudo -S tee -a /etc/postgresql/18/main/pg_hba.conf > /dev/null
+echo "$PG_HBA_ENTRY" | echo $SUDO_PASS | sudo -S tee -a /etc/postgresql/16/main/pg_hba.conf > /dev/null
 
 # Reload PostgreSQL to apply pg_hba.conf changes
 echo "Reloading PostgreSQL configuration..."

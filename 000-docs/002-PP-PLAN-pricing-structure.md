@@ -47,7 +47,7 @@ All tiers include Contabo infrastructure by default.
 ```
 
 **All Tiers Include:**
-- ✅ PostgreSQL 13-16 (your choice)
+- ✅ PostgreSQL 16 (latest stable)
 - ✅ Daily backups (30-day retention)
 - ✅ Point-in-time recovery (7 days)
 - ✅ Multi-region backup redundancy

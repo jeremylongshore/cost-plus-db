@@ -84,7 +84,7 @@ As original, but add: **Compliance-Focused Enterprises** (5%) - Needing AWS/GCP 
 | **Pro** | $129/mo | 6 vCPU, 16GB RAM, 400GB storage | Larger databases | $25-30 |
 | **Enterprise** | $149/mo | 8 vCPU, 32GB RAM, 800GB storage | Regulated industries | $35-40 (potential AWS/GCP) |
 
-**Error Correction:** Specs adjusted for 2025 (e.g., more RAM/vCPU in higher tiers per provider trends). All include PostgreSQL 13-16, daily backups (30-day), PITR (7 days), monitoring (Betterstack), support. Enterprise: Slack, DPA, audits.
+**Error Correction:** Specs adjusted for 2025 (e.g., more RAM/vCPU in higher tiers per provider trends). All include PostgreSQL 16, daily backups (30-day), PITR (7 days), monitoring (Betterstack), support. Enterprise: Slack, DPA, audits.
 
 #### Infrastructure Strategy
 
