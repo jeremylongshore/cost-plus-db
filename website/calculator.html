@@ -187,7 +187,16 @@
       Once you're happy with your configuration, enter your email and we'll send you a payment link within 1-2 hours.
     </p>
 
-    <form id="signup-form" action="/.netlify/functions/create-checkout" method="POST">
+    <form name="database-request"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field">
+
+      <!-- Honeypot for spam protection -->
+      <p class="hidden">
+        <label>Don't fill this out: <input name="bot-field"></label>
+      </p>
+
       <label for="email">Email Address *</label>
       <input type="email" id="email" name="email" required
              placeholder="you@example.com">
@@ -359,27 +368,8 @@
       selectTier('dedicated'); // Default to dedicated tier
     });
 
-    // Handle form submission
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(e.target);
-      const data = {
-        email: formData.get('email'),
-        company: formData.get('company'),
-        notes: formData.get('notes'),
-        config: JSON.parse(formData.get('config'))
-      };
-
-      // For now, just show alert (you'll replace with actual Netlify Function call)
-      alert('Thanks! We\'ll email you within 1-2 hours with your payment link and provisioning details.\\n\\nConfiguration saved:\\n' + JSON.stringify(data.config, null, 2));
-
-      // TODO: Replace with actual form submission to Netlify Function
-      // const response = await fetch('/.netlify/functions/create-checkout', {
-      //   method: 'POST',
-      //   body: JSON.stringify(data)
-      // });
-    });
+    // Form is handled by Netlify Forms automatically
+    // No JavaScript needed - Netlify processes the form on submission
   </script>
 
 </body>
