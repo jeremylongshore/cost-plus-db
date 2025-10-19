@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>AI & Data Policy - CostPlusDB</title>
+  <meta name="description" content="How we use AI, automation, and handle your data">
+
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">AI & Data Policy</h1>
+      <span class="subtitle">How we use AI and handle your data</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/calculator.html">Calculator</a></li>
+<li><a href="/about.html">About</a></li>
+<li><a href="/transparency/">Transparency</a></li>
+<li><a href="/security.html">Security</a></li>
+</ul>
+</nav>
+
+<h2>Our Commitment</h2>
+
+<p><strong>Radical transparency:</strong> If AI touches your data, you deserve to know exactly how and why.</p>
+
+<p><strong>Last updated:</strong> October 19, 2025</p>
+
+<hr>
+
+<h2>AI & Automation Usage</h2>
+
+<h3>✅ What We Use AI For</h3>
+
+<details>
+<summary><strong>Internal Operations (No Customer Data)</strong></summary>
+<ul>
+<li><strong>Documentation:</strong> Generating SOPs, guides, and marketing copy</li>
+<li><strong>Infrastructure:</strong> Server provisioning scripts and automation</li>
+<li><strong>Code Review:</strong> Security audits and configuration checks</li>
+<li><strong>Support Drafting:</strong> Initial responses (always human-reviewed before sending)</li>
+</ul>
+<p><strong>Data used:</strong> ZERO customer data - only templates and configs</p>
+</details>
+
+<details>
+<summary><strong>AI Tools We Use</strong></summary>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Customer Data?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code (Anthropic)</td>
+<td>Infrastructure automation, docs</td>
+<td>❌ NO</td>
+</tr>
+<tr>
+<td>GitHub Copilot</td>
+<td>Code suggestions</td>
+<td>❌ NO</td>
+</tr>
+<tr>
+<td>ChatGPT</td>
+<td>Support drafting (reviewed)</td>
+<td>❌ NO</td>
+</tr>
+</tbody>
+</table>
+</details>
+
+<h3>❌ What We DON'T Use AI For</h3>
+
+<p><strong>NEVER used on customer data:</strong></p>
+<ul>
+<li>❌ Analyzing your database contents</li>
+<li>❌ Processing your application data</li>
+<li>❌ Training AI models on your schemas</li>
+<li>❌ Automated decisions about access or pricing</li>
+</ul>
+
+<hr>
+
+<h2>Customer Data Policy</h2>
+
+<h3>What Data We Collect</h3>
+
+<p><strong>Infrastructure Data (Required):</strong></p>
+<ul>
+<li>✅ Connection logs (IP, timestamp, success/fail)</li>
+<li>✅ Performance metrics (query count, DB size)</li>
+<li>✅ Backup metadata (size, timestamp)</li>
+<li>✅ Billing info (Stripe handles payments)</li>
+</ul>
+
+<p><strong>What We DON'T Collect:</strong></p>
+<ul>
+<li>❌ Your database schema</li>
+<li>❌ Your table contents</li>
+<li>❌ Your application data</li>
+<li>❌ Your query contents</li>
+</ul>
+
+<h3>Who Can Access Your Data</h3>
+
+<table>
+<thead>
+<tr>
+<th>Who</th>
+<th>Access Level</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jeremy (Owner)</td>
+<td>Admin (with permission)</td>
+<td>Setup, maintenance, debugging</td>
+</tr>
+<tr>
+<td>Automated backups</td>
+<td>Read-only snapshot</td>
+<td>pgBackRest backup process</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>Connection count only</td>
+<td>Betterstack uptime checks</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>We NEVER:</strong></p>
+<ul>
+<li>Sell your data to third parties</li>
+<li>Use your data for AI training</li>
+<li>Share with other customers</li>
+<li>Access without permission (except emergencies)</li>
+</ul>
+
+<h3>Emergency Access</h3>
+
+<p><strong>When we might access WITHOUT permission:</strong></p>
+<ol>
+<li>Active security attack detected</li>
+<li>Data corruption during backup verification</li>
+<li>Valid court order or subpoena</li>
+</ol>
+
+<p><strong>You'll be notified:</strong> Within 1 hour via email + full incident report within 24 hours</p>
+
+<hr>
+
+<h2>Automation Boundaries</h2>
+
+<h3>✅ Fully Automated (No Human Review)</h3>
+<ul>
+<li>Daily backups (pgBackRest)</li>
+<li>Security updates</li>
+<li>SSL certificate renewal</li>
+<li>Monitoring alerts</li>
+<li>Log rotation</li>
+</ul>
+
+<h3>⚠️ Semi-Automated (Human Review Required)</h3>
+<ul>
+<li>Database provisioning (script + Jeremy verification)</li>
+<li>PostgreSQL upgrades</li>
+<li>Firewall changes</li>
+<li>Support responses (AI drafts, Jeremy sends)</li>
+</ul>
+
+<h3>🚫 Manual Only (No Automation)</h3>
+<ul>
+<li>Customer onboarding decisions</li>
+<li>Pricing negotiations</li>
+<li>Security incident response</li>
+<li>Data deletion requests</li>
+<li>Refund processing</li>
+</ul>
+
+<hr>
+
+<h2>Third-Party Services</h2>
+
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Data Shared</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contabo VPS</td>
+<td>Database resides on servers</td>
+<td>Infrastructure hosting</td>
+</tr>
+<tr>
+<td>Wasabi S3</td>
+<td>Encrypted backups</td>
+<td>Backup storage</td>
+</tr>
+<tr>
+<td>Betterstack</td>
+<td>Connection ping results</td>
+<td>Uptime monitoring</td>
+</tr>
+<tr>
+<td>Stripe</td>
+<td>Email, billing info</td>
+<td>Payment processing</td>
+</tr>
+<tr>
+<td>Netlify</td>
+<td>Form submissions</td>
+<td>Website hosting</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Encryption:</strong></p>
+<ul>
+<li>✅ Backups encrypted AES-256-CBC before Wasabi upload</li>
+<li>✅ Database connections require TLS/SSL</li>
+<li>✅ SSH uses Ed25519 key authentication</li>
+</ul>
+
+<hr>
+
+<h2>Data Retention</h2>
+
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention</th>
+<th>Deletion Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Active database</td>
+<td>Until cancellation</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>After cancellation</td>
+<td>30 days</td>
+<td>DROP DATABASE + backup deletion</td>
+</tr>
+<tr>
+<td>Backups (Wasabi)</td>
+<td>30 days rolling</td>
+<td>Automatic expiration</td>
+</tr>
+<tr>
+<td>Connection logs</td>
+<td>90 days</td>
+<td>Automatic rotation</td>
+</tr>
+<tr>
+<td>Billing records</td>
+<td>7 years (legal)</td>
+<td>Encrypted archive</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Deletion Requests</h3>
+
+<p><strong>Right to be forgotten:</strong></p>
+<ul>
+<li>Email: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> with subject "DATA DELETION REQUEST"</li>
+<li>Timeline: Database deleted within 24 hours, backups purged within 30 days</li>
+<li>Confirmation: Proof of deletion provided (screenshot)</li>
+</ul>
+
+<hr>
+
+<h2>Your Rights</h2>
+
+<p><strong>You have the right to:</strong></p>
+
+<ul>
+<li>✅ <strong>Inspect:</strong> Request access logs</li>
+<li>✅ <strong>Export:</strong> Download full database dump anytime</li>
+<li>✅ <strong>Delete:</strong> Request immediate data deletion</li>
+<li>✅ <strong>Audit:</strong> Request our security audit reports</li>
+<li>✅ <strong>Opt-out:</strong> Request NO AI-assisted support</li>
+</ul>
+
+<p><strong>How to exercise:</strong></p>
+<ul>
+<li>Email: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></li>
+<li>Response: Within 24 hours</li>
+<li>Fulfillment: Within 7 days (deletion = 24 hours)</li>
+</ul>
+
+<hr>
+
+<h2>AI-Generated Content Disclosure</h2>
+
+<p><strong>AI-assisted on this website:</strong></p>
+<ul>
+<li>About page story (AI-drafted, human-edited)</li>
+<li>Security documentation (AI-drafted from official sources)</li>
+<li>FAQ responses (AI-drafted, human-reviewed)</li>
+</ul>
+
+<p><strong>100% human-written:</strong></p>
+<ul>
+<li>Pricing structure and business model</li>
+<li>Customer communication (emails, support)</li>
+</ul>
+
+<p><strong>Git commits marked with:</strong></p>
+<pre>🤖 Generated with [Claude Code](https://claude.com/claude-code)
+Co-Authored-By: Claude &lt;noreply@anthropic.com&gt;</pre>
+
+<p>See our commit history: <a href="https://github.com/jeremylongshore/cost-plus-db">GitHub</a></p>
+
+<hr>
+
+<h2>Policy Updates</h2>
+
+<p><strong>If we add NEW AI tools or change data handling:</strong></p>
+<ul>
+<li>30 days advance notice via email</li>
+<li>Opt-out option provided</li>
+<li>Updated policy published here</li>
+</ul>
+
+<hr>
+
+<h2>Questions?</h2>
+
+<p>
+<strong>Email:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a><br>
+<strong>Response time:</strong> 4 hours (business days)<br>
+<strong>Policy violation:</strong> Use subject "POLICY VIOLATION" for priority
+</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost + 25%</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström<br>
+Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren Embry</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io</p>
+<p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms & Acceptable Use</a> | <a href="/ai-policy.html">AI & Data Policy</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a></p>
+</footer>
+
+</body>
+</html>

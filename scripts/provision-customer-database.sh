@@ -82,13 +82,48 @@ echo "$PG_HBA_ENTRY" | echo $SUDO_PASS | sudo -S tee -a /etc/postgresql/16/main/
 echo "Reloading PostgreSQL configuration..."
 echo $SUDO_PASS | sudo -S -u postgres psql -p $POSTGRES_PORT -c "SELECT pg_reload_conf();"
 
+# Add user to pgBouncer (if installed)
+if command -v pgbouncer &> /dev/null && [ -f /etc/pgbouncer/userlist.txt ]; then
+    echo "Adding user to pgBouncer..."
+
+    # Extract password hash from PostgreSQL
+    PG_HASH=$(echo $SUDO_PASS | sudo -S -u postgres psql -p $POSTGRES_PORT -t -A -c \
+      "SELECT passwd FROM pg_shadow WHERE usename = '$DB_USER'")
+
+    # Add to pgBouncer userlist
+    echo "\"$DB_USER\" \"$PG_HASH\"" | echo $SUDO_PASS | sudo -S tee -a /etc/pgbouncer/userlist.txt > /dev/null
+
+    # Reload pgBouncer to pick up new user
+    echo $SUDO_PASS | sudo -S systemctl reload pgbouncer
+
+    echo "✅ User added to pgBouncer"
+fi
+
 # Save credentials securely
 CRED_DIR="/root/customer-credentials"
 CRED_FILE="$CRED_DIR/${CUSTOMER_NAME}.txt"
 echo $SUDO_PASS | sudo -S mkdir -p $CRED_DIR
 echo $SUDO_PASS | sudo -S chmod 700 $CRED_DIR
 
-echo $SUDO_PASS | sudo -S tee $CRED_FILE > /dev/null <<EOF
+if command -v pgbouncer &> /dev/null && [ -f /etc/pgbouncer/userlist.txt ]; then
+    # pgBouncer is installed
+    echo $SUDO_PASS | sudo -S tee $CRED_FILE > /dev/null <<EOF
+Customer: $CUSTOMER_NAME
+Database: $DB_NAME
+User: $DB_USER
+Password: $DB_PASSWORD
+
+Connection String (RECOMMENDED - via pgBouncer):
+  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:6432/$DB_NAME?sslmode=require
+
+Connection String (DIRECT - PostgreSQL):
+  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:$POSTGRES_PORT/$DB_NAME?sslmode=require
+
+Created: $(date)
+EOF
+else
+    # pgBouncer not installed
+    echo $SUDO_PASS | sudo -S tee $CRED_FILE > /dev/null <<EOF
 Customer: $CUSTOMER_NAME
 Database: $DB_NAME
 User: $DB_USER
@@ -99,6 +134,7 @@ Connection String (SSL required):
 
 Created: $(date)
 EOF
+fi
 
 echo $SUDO_PASS | sudo -S chmod 600 $CRED_FILE
 
@@ -109,12 +145,21 @@ echo "Credentials saved to: $CRED_FILE"
 echo ""
 echo "Connection details:"
 echo "  Host: <your_server_ip>"
-echo "  Port: $POSTGRES_PORT"
 echo "  Database: $DB_NAME"
 echo "  User: $DB_USER"
 echo "  Password: $DB_PASSWORD"
 echo "  SSL: REQUIRED"
 echo ""
-echo "Connection string:"
-echo "  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:$POSTGRES_PORT/$DB_NAME?sslmode=require"
+
+if command -v pgbouncer &> /dev/null && [ -f /etc/pgbouncer/userlist.txt ]; then
+    echo "Connection string (RECOMMENDED - via pgBouncer):"
+    echo "  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:6432/$DB_NAME?sslmode=require"
+    echo ""
+    echo "Connection string (DIRECT - PostgreSQL):"
+    echo "  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:$POSTGRES_PORT/$DB_NAME?sslmode=require"
+else
+    echo "Connection string:"
+    echo "  postgresql://$DB_USER:$DB_PASSWORD@<server_ip>:$POSTGRES_PORT/$DB_NAME?sslmode=require"
+fi
+
 echo "======================================"
