@@ -172,7 +172,15 @@ Compliance Package - <strong>+$100/mo</strong>
 
 <h2>Request Database</h2>
 
-<p>Once you're happy with your configuration, submit your request and we'll email you within 1-2 hours with payment details.</p>
+<p>Once you're happy with your configuration, submit your request.</p>
+
+<h3>What Happens Next:</h3>
+<ol>
+<li><strong>We review your request</strong> (usually within 1-2 hours)</li>
+<li><strong>We email you a Stripe payment link</strong> - secure checkout with card/bank account</li>
+<li><strong>Once payment confirms</strong>, we provision your database (1-2 hours)</li>
+<li><strong>You receive credentials</strong> - connection details sent securely</li>
+</ol>
 
 <form name="database-request" method="POST" data-netlify="true" netlify-honeypot="bot-field">
 
@@ -187,7 +195,7 @@ Compliance Package - <strong>+$100/mo</strong>
 <input type="text" id="company" name="company">
 
 <label for="notes">Additional Notes</label>
-<textarea id="notes" name="notes" rows="3"></textarea>
+<textarea id="notes" name="notes" rows="3" placeholder="Compliance needs, special requirements, questions..."></textarea>
 
 <input type="hidden" id="config-data" name="config">
 
@@ -195,7 +203,7 @@ Compliance Package - <strong>+$100/mo</strong>
 Request Database for <span id="button-price">$17.50/month</span>
 </button>
 
-<p>We'll email you within 1-2 hours with payment link and provisioning details.</p>
+<p><strong>No payment now.</strong> We'll send you a Stripe payment link via email within 1-2 hours.</p>
 
 </form>
 
