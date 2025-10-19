@@ -110,10 +110,9 @@
 
 <h3>PostgreSQL Configuration</h3>
 <ul>
-<li><strong>Version:</strong> 16 (latest stable), customer can choose 13-16</li>
+<li><strong>Version:</strong> 16 (latest stable)</li>
 <li><strong>SSL/TLS:</strong> Enforced on all connections, self-signed or Let's Encrypt</li>
-<li><strong>Connection Pooling:</strong> pgBouncer for efficient connection management</li>
-<li><strong>Authentication:</strong> md5 or scram-sha-256, unique password per customer</li>
+<li><strong>Authentication:</strong> scram-sha-256, unique password per customer</li>
 <li><strong>Logging:</strong> Enabled for slow queries, errors, and connections</li>
 </ul>
 
@@ -232,7 +231,6 @@ every 15 minutes until resolved.
 <li>SSH into appropriate VPS</li>
 <li>Create new PostgreSQL database and user</li>
 <li>Generate strong random password (save in password manager)</li>
-<li>Configure pgBouncer for connection pooling</li>
 <li>Add to backup schedule</li>
 <li>Add to monitoring alerts</li>
 <li>Test connection from external client</li>
