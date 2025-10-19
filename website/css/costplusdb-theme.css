@@ -5,19 +5,49 @@
  * https://github.com/owickstrom/the-monospace-web
  * Licensed under MIT License
  *
- * Using Fira Code font by Nikita Prokopov
- * https://github.com/tonsky/FiraCode
- * Licensed under SIL Open Font License 1.1
+ * Using OG Courier font by Darren Embry
+ * https://github.com/dse/font-og-courier
+ * Open source (see repo for license)
  *
  * Theme: IBM Blue (#0f62fe) background, White (#ffffff) text
  */
 
-/* Import Fira Code from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+/* OG Courier Font - Classic typewriter style */
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OG Courier';
+  src: url('/fonts/og-courier/OGCourierZeroSlash-BoldItalic.woff2') format('woff2');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
 
 :root {
-  /* Override font to Fira Code */
-  --font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  /* Override font to OG Courier */
+  --font-family: 'OG Courier', 'Courier New', monospace;
 
   /* CostPlusDB Brand Colors */
   --background-color: #0f62fe;
