@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Jeremy Longshore">
-  <title>CostPlusDB - Database Hosting at Cost Plus</title>
+  <title>CostPlusDB - Database Hosting at Cost + 25%</title>
   <meta name="description" content="Transparent PostgreSQL hosting. We show you our costs, you pay cost plus. No hidden fees.">
 
   <link rel="stylesheet" href="src/reset.css">
@@ -34,238 +34,139 @@
   </tr>
 </table>
 
-<h2>Stop Overpaying for PostgreSQL</h2>
+<nav>
+<h2>Pages</h2>
+<ul>
+<li><a href="/">Home</a> - What is CostPlusDB?</li>
+<li><a href="/calculator.html">Calculator</a> - See your exact price, request database</li>
+<li><a href="/about.html">About</a> - The story, who's building this</li>
+<li><a href="/docs.html">Docs</a> - Setup guides, API docs, troubleshooting</li>
+<li><a href="/transparency/">Transparency</a> - Our internal docs, pricing proof</li>
+<li><a href="/security.html">Security</a> - How we protect your data</li>
+<li><a href="/activity.html">Activity</a> - Updates and changelog</li>
+</ul>
+</nav>
 
-<p><strong>AWS RDS charges $280/month.</strong><br>
-<strong>We charge $89/month.</strong><br>
-Same specs. Same features. 68% cheaper.</p>
+<h2>The Idea</h2>
+
+<p>We show you our infrastructure costs.<br>
+You pay exactly that + 25%.<br>
+No hidden fees. No surprises.</p>
+
+<hr>
+
+<h2>The Math</h2>
 
 <figure>
 <pre>
 ╔════════════════════════════════════════╗
-║  DEDICATED TIER:    $89/MONTH          ║
-║  (8GB RAM, 200GB storage, PostgreSQL)  ║
+║  YOUR PRICE:    $89.00/MONTH           ║
+║  (DEDICATED TIER)                      ║
 ║                                        ║
-║  AWS RDS:           $280/MONTH         ║
-║  YOU SAVE:          $191/MONTH (68%)   ║
+║  AWS RDS:       $280.00/MONTH          ║
+║  YOU SAVE:      $191.00/MONTH (68%)    ║
 ╚════════════════════════════════════════╝
 </pre>
+<figcaption>Dedicated tier: 8GB RAM, 200GB storage, PostgreSQL 16</figcaption>
 </figure>
 
-<ul>
-<li>Daily backups (30-day retention)</li>
-<li>Point-in-time recovery (7 days)</li>
-<li>SSL/TLS enforced</li>
-<li>24/7 monitoring</li>
-<li>30-minute support response</li>
-<li>Transparent invoicing (see our exact costs every month)</li>
-</ul>
-
-<h3>Get Your Database in 48 Hours</h3>
-
-<p><a href="/calculator.html"><strong>→ See Your Exact Price</strong></a> (takes 2 minutes)</p>
-
-<p><strong>Or email me directly:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a><br>
-I'm Jeremy - founder, operator, and the person who'll set up your database. Response within 30 minutes during business hours.</p>
-
-<hr>
-
-<nav>
-<h2>Learn More</h2>
-<ul>
-<li><a href="/calculator.html">Pricing Calculator</a> - See all tiers ($49-$149/mo)</li>
-<li><a href="/about.html">About</a> - Who runs this & why</li>
-<li><a href="/transparency/">Transparency</a> - Our costs, SOPs, business plan</li>
-<li><a href="/security.html">Security</a> - How we protect your data</li>
-<li><a href="/docs.html">Documentation</a> - FAQs and setup guides</li>
-</ul>
-</nav>
-
-<hr>
-
-<h2>Common Questions</h2>
-
-<details open>
-<summary><strong>Is this legit? Why so cheap?</strong></summary>
-<p>I'm Jeremy - a bootstrapped software consultant who drives a truck part-time. I rent VPS servers from Contabo/Hetzner, install PostgreSQL 16, and charge you cost plus.</p>
-<p><strong>AWS marks up 2,233%.</strong> I mark up 87%. Still profitable for me, way cheaper for you.</p>
-<p><strong>Proof:</strong> Every invoice shows you my exact infrastructure costs. <a href="/transparency/">See our transparency docs</a>.</p>
-</details>
-
-<details>
-<summary><strong>What if you go out of business?</strong></summary>
-<p><strong>You own your data.</strong> You have full database access (superuser credentials). Export your data anytime with pg_dump.</p>
-<p>If I ever shut down, you get 60 days notice + migration assistance to AWS/GCP/self-hosted. No lock-in, no proprietary tech.</p>
-</details>
-
-<details>
-<summary><strong>How is support? Can I talk to a human?</strong></summary>
-<p><strong>You email me directly:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
-<ul>
-<li><strong>Critical issues</strong> (database down): 24/7 monitoring, immediate response</li>
-<li><strong>General support:</strong> 30-minute response during business hours (9 AM - 6 PM ET, M-F)</li>
-<li><strong>Premium Slack support:</strong> +$29/mo for dedicated private channel (included with Pro/Enterprise)</li>
-</ul>
-<p>No support queue. You talk directly to the founder who built and maintains your database.</p>
-</details>
-
-<details>
-<summary><strong>What about security and backups?</strong></summary>
-<p><strong>Security:</strong></p>
-<ul>
-<li>SSL/TLS enforced on all connections</li>
-<li>scram-sha-256 password encryption</li>
-<li>SSH key auth only (no passwords)</li>
-<li>UFW firewall + fail2ban intrusion prevention</li>
-<li>Automatic security updates</li>
-</ul>
-<p><strong>Backups:</strong></p>
-<ul>
-<li>Daily automated backups (pgBackRest)</li>
-<li>30-day retention</li>
-<li>7-day point-in-time recovery</li>
-<li>Encrypted and stored in Wasabi S3</li>
-<li>Monthly restoration testing (we verify backups actually work)</li>
-</ul>
-<p><a href="/security.html">Full security practices</a></p>
-</details>
-
-<details>
-<summary><strong>Shared vs Dedicated - what's the difference?</strong></summary>
-<ul>
-<li><strong>Shared ($49/mo):</strong> Your database shares one PostgreSQL instance with other customers on the same VPS. Each customer has their own isolated database + user. You can't access other customers' data.</li>
-<li><strong>Dedicated ($89/mo):</strong> You get an entire VPS to yourself. One PostgreSQL instance running only your database(s).</li>
-<li><strong>Pro/Enterprise:</strong> Same as Dedicated but with more resources (CPU/RAM/storage).</li>
-</ul>
-<p><a href="/calculator.html">See all tiers in the calculator</a></p>
-</details>
-
-<hr>
-
-<h2>Ready to Stop Overpaying?</h2>
-
-<p><a href="/calculator.html"><strong>→ Configure Your Database</strong></a> - See exact pricing (2 minutes)</p>
-
-<p><strong>Questions?</strong> Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> - I usually respond within 30 minutes.</p>
-
-<hr>
-
-<h2>All the Details</h2>
-
-<details>
-<summary><strong>What PostgreSQL version?</strong></summary>
-<p>PostgreSQL 16 (latest stable). We don't offer multiple versions - you get the best, most secure version available.</p>
-</details>
-
-<details>
-<summary><strong>How do I connect to my database?</strong></summary>
-<p>After provisioning (24-48 hours), you'll receive:</p>
-<ul>
-<li><strong>Host:</strong> Server IP address</li>
-<li><strong>Port:</strong> 5433 (non-default for security)</li>
-<li><strong>Database:</strong> your_company_db</li>
-<li><strong>User:</strong> your_company_user</li>
-<li><strong>Password:</strong> Secure random password</li>
-<li><strong>SSL:</strong> Required (sslmode=require)</li>
-</ul>
-<p>Connection string example:</p>
-<pre>postgresql://your_user:password@server_ip:5433/your_db?sslmode=require</pre>
-</details>
-
-<details>
-<summary><strong>What's your uptime SLA?</strong></summary>
-<p>99.9% uptime measured monthly. If we go below 99.9%, you get a pro-rated refund.</p>
-<p>We're honest about what we can deliver as a bootstrapped service. If you need 99.999% uptime (five nines), AWS RDS is better for you.</p>
-</details>
-
-<details>
-<summary><strong>Can I see how you operate?</strong></summary>
-<p>Yes! Unlike most providers, we publish everything:</p>
-<ul>
-<li><a href="/transparency/operations-manual.html">Operations Manual</a> - Every SOP we follow</li>
-<li><a href="/transparency/cost-calculations.html">Cost Breakdown</a> - Exact infrastructure costs</li>
-<li><a href="/transparency/pricing-structure.html">Pricing Structure</a> - How we calculate prices</li>
-<li><a href="/transparency/business-overview.html">Business Plan</a> - Full roadmap and projections</li>
-</ul>
-</details>
-
-<details>
-<summary><strong>What's your long-term plan?</strong></summary>
-<p><strong>Phase 1 (Now):</strong> Rent VPS servers, build customer base, refine operations<br>
-<strong>Phase 2 (12-18 months):</strong> Buy our own servers in a colocation datacenter - your price drops 30-40%<br>
-<strong>Phase 3 (18-36 months):</strong> Multi-region with high-availability across datacenters</p>
-<p><strong>Learn more:</strong> <a href="/about.html#long-term-vision">Long-Term Vision</a> | <a href="/transparency/business-overview.html">Business Plan</a></p>
-</details>
-
-<hr>
-
-<h2>Getting Started</h2>
-
-<details>
-<summary><strong>How do I sign up?</strong></summary>
-<ol>
-<li><a href="/calculator.html">Use the calculator</a> to estimate your costs</li>
-<li>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> with your requirements</li>
-<li>I'll review and confirm if we're a good fit</li>
-<li>Provisioning takes 24-48 hours</li>
-<li>You receive connection details and can start using your database</li>
-</ol>
-</details>
-
-<details>
-<summary><strong>Do you have a control panel or dashboard?</strong></summary>
-<p>Not yet. This is a bootstrapped operation. You'll receive:</p>
-<ul>
-<li>Connection credentials via email</li>
-<li>Monthly invoices showing exact cost breakdown</li>
-<li>Backup confirmations</li>
-</ul>
-<p>A customer dashboard is planned for Month 6-12 once I have automation in place.</p>
-</details>
-
-<details>
-<summary><strong>Can I migrate my existing database?</strong></summary>
-<p>Yes. If you're coming from AWS RDS, Heroku Postgres, or another PostgreSQL provider:</p>
-<ol>
-<li>I'll provision your new database</li>
-<li>You can use pg_dump/pg_restore to migrate</li>
-<li>I can assist during your migration window</li>
-</ol>
-<p>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> to discuss migration assistance.</p>
-</details>
+<p><a href="/calculator.html">Try the calculator</a> to see pricing for all tiers (Shared $49, Dedicated $89, Pro $129, Enterprise $149).</p>
 
 <hr>
 
 <h2>Transparency</h2>
 
-<details>
-<summary><strong>Why publish all your operations?</strong></summary>
-<ul>
-<li><strong>Accountability:</strong> If I publish my SOPs, I have to follow them</li>
-<li><strong>Trust:</strong> You can verify I'm doing what I say</li>
-<li><strong>Education:</strong> Help other solo operators learn</li>
-<li><strong>Peer Review:</strong> Security experts can spot gaps and help improve</li>
-</ul>
-<p><strong>Learn more:</strong> <a href="/transparency/">All Transparency Docs</a></p>
-</details>
+<p>We show you <strong>everything</strong>. Most database providers hide their operations behind NDAs and corporate speak.</p>
 
 <details>
-<summary><strong>Where do you publish everything?</strong></summary>
+<summary>What we publish</summary>
 <ul>
-<li><a href="/transparency/operations-manual.html">Operations Manual</a></li>
-<li><a href="/transparency/cost-calculations.html">Cost Calculations</a></li>
-<li><a href="/transparency/pricing-structure.html">Pricing Structure</a></li>
-<li><a href="/transparency/business-overview.html">Business Plan</a></li>
-<li><a href="/security.html">Security Practices</a></li>
+<li><a href="/transparency/operations-manual.html">Operations Manual</a> - Every SOP we follow</li>
+<li><a href="/transparency/cost-calculations.html">Cost Breakdown</a> - Exact infrastructure costs</li>
+<li><a href="/transparency/business-overview.html">Business Plan</a> - Why we built this</li>
+<li><a href="/transparency/pricing-structure.html">Pricing Structure</a> - How we calculate prices</li>
+<li><a href="/transparency/business-overview.html#technical-architecture">Infrastructure</a> - What we use and why</li>
 </ul>
+<p>All docs are internal operations documents, unedited.</p>
 </details>
 
 <hr>
 
-<h2>Still Have Questions?</h2>
+<h2>The Problem</h2>
 
-<p><strong>Email:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a><br>
-<strong>Response time:</strong> Usually within 4 hours (business days)</p>
+<p>Database hosting has insane markups:</p>
+
+<pre>
+AWS RDS (2 vCPU / 8GB RAM)
+├─ They charge:  $280/month
+├─ Actual cost:  ~$12/month
+└─ Markup:       2,233%
+
+Google Cloud SQL (Same specs)
+├─ They charge:  $275/month
+├─ Actual cost:  ~$12/month
+└─ Markup:       2,192%
+
+CostPlusDB (Same specs)
+├─ We charge:    $89/month
+├─ Our cost:     ~$12/month
+└─ Our margin:   87%
+</pre>
+
+<hr>
+
+<h2>What You Get</h2>
+
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td>16 (latest stable)</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>Daily automated (30-day retention)</td>
+</tr>
+<tr>
+<td>Point-in-time recovery</td>
+<td>7 days (pgBackRest)</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>24/7 uptime + performance</td>
+</tr>
+<tr>
+<td>SSL/TLS</td>
+<td>Enforced on all connections</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>24/7 for critical issues, 30-min response business hours. Slack upgrade +$29/mo</td>
+</tr>
+<tr>
+<td>Transparent invoices</td>
+<td>See our exact costs monthly</td>
+</tr>
+<tr>
+<td>No surprises</td>
+<td>Fixed 25% markup, forever</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Get Started</h2>
+
+<p><a href="/calculator.html">Configure Your Database →</a></p>
+
+<p>Takes 2 minutes. See exact pricing before you pay.</p>
 
 <hr>
 
@@ -282,10 +183,9 @@ Using <a href="https://github.com/dse/font-og-courier">OG Courier</a> by Darren 
 <a href="https://hustlestats.io">hustlestats.io</a> |
 <a href="https://github.com/jeremylongshore">GitHub</a></p>
 
-<p>&copy; 2025 intent solutions io |
-<a href="/privacy.html">Privacy</a> |
-<a href="/terms.html">Terms</a> |
-<a href="/security.html">Security</a></p>
+<p>&copy; 2025 intent solutions io</p>
+<p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms & Acceptable Use</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a></p>
 </footer>
 
 </body>
