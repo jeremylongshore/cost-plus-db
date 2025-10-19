@@ -19,11 +19,35 @@ CostPlusDB has implemented solid foundational security practices. The current SO
 - ⚠️ **12 security improvements recommended**
 - 🔴 **3 critical gaps identified**
 
+### Security Model
+
+**IMPORTANT:** This audit covers two distinct security perimeters:
+
+1. **Internal Security (Operator Access)** - SSH hardening, VPS security, system administration
+   - **Who:** Jeremy (CostPlusDB operator only)
+   - **Access:** SSH to VPS, root/sudo, OS-level management
+   - **Purpose:** Manage servers, provision databases, monitoring, backups
+
+2. **Customer Security (Database Access)** - PostgreSQL security, connection encryption, data isolation
+   - **Who:** Customers and their applications
+   - **Access:** PostgreSQL database connections only (via port 5432/6432)
+   - **Purpose:** Read/write data in their database
+
+**Customers do NOT get:**
+- ❌ SSH access to VPS
+- ❌ OS-level access
+- ❌ Access to other customers' databases
+- ❌ Ability to install software or modify server config
+
+**This separation is critical:** SSH security protects operator access. PostgreSQL security protects customer data.
+
 ---
 
 ## 🟢 What You're Doing Right
 
-### SSH Security
+### Internal Security (Operator Access)
+
+#### SSH Security
 ✅ **Ed25519 SSH Keys** - Using modern, secure key algorithm
 ✅ **Password Authentication Disabled** - Prevents brute-force password attacks
 ✅ **Root Login Disabled** - Prevents direct root access
@@ -32,25 +56,43 @@ CostPlusDB has implemented solid foundational security practices. The current SO
 ✅ **LoginGraceTime = 20** - Prevents connection hogging
 ✅ **ClientAliveInterval = 300** - Prevents hung connections
 
-### Firewall
+**Impact:** Only the operator (Jeremy) can SSH to servers. Compromised customer account cannot SSH.
+
+#### Firewall (Internal)
 ✅ **UFW Enabled** - Default deny incoming traffic
-✅ **Minimal Open Ports** - Only SSH, PostgreSQL, pgBouncer exposed
+✅ **SSH Port Restricted** - Only port 2222 for operator access
 ✅ **Firewall Rules Documented** - Clear comments on each rule
 
-### System Hardening
+**Impact:** Operator can SSH in. All other traffic blocked except PostgreSQL (for customers).
+
+#### System Hardening
 ✅ **Automatic Security Updates** - Unattended-upgrades configured
 ✅ **Automatic Reboots at 4 AM** - For kernel updates
 ✅ **Non-Root Admin User** - Following principle of least privilege
 ✅ **Log Rotation** - Prevents disk space issues
 ✅ **NTP Synchronization** - Critical for accurate logs
 
-### Intrusion Prevention
+**Impact:** Server stays patched automatically. Operator uses non-root account.
+
+#### Intrusion Prevention (Internal)
 ✅ **fail2ban for SSH** - Automatic IP banning (1h ban, 3 attempts)
 ✅ **Log Monitoring** - Logwatch configured
 
-### Operations
+**Impact:** Brute-force SSH attacks blocked. Only protects operator access.
+
+#### Operations
 ✅ **Structured Directories** - `/opt/costplusdb/` with proper permissions
 ✅ **VPS Documentation** - Inventory template provided
+
+### Customer Security (Database Access)
+
+#### PostgreSQL Security (Documented but not yet fully implemented)
+⚠️ **SSL/TLS Enforcement** - Documented in SOPs, implementation pending
+⚠️ **Separate Users Per Customer** - Design documented, automation pending
+⚠️ **Connection Pooling (pgBouncer)** - Port allocated (6432), setup pending
+⚠️ **Connection Logging** - Configuration documented, not yet enabled
+
+**Impact:** Customer database access will be encrypted and isolated once implemented.
 
 ---
 
@@ -58,33 +100,44 @@ CostPlusDB has implemented solid foundational security practices. The current SO
 
 ### Priority 1: Critical (Implement Before Launch)
 
-#### 1. **Add SSH AllowGroups Restriction**
-**Current:** SSH allows any user with valid key
-**Risk:** If a user account is compromised, attacker can SSH in
-**Fix:**
-```bash
-# Create SSH group
-sudo groupadd sshusers
-sudo usermod -a -G sshusers admin
+These are critical for **customer-facing security** (database access):
 
-# Add to /etc/ssh/sshd_config
-AllowGroups sshusers
+#### 1. **Complete PostgreSQL SSL/TLS Configuration** 🔴 CRITICAL
+**Current:** SSL/TLS enforcement documented but not implemented
+**Risk:** Customer data transmitted in clear text
+**Impact:** **CUSTOMER SECURITY** - Anyone on network can intercept passwords and data
+**Fix:**
+
+Edit `/etc/postgresql/16/main/postgresql.conf`:
+```
+ssl = on
+ssl_cert_file = '/etc/postgresql/16/main/server.crt'
+ssl_key_file = '/etc/postgresql/16/main/server.key'
+ssl_min_protocol_version = 'TLSv1.2'
+ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL'
+password_encryption = scram-sha-256
 ```
 
-#### 2. **Remove Short Diffie-Hellman Keys**
-**Current:** May have DH keys < 3072 bits
-**Risk:** Weak encryption vulnerable to attacks
-**Fix:**
-```bash
-sudo cp /etc/ssh/moduli /etc/ssh/moduli.backup
-sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp
-sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
+Edit `/etc/postgresql/16/main/pg_hba.conf`:
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Require SSL for all remote connections
+hostssl all             all             0.0.0.0/0               scram-sha-256
+
+# Reject non-SSL connections
+hostnossl all           all             0.0.0.0/0               reject
+
+# Local admin connections
+local   all             postgres                                peer
 ```
 
-#### 3. **Add Fail2ban Jail for PostgreSQL**
-**Current:** Only SSH is protected by fail2ban
+#### 2. **Add Fail2ban Jail for PostgreSQL** 🔴 CRITICAL
+**Current:** Only SSH protected by fail2ban
 **Risk:** PostgreSQL brute-force attacks not detected
+**Impact:** **CUSTOMER SECURITY** - Attackers can brute-force customer database passwords
 **Fix:**
+
 Create `/etc/fail2ban/jail.d/postgresql.local`:
 ```ini
 [postgresql]
@@ -105,11 +158,69 @@ failregex = ^.*FATAL:.*authentication failed for user.*$
 ignoreregex =
 ```
 
+#### 3. **Implement Per-Customer Database Isolation** 🔴 CRITICAL
+**Current:** Customer provisioning SOP incomplete
+**Risk:** Customers could potentially access other databases
+**Impact:** **CUSTOMER SECURITY** - Data breach between customers
+**Fix:**
+
+Per-customer provisioning script:
+```sql
+-- Create isolated database
+CREATE DATABASE customer_{{id}}_db;
+
+-- Create unique user
+CREATE USER customer_{{id}}_user WITH PASSWORD '{{strong_random_password}}';
+
+-- Grant ONLY to their database
+GRANT CONNECT ON DATABASE customer_{{id}}_db TO customer_{{id}}_user;
+
+-- Revoke public schema access
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON DATABASE customer_{{id}}_db FROM PUBLIC;
+
+-- Grant specific permissions
+\c customer_{{id}}_db
+GRANT USAGE ON SCHEMA public TO customer_{{id}}_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO customer_{{id}}_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO customer_{{id}}_user;
+
+-- Connection limit
+ALTER USER customer_{{id}}_user CONNECTION LIMIT 20;
+```
+
 ---
 
-### Priority 2: Important (Implement Within 30 Days)
+### Priority 2: Important for Internal Security (Operator Access)
 
-#### 4. **Enhance SSH Configuration Per Mozilla Guidelines**
+These are for **internal security** (operator SSH access):
+
+#### 4. **Add SSH AllowGroups Restriction**
+**Current:** SSH allows any user with valid key
+**Risk:** If a user account is compromised, attacker can SSH in
+**Impact:** **INTERNAL SECURITY** - Only affects operator access, not customers
+**Fix:**
+```bash
+# Create SSH group
+sudo groupadd sshusers
+sudo usermod -a -G sshusers admin
+
+# Add to /etc/ssh/sshd_config
+AllowGroups sshusers
+```
+
+#### 5. **Remove Short Diffie-Hellman Keys**
+**Current:** May have DH keys < 3072 bits
+**Risk:** Weak encryption vulnerable to attacks
+**Impact:** **INTERNAL SECURITY** - Weakens operator SSH encryption
+**Fix:**
+```bash
+sudo cp /etc/ssh/moduli /etc/ssh/moduli.backup
+sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp
+sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
+```
+
+#### 6. **Enhance SSH Configuration Per Mozilla Guidelines**
 **Current:** Basic SSH hardening
 **Recommended:** Add Mozilla OpenSSH modern configuration
 
@@ -137,9 +248,12 @@ GatewayPorts no
 PermitTunnel no
 ```
 
-#### 5. **Restrict Outgoing Firewall Traffic**
+**Impact:** **INTERNAL SECURITY** - Strengthens operator SSH connections
+
+#### 7. **Restrict Outgoing Firewall Traffic**
 **Current:** All outgoing traffic allowed
 **Risk:** Compromised server can exfiltrate data freely
+**Impact:** **BOTH** - Limits data exfiltration if either operator or customer account compromised
 **Recommended:**
 ```bash
 # Deny all outgoing by default
@@ -157,9 +271,10 @@ sudo ufw allow out 5432 comment 'PostgreSQL replication'
 sudo ufw allow out to 198.252.104.0/24 port 443 comment 'Wasabi S3'
 ```
 
-#### 6. **Implement 2FA/MFA for SSH**
+#### 8. **Implement 2FA/MFA for SSH**
 **Current:** Single-factor (SSH key only)
 **Risk:** Stolen SSH key = full access
+**Impact:** **INTERNAL SECURITY** - Only protects operator SSH access
 **Recommended:** Install Google Authenticator PAM module
 ```bash
 sudo apt install libpam-google-authenticator
@@ -177,9 +292,10 @@ ChallengeResponseAuthentication yes
 AuthenticationMethods publickey,keyboard-interactive
 ```
 
-#### 7. **Secure /proc Filesystem**
+#### 9. **Secure /proc Filesystem**
 **Current:** /proc writable by users
 **Risk:** Information leakage about running processes
+**Impact:** **INTERNAL SECURITY** - No customer users have shell access
 **Recommended:**
 
 Add to `/etc/fstab`:
@@ -187,8 +303,9 @@ Add to `/etc/fstab`:
 proc    /proc    proc    defaults,hidepid=2    0    0
 ```
 
-#### 8. **Enforce Strong Password Policy**
+#### 10. **Enforce Strong Password Policy**
 **Current:** No password policy (passwords disabled for SSH but used for sudo)
+**Impact:** **BOTH** - Affects operator sudo and customer PostgreSQL passwords
 **Recommended:**
 
 Install and configure:
@@ -209,8 +326,11 @@ lcredit = -1
 
 ### Priority 3: Nice to Have (Implement Within 90 Days)
 
-#### 9. **Install File Integrity Monitoring (AIDE)**
+These are for **internal security** monitoring:
+
+#### 11. **Install File Integrity Monitoring (AIDE)**
 **Purpose:** Detect unauthorized file changes
+**Impact:** **INTERNAL SECURITY** - Detects if operator account or server compromised
 ```bash
 sudo apt install aide
 sudo aideinit
@@ -220,8 +340,9 @@ sudo cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db
 echo "0 5 * * * /usr/bin/aide --check | mail -s 'AIDE Report' admin@example.com" | sudo tee -a /etc/crontab
 ```
 
-#### 10. **Install Rootkit Detection (rkhunter)**
+#### 12. **Install Rootkit Detection (rkhunter)**
 **Purpose:** Detect rootkits and backdoors
+**Impact:** **INTERNAL SECURITY** - Detects OS-level compromise
 ```bash
 sudo apt install rkhunter
 
@@ -235,8 +356,9 @@ sudo rkhunter --check --skip-keypress --report-warnings-only
 echo "0 3 * * * /usr/bin/rkhunter --check --skip-keypress --cronjob --report-warnings-only" | sudo tee -a /etc/crontab
 ```
 
-#### 11. **Install Security Auditing Tool (Lynis)**
+#### 13. **Install Security Auditing Tool (Lynis)**
 **Purpose:** Automated security audits
+**Impact:** **BOTH** - Audits system and service configuration
 ```bash
 sudo apt install lynis
 
@@ -247,8 +369,9 @@ sudo lynis audit system
 cat /var/log/lynis.log
 ```
 
-#### 12. **Install Anti-Virus (ClamAV)**
+#### 14. **Install Anti-Virus (ClamAV)**
 **Purpose:** Malware detection (especially if handling file uploads)
+**Impact:** **CUSTOMER SECURITY** - Only if customers can upload files via database
 ```bash
 sudo apt install clamav clamav-daemon
 
@@ -263,8 +386,11 @@ echo "0 2 * * * /usr/bin/clamscan -r /home /opt -i --log=/var/log/clamav/daily-s
 
 ## 🔴 Critical Security Gaps
 
-### 1. **PostgreSQL Security Configuration Missing**
-**Status:** SOP-002 is documented but details incomplete
+**These all affect CUSTOMER SECURITY and must be fixed before first customer:**
+
+### 1. **PostgreSQL SSL/TLS Configuration Missing** 🔴
+**Status:** Documented but not implemented
+**Impact:** **CUSTOMER DATA AT RISK** - Passwords and data transmitted unencrypted
 **Required Actions:**
 - Enforce `scram-sha-256` authentication (not md5)
 - Restrict `pg_hba.conf` to specific IP ranges
@@ -309,8 +435,9 @@ log_line_prefix = '%m [%p] %u@%d from %h '
 log_statement = 'ddl'
 ```
 
-### 2. **Backup Security Not Fully Specified**
+### 2. **Backup Security Not Fully Specified** 🔴
 **Current:** pgBackRest mentioned, encryption not specified
+**Impact:** **CUSTOMER DATA AT RISK** - Backups not encrypted, credentials in plain text
 **Required:**
 - Enable encryption at rest for backups
 - Use unique encryption keys per customer
@@ -330,8 +457,9 @@ repo1-cipher-type=aes-256-cbc
 repo1-cipher-pass=<generate strong passphrase>
 ```
 
-### 3. **Incident Response Plan Incomplete**
+### 3. **Incident Response Plan Incomplete** 🔴
 **Current:** SOP sections listed but content TBD
+**Impact:** **CUSTOMER TRUST** - No plan for how to handle/communicate breaches
 **Required:**
 - SOP-205: Security Incident Response (needs detailed steps)
 - SOP-206: Customer Data Breach Protocol (needs legal/compliance review)
@@ -445,28 +573,40 @@ sudo apt install prometheus-postgres-exporter
 
 ## Action Plan
 
-### Immediate (Before First Customer)
-1. ✅ Implement SSH AllowGroups
-2. ✅ Remove short DH keys
-3. ✅ Add fail2ban PostgreSQL jail
-4. ✅ Complete PostgreSQL SSL/TLS configuration
-5. ✅ Enable pgBackRest encryption
-6. ✅ Restrict UFW outgoing traffic
-7. ✅ Test all security configurations
+### Immediate (Before First Customer) - CUSTOMER SECURITY
+These directly protect customer data:
 
-### Week 1-2 (After Launch)
-8. ⚠️ Add 2FA for SSH
-9. ⚠️ Implement Mozilla SSH hardening
-10. ⚠️ Secure /proc filesystem
-11. ⚠️ Configure AIDE file integrity monitoring
-12. ⚠️ Install rkhunter
+1. 🔴 **Complete PostgreSQL SSL/TLS configuration** (CRITICAL)
+2. 🔴 **Add fail2ban PostgreSQL jail** (CRITICAL)
+3. 🔴 **Implement per-customer database isolation** (CRITICAL)
+4. 🔴 **Enable pgBackRest encryption** (CRITICAL)
+5. 🔴 **Complete incident response SOPs** (CRITICAL)
+6. ✅ Test customer database connections with SSL
+7. ✅ Test fail2ban blocks failed PostgreSQL logins
+8. ✅ Test customer A cannot access customer B's database
 
-### Month 1-3 (Ongoing Improvement)
-13. 📊 Run Lynis security audit monthly
-14. 📊 Install ClamAV (if needed)
-15. 📊 Complete all incident response SOPs
-16. 📊 Document data retention policies
-17. 📊 Create customer security FAQ
+### Immediate (Before First Customer) - INTERNAL SECURITY
+These protect operator access:
+
+9. ✅ Implement SSH AllowGroups
+10. ✅ Remove short DH keys
+11. ✅ Restrict UFW outgoing traffic
+
+### Week 1-2 (After Launch) - INTERNAL SECURITY
+These improve operator security:
+
+12. ⚠️ Add 2FA for SSH (operator only)
+13. ⚠️ Implement Mozilla SSH hardening
+14. ⚠️ Secure /proc filesystem
+15. ⚠️ Configure AIDE file integrity monitoring
+16. ⚠️ Install rkhunter
+
+### Month 1-3 (Ongoing Improvement) - BOTH
+17. 📊 Run Lynis security audit monthly
+18. 📊 Install ClamAV (if customers upload files to DB)
+19. 📊 Document data retention policies
+20. 📊 Create customer security FAQ
+21. 📊 Add PostgreSQL query monitoring (pg_stat_statements)
 
 ---
 
@@ -530,18 +670,33 @@ sudo grep -i "failed\|error\|denied" /var/log/auth.log | tail -50
 
 ## Conclusion
 
-**CostPlusDB has a solid security foundation.** The documented SOPs cover essential hardening for SSH, firewall, and automatic updates. However, **3 critical gaps must be addressed before production launch:**
+**CostPlusDB has a solid internal security foundation** (operator SSH access, firewall, automatic updates). The documented SOPs cover essential hardening.
 
-1. Complete PostgreSQL security configuration with SSL/TLS enforcement
-2. Implement fail2ban for PostgreSQL
-3. Add SSH group restrictions (AllowGroups)
+However, **customer-facing security (PostgreSQL) is incomplete:**
+
+### Critical Gaps (Customer Security) 🔴
+1. PostgreSQL SSL/TLS not enforced - **Customer data at risk**
+2. fail2ban not monitoring PostgreSQL - **Brute-force attacks possible**
+3. Database isolation not fully implemented - **Customer separation unclear**
+4. Backup encryption not configured - **Backup data at risk**
+5. Incident response incomplete - **No breach communication plan**
+
+### Internal Security Status ✅
+- SSH hardening: Solid
+- Firewall: Good
+- Auto-updates: Enabled
+- fail2ban (SSH): Working
+- Recommended improvements: AllowGroups, 2FA, outgoing restrictions
 
 **Recommended timeline:**
-- ✅ **Days 1-3:** Fix critical gaps (PostgreSQL hardening, fail2ban, SSH AllowGroups)
-- ⚠️ **Week 1-2:** Implement priority 2 improvements (2FA, Mozilla SSH config, restrict outgoing traffic)
-- 📊 **Month 1-3:** Add monitoring tools (AIDE, rkhunter, Lynis)
+- 🔴 **Days 1-3:** Fix critical customer security gaps (PostgreSQL SSL/TLS, fail2ban, isolation)
+- ✅ **Days 4-7:** Complete internal security (SSH AllowGroups, DH keys, outgoing firewall)
+- ⚠️ **Week 2-4:** Add 2FA, Mozilla SSH config, AIDE, rkhunter
+- 📊 **Month 1-3:** Monthly Lynis audits, complete incident SOPs
 
-**Once these improvements are implemented, security rating would increase to 🟢 90/100 (Excellent).**
+**Once CUSTOMER security gaps are fixed, security rating would increase to 🟢 90/100 (Excellent).**
+
+**DO NOT onboard first customer until items 1-5 above are complete.**
 
 ---
 
