@@ -264,40 +264,38 @@ ul, ol {
 ul {
   list-style-type: square;
   list-style-position: outside;
-  padding: 0 0 0 2ch;
+  padding: 0;
+  margin-left: 3ch;
 }
 ol {
   list-style-type: none;
+  list-style-position: outside;
   counter-reset: item;
   padding: 0;
+  margin-left: 3ch;
 }
 ol ul,
 ol ol,
 ul ol,
 ul ul {
-  padding: 0 0 0 3ch;
-  margin: 0;
+  margin-left: 3ch;
+  margin-top: calc(var(--line-height) / 2);
 }
 ol li:before {
   content: counters(item, ".") ". ";
   counter-increment: item;
   font-weight: var(--font-weight-medium);
+  margin-right: 0.5ch;
 }
 
 li {
   margin: 0 0 calc(var(--line-height) / 2) 0;
-  padding: 0 0 0 0.5ch;
+  padding-left: 1ch;
   line-height: 1.6;
 }
 
 li::marker {
   line-height: 0;
-}
-
-/* Hanging indent for wrapped bullet text */
-/* This ensures multi-line bullets align properly */
-ul li {
-  padding-left: 1ch;
 }
 
 /* For paragraphs inside list items */
