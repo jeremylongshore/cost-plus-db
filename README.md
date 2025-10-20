@@ -1,0 +1,303 @@
+# CostPlusDB
+
+**Transparent, affordable managed PostgreSQL hosting**
+
+[![Website](https://img.shields.io/badge/website-costplusdb.dev-blue)](https://costplusdb.dev)
+[![Status](https://img.shields.io/badge/status-pre--launch-yellow)](https://github.com/jeremylongshore/cost-plus-db)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+> Database hosting at our cost + transparent margin. No hidden fees. No 20x markups.
+
+---
+
+## What is CostPlusDB?
+
+### The Problem
+
+Cloud database services charge massive markups with zero transparency:
+- AWS RDS charges $280/month for infrastructure that costs them $12
+- That's a **2,233% markup**
+- Complex pricing calculators hide the real costs
+- Surprise charges and hidden fees are standard practice
+
+### The Solution
+
+**Cost-plus pricing:** You pay our actual infrastructure cost + a transparent, fair margin.
+
+We show you exactly what we pay. You pay that + 25%. That's it.
+
+### The Difference
+
+```
+Example: 8GB RAM, 200GB Storage, 4 vCPU PostgreSQL Database
+
+AWS RDS Equivalent:        $280/month
+Heroku Postgres Standard:  $200/month
+DigitalOcean Managed DB:   $120/month
+
+Our Infrastructure Cost:    $12/month
+Your Price:                 $89/month
+Our Margin:                 $77/month
+
+You Save:                   $191/month (68% vs AWS)
+```
+
+**The difference?** We show our costs. They don't.
+
+---
+
+## Key Features
+
+### Core Database Infrastructure
+- **PostgreSQL 16** - Latest stable version with modern features
+- **SSL/TLS Enforced** - All connections encrypted, no exceptions
+- **Dedicated Resources** - Your database, your VPS (Dedicated tier and above)
+- **Connection Pooling** - pgBouncer included for efficient connections
+
+### Security & Compliance
+- **Daily Encrypted Backups** - pgBackRest with Wasabi S3 storage
+- **30-Day Retention** - Point-in-time recovery for 7 days
+- **Multi-Region Redundancy** - Backups stored in multiple geographic locations
+- **Automated Monitoring** - 6 active security monitors (Betterstack)
+- **Intrusion Prevention** - fail2ban, UFW firewall, SSH key auth only
+- **Security Audits** - Pre-launch audit completed, findings addressed
+
+### Operational Transparency
+- **All SOPs Published** - Every operational procedure is public
+- **Cost Breakdowns** - See exactly what you're paying for
+- **Security Practices** - Our entire security model is documented
+- **Incident Reports** - We publish what went wrong and how we fixed it
+
+---
+
+## Pricing
+
+We offer four tiers with transparent pricing:
+
+| Tier | Storage | RAM | Price | Our Cost | Margin |
+|------|---------|-----|-------|----------|--------|
+| **Shared** | 5GB | 2GB | $49/mo | ~$2/mo | $47/mo |
+| **Dedicated** | 25GB | 8GB | $89/mo | ~$12/mo | $77/mo |
+| **Pro** | 50GB | 16GB | $129/mo | ~$20/mo | $109/mo |
+| **Enterprise** | 100GB | 32GB | $149/mo | ~$30/mo | $119/mo |
+
+**All tiers include:**
+- PostgreSQL 16 managed hosting
+- Daily encrypted backups
+- 24/7 uptime monitoring
+- Email support (4-hour SLA, M-F 9am-6pm ET)
+- No hidden fees, no surprise charges
+
+**Compare to AWS RDS equivalent:**
+- Dedicated Tier (8GB RAM, 200GB): **AWS charges $280/mo** vs our $89/mo
+- That's **$191/month savings** or **$2,292/year**
+
+---
+
+## Quick Start
+
+### 1. Explore & Calculate
+- Visit: [https://costplusdb.dev](https://costplusdb.dev)
+- Try the pricing calculator: [https://costplusdb.dev/calculator.html](https://costplusdb.dev/calculator.html)
+- Review our transparency documentation
+
+### 2. Get Started
+- **Early Access:** Email [jeremy@intentsolutions.io](mailto:jeremy@intentsolutions.io)
+- **Timeline:** Onboarded within 48 hours
+- **Support:** Direct access to the founder
+
+### 3. Onboarding
+We'll set up:
+- Dedicated PostgreSQL 16 instance
+- SSL/TLS certificates
+- Daily encrypted backups
+- Connection credentials
+- Monitoring alerts
+
+---
+
+## Transparency Commitments
+
+Unlike traditional cloud providers, we publish everything:
+
+### Published Standard Operating Procedures
+- [005-DR-SOPS-postgresql-operations.md](000-docs/005-DR-SOPS-postgresql-operations.md) - Complete operations manual
+- [028-DR-AUDIT-security-pre-launch.md](000-docs/028-DR-AUDIT-security-pre-launch.md) - Security audit and findings
+- [021-DR-FORM-customer-onboarding-intake.md](000-docs/021-DR-FORM-customer-onboarding-intake.md) - Onboarding process
+
+### What We Show (And Competitors Hide)
+- Exact infrastructure costs
+- Profit margins per tier
+- Security implementation details
+- Backup and recovery procedures
+- Incident response protocols
+- Cost breakdowns on every invoice
+
+### Our Values
+1. **Transparency over tricks** - Show all costs, always
+2. **Fair margins** - 25% markup is sustainable and honest
+3. **No BS pricing** - No hidden fees, no surprise charges
+4. **Customer choice** - Pick your infrastructure provider
+5. **Human support** - Solo founder who actually responds
+
+---
+
+## Tech Stack
+
+### Database
+- **PostgreSQL 16** - Latest stable with modern features
+- **pgBackRest** - Enterprise-grade backup and recovery
+- **pgBouncer** - Connection pooling and management
+
+### Infrastructure
+- **Contabo VPS** - Primary infrastructure provider
+- **Ubuntu 24.04 LTS** - Stable, secure, long-term support
+- **Wasabi S3** - Encrypted backup storage with multi-region redundancy
+
+### Security
+- **fail2ban** - Intrusion prevention and rate limiting
+- **UFW Firewall** - Network access control
+- **SSL/TLS** - Let's Encrypt certificates, auto-renewed
+- **SSH Key Auth** - Password authentication disabled
+
+### Monitoring
+- **Betterstack** - 24/7 uptime monitoring (6 active monitors)
+- **Custom Scripts** - Security event monitoring and alerting
+- **Email Alerts** - Instant notifications via Resend
+
+---
+
+## Repository Structure
+
+```
+cost-plus-db/
+├── 000-docs/           # All documentation (31 comprehensive files)
+│   ├── 001-PP-PLAN-costplusdb-overview.md
+│   ├── 002-PP-PLAN-pricing-structure.md
+│   ├── 005-DR-SOPS-postgresql-operations.md
+│   ├── 028-DR-AUDIT-security-pre-launch.md
+│   └── ... (27 more files)
+│
+├── 001-security/       # Security infrastructure (gitignored)
+│   ├── scripts/        # Monitoring and maintenance scripts
+│   └── config/         # Configuration templates
+│
+├── website/            # Public website (costplusdb.dev)
+│   ├── index.html      # Landing page
+│   ├── calculator.html # Pricing calculator
+│   └── transparency/   # Transparency documentation
+│
+├── scripts/            # Operational automation (future)
+├── backend/            # Backend services (future)
+└── CLAUDE.md           # AI assistant guidance
+```
+
+---
+
+## Project Status
+
+**Current Phase:** Pre-launch (accepting early access customers)
+
+### What's Complete
+- **Documentation:** 31 comprehensive documents covering all operations
+- **Security:** Audit completed, critical findings addressed
+- **Infrastructure:** VPS hardened, PostgreSQL configured
+- **Monitoring:** 6 active monitors, automated alerting
+- **Website:** Live at [costplusdb.dev](https://costplusdb.dev)
+- **Backup System:** pgBackRest configured with Wasabi S3
+
+### What We're Building
+- **Month 1:** First 10 customers, gather feedback
+- **Month 2:** Automated customer onboarding
+- **Month 3:** 30-day backup retention, advanced monitoring
+- **Month 6+:** SOC 2 compliance preparation
+- **Month 12+:** HIPAA compliance support
+
+### What We're Honest About
+We're NOT launching with:
+- ❌ 99.999% uptime SLA (we promise 99.9%)
+- ❌ HIPAA compliance (Month 12+ roadmap)
+- ❌ SOC 2 certification (following standards, not certified yet)
+- ❌ Phone support (email/Slack only)
+
+---
+
+## Documentation
+
+Browse all 31 documentation files in the [000-docs/](000-docs/) directory:
+
+### Key Documents
+- [001-PP-PLAN-costplusdb-overview.md](000-docs/001-PP-PLAN-costplusdb-overview.md) - Complete business blueprint
+- [002-PP-PLAN-pricing-structure.md](000-docs/002-PP-PLAN-pricing-structure.md) - Pricing philosophy and calculations
+- [005-DR-SOPS-postgresql-operations.md](000-docs/005-DR-SOPS-postgresql-operations.md) - Operations manual
+- [028-DR-AUDIT-security-pre-launch.md](000-docs/028-DR-AUDIT-security-pre-launch.md) - Security audit report
+
+### Categories
+- **Business Plans (PP-PLAN):** Overview, pricing, cost calculations
+- **Operations (DR-SOPS):** PostgreSQL operations, security implementation
+- **Guides (DR-GUID):** Onboarding, backups, database migration
+- **Audits (DR-AUDIT):** Security, documentation, website compliance
+- **Tasks (PM-TASK):** Launch checklists, automation setup
+
+---
+
+## Contributing
+
+This is a solo project by Jeremy Longshore. While not actively seeking contributions, I'm open to:
+- Security vulnerability reports (please email privately)
+- Feedback on documentation clarity
+- Suggestions for transparency improvements
+
+**Please do not submit PRs without prior discussion.**
+
+---
+
+## Contact
+
+**Founder:** Jeremy Longshore
+- **Email:** [jeremy@intentsolutions.io](mailto:jeremy@intentsolutions.io)
+- **Website:** [jeremylongshore.com](https://jeremylongshore.com)
+- **GitHub:** [@jeremylongshore](https://github.com/jeremylongshore)
+- **Company:** intent solutions io
+
+**Project Links:**
+- **Website:** [https://costplusdb.dev](https://costplusdb.dev)
+- **Calculator:** [https://costplusdb.dev/calculator.html](https://costplusdb.dev/calculator.html)
+- **GitHub:** [https://github.com/jeremylongshore/cost-plus-db](https://github.com/jeremylongshore/cost-plus-db)
+
+---
+
+## License
+
+- **Documentation:** [Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
+- **Code:** [MIT License](LICENSE)
+
+You are free to:
+- Use our documentation to build your own transparent service
+- Share and adapt our operational procedures
+- Learn from our cost-plus pricing model
+
+We only ask that you:
+- Give credit where credit is due
+- Share your improvements under the same license
+- Consider adopting transparent pricing yourself
+
+---
+
+## Why CostPlusDB Exists
+
+Cloud database services charge 500-2000% markups and hide behind complex pricing calculators. This is standard practice, but it doesn't have to be.
+
+**CostPlusDB exists to prove that:**
+1. You can run a sustainable database service with transparent pricing
+2. Customers deserve to know what they're paying for
+3. Fair margins (25%) are better than massive markups (2000%)
+4. Publishing your SOPs makes you more secure, not less
+
+If you believe in transparent pricing and fair margins, we'd love to have you as a customer.
+
+**Get started:** [jeremy@intentsolutions.io](mailto:jeremy@intentsolutions.io)
+
+---
+
+*Built with transparency. Priced with fairness. Operated with integrity.*
