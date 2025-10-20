@@ -48,7 +48,7 @@ a:link, a:visited {
   text-align: center;
 }
 
-/* Pages Section - Monospace Navigation */
+/* Pages Section - Table of Contents */
 .pages-section {
   text-align: center;
   margin: calc(var(--line-height) * 2) 0;
@@ -58,34 +58,56 @@ a:link, a:visited {
   margin-bottom: calc(var(--line-height) * 1.5);
 }
 
-.nav-links {
+.toc-table {
   font-family: var(--font-family);
   font-size: 18px;
-  line-height: 1.8;
-  white-space: pre;
   margin: 0 auto;
-  width: fit-content;
-  background: transparent;
-  border: none;
-  padding: 0;
-  overflow-x: auto;
-  text-align: left;
+  border-collapse: collapse;
+  width: 70ch;
+  max-width: 100%;
 }
 
-.nav-links a {
+.toc-table tr {
+  height: 2em;
+}
+
+.toc-table td {
+  border: none;
+  padding: 0;
+}
+
+.toc-table td:first-child {
+  text-align: left;
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+.toc-table td:nth-child(2) {
+  width: 100%;
+  border-bottom: 2px dotted var(--text-color-alt);
+  padding: 0 4px;
+}
+
+.toc-table td:last-child {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 4px;
+}
+
+.toc-table a {
   color: var(--text-color);
   text-decoration: underline;
 }
 
-.nav-links a:hover {
+.toc-table a:hover {
   text-decoration: none;
 }
 
 /* Responsive */
 @media screen and (max-width: 768px) {
-  .nav-links {
+  .toc-table {
     font-size: 14px;
-    max-width: 100vw;
+    width: 95%;
   }
 }
 
