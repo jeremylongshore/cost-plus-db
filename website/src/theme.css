@@ -47,3 +47,42 @@ a:link, a:visited {
 .text-center {
   text-align: center;
 }
+
+/* Diagonal cascade effect for navigation */
+:root {
+  --cascade-step: 2ch;
+}
+
+nav ul {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+nav ul li:nth-child(1) { margin-left: 0; }
+nav ul li:nth-child(2) { margin-left: calc(var(--cascade-step) * 1); }
+nav ul li:nth-child(3) { margin-left: calc(var(--cascade-step) * 2); }
+nav ul li:nth-child(4) { margin-left: calc(var(--cascade-step) * 3); }
+nav ul li:nth-child(5) { margin-left: calc(var(--cascade-step) * 4); }
+nav ul li:nth-child(6) { margin-left: calc(var(--cascade-step) * 5); }
+nav ul li:nth-child(7) { margin-left: calc(var(--cascade-step) * 6); }
+nav ul li:nth-child(8) { margin-left: calc(var(--cascade-step) * 7); }
+
+/* Responsive: reduce cascade on smaller screens */
+@media screen and (max-width: 1200px) {
+  :root {
+    --cascade-step: 1ch;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :root {
+    --cascade-step: 0.5ch;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  nav ul li {
+    margin-left: 0 !important;
+  }
+}
