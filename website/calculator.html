@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Jeremy Longshore">
-  <title>Calculator - CostPlusDB</title>
+  <title>Get Started - CostPlusDB</title>
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="src/reset.css">
@@ -16,8 +16,8 @@
 <table class="header">
   <tr>
     <td colspan="2" rowspan="2" class="width-auto">
-      <h1 class="title">Database Calculator</h1>
-      <span class="subtitle">Real-time transparent pricing</span>
+      <h1 class="title">Get Started</h1>
+      <span class="subtitle">Quality consultation for database hosting</span>
     </td>
     <th>Page</th>
     <td class="width-min"><a href="/">← Home</a></td>
@@ -26,154 +26,85 @@
 
 <p><a href="/">← Back to Home</a></p>
 
-<h2>Configure Your Database</h2>
+<h2>Database Migration is Serious Business</h2>
 
-<p>Adjust the options below and watch the price update in real-time. We show you our exact costs.</p>
-
-<hr>
-
-<h2>Quick Tiers</h2>
-
-<div class="grid">
-<button onclick="selectTier('shared')">SHARED</button>
-<button onclick="selectTier('dedicated')">DEDICATED</button>
-<button onclick="selectTier('pro')">PRO</button>
-<button onclick="selectTier('enterprise')">ENTERPRISE</button>
-</div>
-
-<hr>
-
-<h2>Configuration</h2>
-
-<label for="tier">Base Tier</label>
-<select id="tier" onchange="selectTierFromDropdown()">
-<option value="shared">Shared - $49/mo (2GB RAM, 20GB storage)</option>
-<option value="dedicated" selected>Dedicated - $89/mo (8GB RAM, 200GB storage)</option>
-<option value="pro">Pro - $129/mo (16GB RAM, 400GB storage)</option>
-<option value="enterprise">Enterprise - $149/mo (32GB RAM, 800GB storage)</option>
-</select>
-
-<label for="provider">Infrastructure Provider</label>
-<select id="provider" onchange="updatePrice()">
-<option value="contabo" selected>Contabo (Default - Best Value)</option>
-<option value="hetzner">Hetzner (Premium EU)</option>
-<option value="digitalocean">DigitalOcean (Global)</option>
-<option value="aws">AWS (Enterprise Compliance)</option>
-</select>
-
-<label for="region">Region</label>
-<select id="region" onchange="updatePrice()">
-<option value="default" selected>Default (Germany / US East)</option>
-<option value="eu-central">EU Central (GDPR)</option>
-<option value="us-east">US East</option>
-<option value="us-west">US West</option>
-<option value="asia">Asia Pacific</option>
-</select>
+<p><strong>Your database is critical infrastructure.</strong> Rather than a one-size-fits-all calculator, we provide personalized consultation to ensure the right fit.</p>
 
 <details>
-<summary>Advanced Options</summary>
-
-<label>
-<input type="checkbox" id="addon-ha" onchange="updatePrice()">
-High Availability - <strong>+$99/mo</strong>
-</label>
-
-<label>
-<input type="checkbox" id="addon-replicas" onchange="updatePrice()">
-Read Replicas - <strong>+$15/mo</strong>
-</label>
-
-<label>
-<input type="checkbox" id="addon-vpn" onchange="updatePrice()">
-VPN Access - <strong>+$15/mo</strong>
-</label>
-
-<label>
-<input type="checkbox" id="addon-compliance" onchange="updatePrice()">
-Compliance Package - <strong>+$100/mo</strong>
-</label>
-
+<summary><strong>Why consultation instead of instant signup?</strong></summary>
+<ul>
+<li><strong>Migration complexity:</strong> Every database has unique requirements, schemas, and performance needs</li>
+<li><strong>Right-sizing:</strong> We help you choose the tier that actually fits your workload, not oversell</li>
+<li><strong>Compatibility check:</strong> Ensure PostgreSQL 16 supports your current database features</li>
+<li><strong>Timeline planning:</strong> Migrations need coordination - we work with your schedule</li>
+<li><strong>Risk mitigation:</strong> We identify potential issues before they become production problems</li>
+</ul>
+<p>This 15-30 minute conversation saves days of troubleshooting later.</p>
 </details>
 
 <hr>
 
-<h2>Your Pricing (Live)</h2>
+<h2>Our Pricing Tiers</h2>
 
 <table>
 <thead>
 <tr>
-<th>Item</th>
-<th>Price</th>
+<th>Tier</th>
+<th>Specs</th>
+<th>Monthly Price</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Base Tier</strong> (<span id="tier-name">Dedicated</span>: <span id="tier-specs">8GB RAM, 200GB storage</span>)</td>
-<td><strong id="price-base">$89.00</strong></td>
-</tr>
-<tr id="upgrade-provider-row" class="hidden">
-<td>Infrastructure Upgrade (<span id="upgrade-provider-name">Hetzner</span>)</td>
-<td id="price-provider-upgrade">+$20.00</td>
-</tr>
-<tr id="upgrade-region-row" class="hidden">
-<td>Region Selection (<span id="upgrade-region-name">EU Central</span>)</td>
-<td id="price-region-upgrade">+$10.00</td>
-</tr>
-<tr id="addons-ha-row" class="hidden">
-<td>High Availability</td>
-<td id="price-ha">+$99.00</td>
-</tr>
-<tr id="addons-replicas-row" class="hidden">
-<td>Read Replicas</td>
-<td id="price-replicas">+$15.00</td>
-</tr>
-<tr id="addons-vpn-row" class="hidden">
-<td>VPN Access</td>
-<td id="price-vpn">+$15.00</td>
-</tr>
-<tr id="addons-compliance-row" class="hidden">
-<td>Compliance Package</td>
-<td id="price-compliance">+$100.00</td>
+<td><strong>Shared</strong></td>
+<td>2GB RAM, 20GB storage</td>
+<td>$49/month</td>
 </tr>
 <tr>
-<td><strong>YOUR MONTHLY PRICE</strong></td>
-<td><strong id="price-total">$89.00</strong></td>
+<td><strong>Dedicated</strong></td>
+<td>8GB RAM, 200GB storage</td>
+<td>$89/month</td>
 </tr>
 <tr>
-<td>AWS RDS Equivalent</td>
-<td id="price-aws">$280.00</td>
+<td><strong>Pro</strong></td>
+<td>16GB RAM, 400GB storage</td>
+<td>$129/month</td>
 </tr>
 <tr>
-<td><strong>YOU SAVE</strong></td>
-<td><strong id="price-savings">$191.00</strong></td>
+<td><strong>Enterprise</strong></td>
+<td>32GB RAM, 800GB storage</td>
+<td>$149/month</td>
 </tr>
 </tbody>
 </table>
 
-<details>
-<summary>How we price</summary>
+<details style="margin-top: calc(var(--line-height) * 1);">
+<summary><strong>Add-ons available</strong></summary>
 <ul>
-<li><strong>Base tiers</strong>: Fixed flat rates (Shared $49, Dedicated $89, Pro $129, Enterprise $149)</li>
-<li><strong>Infrastructure upgrades</strong>: Cost + 25% for Hetzner/DigitalOcean/AWS</li>
-<li><strong>Add-ons</strong>: Cost + 25% for HA, replicas, VPN, compliance</li>
-<li><strong>Region selection</strong>: +$10/month for specific datacenter choice</li>
+<li><strong>High Availability:</strong> +$99/month</li>
+<li><strong>Read Replicas:</strong> +$15/month</li>
+<li><strong>VPN Access:</strong> +$15/month</li>
+<li><strong>Compliance Package:</strong> +$100/month</li>
+<li><strong>Premium Infrastructure:</strong> Hetzner (+$20), DigitalOcean (+$40), AWS (+$91)</li>
+<li><strong>Region Selection:</strong> +$10/month for specific datacenter</li>
 </ul>
 <p>See our <a href="/transparency/">transparency docs</a> for exact cost breakdowns.</p>
 </details>
 
 <hr>
 
-<h2>Request Database</h2>
+<h2>Request Consultation</h2>
 
-<p>Once you're happy with your configuration, submit your request.</p>
+<p>Tell us about your database needs and we'll schedule a brief consultation to ensure the right fit.</p>
 
 <h3>What Happens Next:</h3>
 <ol>
-<li><strong>We review your request</strong> - We carefully evaluate each application to ensure alignment with our service capabilities and capacity constraints</li>
-<li><strong>Qualification call (if needed)</strong> - For complex requirements or enterprise tiers, we schedule a brief consultation to ensure we can meet your needs</li>
-<li><strong>Approval & payment link</strong> - Upon approval, we send a secure Stripe payment link via email</li>
-<li><strong>Database provisioning</strong> - Payment confirmation triggers provisioning (typically 1-2 hours)</li>
-<li><strong>Credentials delivered</strong> - Connection details and setup guide sent securely</li>
+<li><strong>We review your request</strong> (typically within 2 hours)</li>
+<li><strong>15-30 minute consultation</strong> - We discuss your requirements, migration timeline, and technical needs</li>
+<li><strong>Custom recommendation</strong> - We recommend the right tier and add-ons for your workload</li>
+<li><strong>Approval & payment link</strong> - Upon mutual agreement, we send a secure Stripe payment link</li>
+<li><strong>Database provisioning</strong> - Payment confirmation triggers setup (1-2 hours)</li>
+<li><strong>Credentials & onboarding</strong> - Connection details, migration support, and ongoing guidance</li>
 </ol>
 
 <details style="margin-top: calc(var(--line-height) * 1);">
@@ -188,11 +119,14 @@ Compliance Package - <strong>+$100/mo</strong>
 <p>This process typically takes 1-2 hours. Most requests are approved same-day. If we cannot accommodate your needs, we'll recommend alternative providers.</p>
 </details>
 
-<form name="database-request" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+<form name="consultation-request" method="POST" data-netlify="true" netlify-honeypot="bot-field">
 
 <p class="hidden">
 <label>Don't fill this out: <input name="bot-field"></label>
 </p>
+
+<label for="name">Name *</label>
+<input type="text" id="name" name="name" required>
 
 <label for="email">Email Address *</label>
 <input type="email" id="email" name="email" required>
@@ -200,16 +134,34 @@ Compliance Package - <strong>+$100/mo</strong>
 <label for="company">Company Name (optional)</label>
 <input type="text" id="company" name="company">
 
-<label for="notes">Additional Notes</label>
-<textarea id="notes" name="notes" rows="3" placeholder="Compliance needs, special requirements, questions..."></textarea>
+<label for="current-db">Current Database Details</label>
+<textarea id="current-db" name="current-db" rows="2" placeholder="e.g., PostgreSQL 14 on Heroku, 50GB data, 1000 req/min"></textarea>
 
-<input type="hidden" id="config-data" name="config">
+<label for="tier-interest">Tier of Interest (optional)</label>
+<select id="tier-interest" name="tier-interest">
+<option value="">Not sure yet</option>
+<option value="shared">Shared - $49/mo (2GB RAM, 20GB storage)</option>
+<option value="dedicated">Dedicated - $89/mo (8GB RAM, 200GB storage)</option>
+<option value="pro">Pro - $129/mo (16GB RAM, 400GB storage)</option>
+<option value="enterprise">Enterprise - $149/mo (32GB RAM, 800GB storage)</option>
+</select>
+
+<label for="timeline">Migration Timeline</label>
+<select id="timeline" name="timeline">
+<option value="asap">As soon as possible</option>
+<option value="1-2weeks">1-2 weeks</option>
+<option value="1month">Within 1 month</option>
+<option value="exploring">Just exploring options</option>
+</select>
+
+<label for="requirements">Specific Requirements or Questions</label>
+<textarea id="requirements" name="requirements" rows="4" placeholder="Compliance needs, high availability, read replicas, migration concerns, etc."></textarea>
 
 <button type="submit">
-Request Database for <span id="button-price">$89.00/month</span>
+Request Consultation
 </button>
 
-<p><strong>No payment required now.</strong> This is an application to request service. Upon approval, we'll send a secure payment link via email (typically within 1-2 hours).</p>
+<p><strong>No payment required.</strong> This is a consultation request. We'll review your information and reach out within 2 hours to schedule a brief call.</p>
 
 </form>
 
@@ -232,184 +184,6 @@ Request Database for <span id="button-price">$89.00/month</span>
 <p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a></p>
 </footer>
 
-<script>
-// Flat-rate tier pricing
-const TIERS = {
-  shared: {
-    name: 'Shared',
-    price: 49,
-    ram: 2,
-    storage: 20,
-    specs: '2GB RAM, 20GB storage',
-    awsComparison: 60
-  },
-  dedicated: {
-    name: 'Dedicated',
-    price: 89,
-    ram: 8,
-    storage: 200,
-    specs: '8GB RAM, 200GB storage',
-    awsComparison: 280
-  },
-  pro: {
-    name: 'Pro',
-    price: 129,
-    ram: 16,
-    storage: 400,
-    specs: '16GB RAM, 400GB storage',
-    awsComparison: 480
-  },
-  enterprise: {
-    name: 'Enterprise',
-    price: 149,
-    ram: 32,
-    storage: 800,
-    specs: '32GB RAM, 800GB storage',
-    awsComparison: 820
-  }
-};
-
-// Infrastructure upgrade pricing (cost + 25%)
-const PROVIDER_UPGRADES = {
-  contabo: { name: 'Contabo', price: 0 }, // Default, included in base
-  hetzner: { name: 'Hetzner', price: 20 },
-  digitalocean: { name: 'DigitalOcean', price: 40 },
-  aws: { name: 'AWS', price: 91 }
-};
-
-// Region upgrade pricing
-const REGION_UPGRADE_PRICE = 10;
-
-// Add-on pricing (cost + 25%)
-const ADDONS = {
-  ha: 99,
-  replicas: 15,
-  vpn: 15,
-  compliance: 100
-};
-
-function selectTier(tierName) {
-  document.getElementById('tier').value = tierName;
-  document.getElementById('provider').value = 'contabo'; // Reset to default
-  updatePrice();
-}
-
-function selectTierFromDropdown() {
-  const tierName = document.getElementById('tier').value;
-  updatePrice();
-}
-
-function updatePrice() {
-  const tierName = document.getElementById('tier').value;
-  const tier = TIERS[tierName];
-  const provider = document.getElementById('provider').value;
-  const region = document.getElementById('region').value;
-
-  const addonHa = document.getElementById('addon-ha').checked;
-  const addonReplicas = document.getElementById('addon-replicas').checked;
-  const addonVpn = document.getElementById('addon-vpn').checked;
-  const addonCompliance = document.getElementById('addon-compliance').checked;
-
-  // Base tier price
-  let totalPrice = tier.price;
-
-  // Update tier display
-  document.getElementById('tier-name').textContent = tier.name;
-  document.getElementById('tier-specs').textContent = tier.specs;
-  document.getElementById('price-base').textContent = '$' + tier.price.toFixed(2);
-
-  // Infrastructure upgrade
-  const providerUpgrade = PROVIDER_UPGRADES[provider];
-  if (providerUpgrade.price > 0) {
-    document.getElementById('upgrade-provider-row').classList.remove('hidden');
-    document.getElementById('upgrade-provider-name').textContent = providerUpgrade.name;
-    document.getElementById('price-provider-upgrade').textContent = '+$' + providerUpgrade.price.toFixed(2);
-    totalPrice += providerUpgrade.price;
-  } else {
-    document.getElementById('upgrade-provider-row').classList.add('hidden');
-  }
-
-  // Region upgrade
-  if (region !== 'default') {
-    document.getElementById('upgrade-region-row').classList.remove('hidden');
-    const regionNames = {
-      'eu-central': 'EU Central',
-      'us-east': 'US East',
-      'us-west': 'US West',
-      'asia': 'Asia Pacific'
-    };
-    document.getElementById('upgrade-region-name').textContent = regionNames[region];
-    document.getElementById('price-region-upgrade').textContent = '+$' + REGION_UPGRADE_PRICE.toFixed(2);
-    totalPrice += REGION_UPGRADE_PRICE;
-  } else {
-    document.getElementById('upgrade-region-row').classList.add('hidden');
-  }
-
-  // Add-ons
-  if (addonHa) {
-    document.getElementById('addons-ha-row').classList.remove('hidden');
-    totalPrice += ADDONS.ha;
-  } else {
-    document.getElementById('addons-ha-row').classList.add('hidden');
-  }
-
-  if (addonReplicas) {
-    document.getElementById('addons-replicas-row').classList.remove('hidden');
-    totalPrice += ADDONS.replicas;
-  } else {
-    document.getElementById('addons-replicas-row').classList.add('hidden');
-  }
-
-  if (addonVpn) {
-    document.getElementById('addons-vpn-row').classList.remove('hidden');
-    totalPrice += ADDONS.vpn;
-  } else {
-    document.getElementById('addons-vpn-row').classList.add('hidden');
-  }
-
-  if (addonCompliance) {
-    document.getElementById('addons-compliance-row').classList.remove('hidden');
-    totalPrice += ADDONS.compliance;
-  } else {
-    document.getElementById('addons-compliance-row').classList.add('hidden');
-  }
-
-  // Final calculations
-  const awsPrice = tier.awsComparison;
-  const savings = awsPrice - totalPrice;
-
-  document.getElementById('price-total').textContent = '$' + totalPrice.toFixed(2);
-  document.getElementById('price-aws').textContent = '$' + awsPrice.toFixed(2);
-  document.getElementById('price-savings').textContent = '$' + savings.toFixed(2);
-  document.getElementById('button-price').textContent = '$' + totalPrice.toFixed(2) + '/month';
-
-  // Save config to form
-  const config = {
-    tier: tierName,
-    tierSpecs: tier.specs,
-    provider: provider,
-    region: region,
-    addons: {
-      ha: addonHa,
-      replicas: addonReplicas,
-      vpn: addonVpn,
-      compliance: addonCompliance
-    },
-    pricing: {
-      basePrice: tier.price,
-      providerUpgrade: providerUpgrade.price,
-      regionUpgrade: (region !== 'default' ? REGION_UPGRADE_PRICE : 0),
-      totalPrice: totalPrice
-    }
-  };
-  document.getElementById('config-data').value = JSON.stringify(config);
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  updatePrice();
-});
-</script>
 
 </body>
 </html>
