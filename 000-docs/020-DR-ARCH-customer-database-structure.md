@@ -70,7 +70,7 @@
     "db_name": "acme_production",
     "db_user": "acme_user",
     "db_password": "GENERATED_PASSWORD_HERE",
-    "connection_string": "postgresql://acme_user:PASSWORD@costplusdb.dev:5433/acme_production?sslmode=require"
+    "connection_string": "postgresql://acme_user:PASSWORD@costplusdb.dev:5432/acme_production?sslmode=require"
   },
   "plan": {
     "tier": "Shared",
@@ -120,12 +120,12 @@ Database Password: [GENERATED_32_CHAR_PASSWORD]
 CONNECTION DETAILS
 -----------------
 Host:              costplusdb.dev
-Port:              5433
+Port:              5432
 SSL Mode:          require (mandatory)
 
 CONNECTION STRING
 ----------------
-postgresql://acme_user:[PASSWORD]@costplusdb.dev:5433/acme_production?sslmode=require
+postgresql://acme_user:[PASSWORD]@costplusdb.dev:5432/acme_production?sslmode=require
 
 BACKUP INFORMATION
 -----------------

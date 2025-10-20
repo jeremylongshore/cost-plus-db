@@ -359,7 +359,8 @@ $MESSAGE
 Automated alert from CostPlusDB Security System
 " >> /home/admincostplus/projects/costplusdb/001-security/logs/alerts/pending-emails.log
 
-# TODO: Configure actual email sending (Mailgun, SendGrid, or SMTP)
+# NOTE: Email configuration pending - configure Mailgun, SendGrid, or SMTP when ready
+# Uncomment and configure when email service is set up:
 # echo "$MESSAGE" | mail -s "[CostPlusDB] $SUBJECT" "$TO_EMAIL"
 EOF
 

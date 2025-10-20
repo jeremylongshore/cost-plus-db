@@ -73,7 +73,7 @@ host    all             all             ::1/128                 scram-sha-256
 
 **Apply changes:**
 ```bash
-sudo -u postgres psql -p 5433 -c "SELECT pg_reload_conf();"
+sudo -u postgres psql -p 5432 -c "SELECT pg_reload_conf();"
 ```
 
 ### 1.2 Optimize postgresql.conf Security Settings
@@ -92,7 +92,7 @@ sudo nano /etc/postgresql/16/main/postgresql.conf
 #------------------------------------------------------------------------------
 
 listen_addresses = '*'          # Listen on all interfaces
-port = 5433                     # Non-default port for security
+port = 5432                     # Standard PostgreSQL port
 max_connections = 100           # Adjust based on needs
 
 # SSL Settings
@@ -164,7 +164,7 @@ sudo systemctl restart postgresql@16-main
 
 **Check current SSL status:**
 ```bash
-sudo -u postgres psql -p 5433 -c "SHOW ssl; SHOW ssl_cert_file; SHOW ssl_min_protocol_version;"
+sudo -u postgres psql -p 5432 -c "SHOW ssl; SHOW ssl_cert_file; SHOW ssl_min_protocol_version;"
 ```
 
 **Expected output:**
@@ -228,17 +228,17 @@ sudo chown postgres:postgres /var/lib/postgresql/16/main/ssl/*
 **From remote client:**
 ```bash
 # Should succeed
-psql "postgresql://username:password@server_ip:5433/database?sslmode=require"
+psql "postgresql://username:password@server_ip:5432/database?sslmode=require"
 
 # Should fail (SSL required)
-psql "postgresql://username:password@server_ip:5433/database?sslmode=disable"
+psql "postgresql://username:password@server_ip:5432/database?sslmode=disable"
 ```
 
 ### 2.2 Verify SSL is Enforced
 
 **Check active connections:**
 ```bash
-sudo -u postgres psql -p 5433 -c "SELECT pid, usename, client_addr, ssl, cipher FROM pg_stat_ssl JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid;"
+sudo -u postgres psql -p 5432 -c "SELECT pid, usename, client_addr, ssl, cipher FROM pg_stat_ssl JOIN pg_stat_activity ON pg_stat_ssl.pid = pg_stat_activity.pid;"
 ```
 
 **Expected:** All remote connections show `ssl = t` (true)
@@ -247,7 +247,7 @@ sudo -u postgres psql -p 5433 -c "SELECT pid, usename, client_addr, ssl, cipher 
 
 ## Section 3: Firewall Configuration (UFW)
 
-**Status:** ⚠️ TODO
+**Status:** ✅ Complete (verify implementation)
 **Priority:** CRITICAL
 **Time:** 30 minutes
 
@@ -265,8 +265,8 @@ sudo ufw default allow outgoing
 # Allow SSH (IMPORTANT - do this first!)
 sudo ufw allow 22/tcp comment 'SSH'
 
-# Allow PostgreSQL (custom port)
-sudo ufw allow 5433/tcp comment 'PostgreSQL direct'
+# Allow PostgreSQL (standard port)
+sudo ufw allow 5432/tcp comment 'PostgreSQL direct'
 
 # Allow pgBouncer (when implemented)
 sudo ufw allow 6432/tcp comment 'pgBouncer connection pooling'
@@ -288,11 +288,11 @@ sudo ufw limit 22/tcp comment 'SSH rate limit'
 **Allow PostgreSQL from specific IPs only:**
 ```bash
 # Delete the open rule
-sudo ufw delete allow 5433/tcp
+sudo ufw delete allow 5432/tcp
 
 # Add IP-specific rules
-sudo ufw allow from 1.2.3.4 to any port 5433 comment 'Customer XYZ'
-sudo ufw allow from 5.6.7.8 to any port 5433 comment 'Customer ABC'
+sudo ufw allow from 1.2.3.4 to any port 5432 comment 'Customer XYZ'
+sudo ufw allow from 5.6.7.8 to any port 5432 comment 'Customer ABC'
 ```
 
 ---
@@ -337,7 +337,7 @@ sudo nano /etc/fail2ban/jail.d/postgresql.local
 ```conf
 [postgresql]
 enabled = true
-port = 5433
+port = 5432
 filter = postgresql
 logpath = /var/log/postgresql/postgresql-16-main.log
 maxretry = 5
@@ -514,7 +514,7 @@ fi
 
 ## Section 7: Connection Pooling (pgBouncer)
 
-**Status:** ⚠️ TODO
+**Status:** ⚠️ Documented (implementation pending)
 **Priority:** HIGH
 **Time:** 30 minutes
 
@@ -554,7 +554,7 @@ sudo -u postgres pgbackrest --stanza=main info
 
 ## Section 9: Resource Limits & DoS Prevention
 
-**Status:** ⚠️ TODO
+**Status:** ⚠️ Documented (requires PostgreSQL config updates)
 **Priority:** MEDIUM
 **Time:** 1 hour
 
@@ -603,7 +603,7 @@ Already configured in Section 4 - fail2ban will ban IPs with repeated failed aut
 # Monitor for resource abuse
 
 # Check for long-running queries (>10 minutes)
-sudo -u postgres psql -p 5433 -t -A -c "
+sudo -u postgres psql -p 5432 -t -A -c "
 SELECT pid, usename, datname, query_start, query
 FROM pg_stat_activity
 WHERE state = 'active'
@@ -612,7 +612,7 @@ WHERE state = 'active'
 "
 
 # Check for excessive connections per user
-sudo -u postgres psql -p 5433 -t -A -c "
+sudo -u postgres psql -p 5432 -t -A -c "
 SELECT usename, count(*) as connection_count
 FROM pg_stat_activity
 GROUP BY usename
@@ -683,7 +683,7 @@ cat /etc/apt/apt.conf.d/50unattended-upgrades
 # Example: 16.0 → 16.1
 
 # Check current version
-sudo -u postgres psql -p 5433 -c "SELECT version();"
+sudo -u postgres psql -p 5432 -c "SELECT version();"
 ```
 
 **Major version updates (manual, scheduled):**
@@ -725,7 +725,7 @@ sudo apt list --upgradable | grep postgresql
 
 ## Section 12: Incident Response Runbook
 
-**Status:** ⚠️ TODO (needs documentation)
+**Status:** ✅ Documented (see templates and checklists below)
 **Priority:** MEDIUM (but critical to have)
 **Time:** 2 hours to document
 
@@ -757,10 +757,10 @@ sudo apt list --upgradable | grep postgresql
 2. **Immediate:** Isolate affected database
    ```bash
    # Revoke all connections
-   sudo -u postgres psql -p 5433 -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'customer_db';"
+   sudo -u postgres psql -p 5432 -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'customer_db';"
 
    # Change passwords
-   sudo -u postgres psql -p 5433 -c "ALTER USER customer_user WITH PASSWORD 'new_random_password';"
+   sudo -u postgres psql -p 5432 -c "ALTER USER customer_user WITH PASSWORD 'new_random_password';"
    ```
 3. **Notify:** Email customer within 1 hour
 4. **Forensic:** Export logs, analyze access patterns
@@ -885,16 +885,16 @@ jeremy@intentsolutions.io
 
 ```bash
 # 1. SSL enforcement test
-psql "postgresql://testuser:testpass@server_ip:5433/testdb?sslmode=disable"
+psql "postgresql://testuser:testpass@server_ip:5432/testdb?sslmode=disable"
 # Expected: Connection should FAIL
 
 # 2. Firewall test
-nmap -p 5433 server_ip
-# Expected: Port 5433 open
+nmap -p 5432 server_ip
+# Expected: Port 5432 open
 
 # 3. fail2ban test
 # Attempt 6 failed logins
-for i in {1..6}; do psql "postgresql://baduser:badpass@server_ip:5433/postgres?sslmode=require" 2>&1; done
+for i in {1..6}; do psql "postgresql://baduser:badpass@server_ip:5432/postgres?sslmode=require" 2>&1; done
 # Check ban:
 sudo fail2ban-client status postgresql
 # Expected: IP should be banned
@@ -904,7 +904,7 @@ sudo -u postgres pgbackrest --stanza=main info | grep cipher
 # Expected: cipher: aes-256-cbc
 
 # 5. User isolation test
-psql "postgresql://customer1_user:pass@server_ip:5433/customer2_db?sslmode=require"
+psql "postgresql://customer1_user:pass@server_ip:5432/customer2_db?sslmode=require"
 # Expected: Access denied
 
 # 6. pgBouncer test (when implemented)

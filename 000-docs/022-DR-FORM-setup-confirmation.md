@@ -19,7 +19,7 @@ Your PostgreSQL database has been provisioned and is ready to use. Below are you
 
 ```
 Database Host:     costplusdb.dev
-Database Port:     5433
+Database Port:     5432
 Database Name:     {DATABASE_NAME}
 Database User:     {DATABASE_USER}
 Database Password: {DATABASE_PASSWORD}
@@ -29,14 +29,14 @@ SSL Mode:          require (mandatory)
 ### Connection String
 
 ```
-postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5433/{DATABASE_NAME}?sslmode=require
+postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5432/{DATABASE_NAME}?sslmode=require
 ```
 
 **Copy-paste ready for your app config:**
 
 ```bash
 # .env file format
-DATABASE_URL=postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5433/{DATABASE_NAME}?sslmode=require
+DATABASE_URL=postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5432/{DATABASE_NAME}?sslmode=require
 ```
 
 ---
@@ -46,14 +46,14 @@ DATABASE_URL=postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:543
 **Using psql (PostgreSQL CLI):**
 
 ```bash
-psql "postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5433/{DATABASE_NAME}?sslmode=require"
+psql "postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@costplusdb.dev:5432/{DATABASE_NAME}?sslmode=require"
 ```
 
 **Using TablePlus, DBeaver, or pgAdmin:**
 
 ```
 Host:     costplusdb.dev
-Port:     5433
+Port:     5432
 Database: {DATABASE_NAME}
 Username: {DATABASE_USER}
 Password: {DATABASE_PASSWORD}
@@ -66,7 +66,7 @@ SSL Mode: Require
 SELECT version();
 ```
 
-You should see: `PostgreSQL 18.x on x86_64-pc-linux-gnu`
+You should see: `PostgreSQL 16.x on x86_64-pc-linux-gnu`
 
 ---
 
@@ -193,7 +193,7 @@ You should see: `PostgreSQL 18.x on x86_64-pc-linux-gnu`
 ## 🔄 Common Connection Issues
 
 **"Connection refused" or "could not connect"**
-- Check firewall allows outbound connections on port 5433
+- Check firewall allows outbound connections on port 5432
 - Verify you're using the correct hostname: `costplusdb.dev`
 - Ensure SSL mode is set to `require`
 

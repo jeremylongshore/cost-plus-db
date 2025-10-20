@@ -81,13 +81,13 @@
 3. **You restore to their CostPlusDB database:**
    ```bash
    # On your CostPlusDB server
-   sudo -u postgres pg_restore -h localhost -p 5433 -U customer_user -d customer_db --no-owner --no-acl dump.backup
+   sudo -u postgres pg_restore -h localhost -p 5432 -U customer_user -d customer_db --no-owner --no-acl dump.backup
    ```
 
 4. **Verification:**
    ```bash
    # Check row counts match
-   sudo -u postgres psql -p 5433 -d customer_db -c "SELECT schemaname, tablename, n_live_tup FROM pg_stat_user_tables ORDER BY schemaname, tablename;"
+   sudo -u postgres psql -p 5432 -d customer_db -c "SELECT schemaname, tablename, n_live_tup FROM pg_stat_user_tables ORDER BY schemaname, tablename;"
    ```
 
 **Customer updates connection string and tests.**
@@ -168,7 +168,7 @@ Method: pg_dump/pg_restore
 YOUR NEW CREDENTIALS (Don't use yet - for testing only)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Host: [server_ip]
-Port: 5433
+Port: 5432
 Database: [customer_name]_db
 User: [customer_name]_user
 Password: [password]
@@ -235,7 +235,7 @@ Jeremy
    ```bash
    echo 'TheCitadel2003' | sudo -S -u postgres pg_restore \
      -h localhost \
-     -p 5433 \
+     -p 5432 \
      -U customer_user \
      -d customer_db \
      --no-owner \
@@ -253,7 +253,7 @@ Jeremy
    # Get customer's row counts from old database
    # Compare with new database
 
-   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
+   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
      "SELECT schemaname, tablename, n_live_tup
       FROM pg_stat_user_tables
       ORDER BY schemaname, tablename;"
@@ -284,7 +284,7 @@ VERIFICATION RESULTS
 NEXT STEPS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. Test your application with new connection string:
-   postgresql://[user]:[pass]@[host]:5433/[db]?sslmode=require
+   postgresql://[user]:[pass]@[host]:5432/[db]?sslmode=require
 
 2. Run your smoke tests
 
@@ -313,7 +313,7 @@ Jeremy
 **[ ] Monitor database activity:**
 ```bash
 # Check active connections
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -c \
+echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -c \
   "SELECT datname, usename, count(*)
    FROM pg_stat_activity
    WHERE datname = 'customer_db'
@@ -359,7 +359,7 @@ Jeremy
 echo 'TheCitadel2003' | sudo -S apt-get install postgresql-18-[extension-name]
 
 # Enable for customer database
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
+echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
   "CREATE EXTENSION IF NOT EXISTS [extension-name];"
 ```
 
@@ -392,7 +392,7 @@ echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
    SELECT count(*) FROM important_table;
 
    # On CostPlusDB
-   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
+   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
      "SELECT count(*) FROM important_table;"
    ```
 
@@ -404,10 +404,10 @@ echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
 
 **Solution:** Rebuild indexes and analyze
 ```bash
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
+echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
   "REINDEX DATABASE customer_db;"
 
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5433 -d customer_db -c \
+echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
   "ANALYZE;"
 ```
 

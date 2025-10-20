@@ -27,7 +27,7 @@ Implement pgBouncer connection pooling for efficient PostgreSQL connection manag
 
 ## Prerequisites
 
-- PostgreSQL 16 installed and running on port 5433
+- PostgreSQL 16 installed and running on port 5432
 - Root or sudo access to server
 - PostgreSQL users already created
 
@@ -69,7 +69,7 @@ sudo nano /etc/pgbouncer/pgbouncer.ini
 [databases]
 ; Format: dbname = host=hostname port=port dbname=database
 ; * means "use the same database name as requested"
-* = host=127.0.0.1 port=5433 dbname=*
+* = host=127.0.0.1 port=5432 dbname=*
 
 [pgbouncer]
 ;;;
@@ -174,7 +174,7 @@ cat > /tmp/extract_pgbouncer_auth.sh <<'EOF'
 AUTH_FILE="/etc/pgbouncer/userlist.txt"
 
 # Extract usernames and passwords from PostgreSQL
-sudo -u postgres psql -p 5433 -t -A -c \
+sudo -u postgres psql -p 5432 -t -A -c \
   "SELECT usename, passwd FROM pg_shadow WHERE passwd IS NOT NULL" \
   | sed 's/|/ /' > "$AUTH_FILE"
 
@@ -209,7 +209,7 @@ Example:
 
 **Get password hash from PostgreSQL:**
 ```bash
-sudo -u postgres psql -p 5433 -c "SELECT usename, passwd FROM pg_shadow WHERE usename = 'testcustomer_user';"
+sudo -u postgres psql -p 5432 -c "SELECT usename, passwd FROM pg_shadow WHERE usename = 'testcustomer_user';"
 ```
 
 ---
@@ -298,7 +298,7 @@ sudo ufw allow 6432/tcp comment 'pgBouncer connection pooling'
 sudo ufw status numbered
 ```
 
-**IMPORTANT:** If you use pgBouncer, clients should connect to port 6432, NOT 5433.
+**IMPORTANT:** If you use pgBouncer, clients should connect to port 6432, NOT 5432.
 
 ---
 
@@ -306,7 +306,7 @@ sudo ufw status numbered
 
 **Before pgBouncer (direct PostgreSQL):**
 ```
-postgresql://username:password@server_ip:5433/database?sslmode=require
+postgresql://username:password@server_ip:5432/database?sslmode=require
 ```
 
 **After pgBouncer (connection pooling):**
@@ -314,7 +314,7 @@ postgresql://username:password@server_ip:5433/database?sslmode=require
 postgresql://username:password@server_ip:6432/database?sslmode=require
 ```
 
-**Note:** Port changes from 5433 → 6432
+**Note:** Port changes from 5432 → 6432
 
 ---
 
@@ -326,7 +326,7 @@ postgresql://username:password@server_ip:6432/database?sslmode=require
 # After creating PostgreSQL user, add to pgBouncer auth file
 
 # Extract password hash
-PG_HASH=$(sudo -u postgres psql -p 5433 -t -A -c \
+PG_HASH=$(sudo -u postgres psql -p 5432 -t -A -c \
   "SELECT passwd FROM pg_shadow WHERE usename = '$DB_USER'")
 
 # Add to pgBouncer userlist

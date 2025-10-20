@@ -84,7 +84,7 @@ log-level-file=debug
 
 [main]
 pg1-path=/var/lib/postgresql/16/main
-pg1-port=5433
+pg1-port=5432
 pg1-socket-path=/var/run/postgresql
 ```
 

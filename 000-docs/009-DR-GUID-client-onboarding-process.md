@@ -301,7 +301,7 @@ Once payment received:
 
 **[Day 0] Provision Database**
 - [ ] Run provisioning script: `SUDO_PASS='[password]' ./provision-customer-database.sh [customer_name]`
-- [ ] Verify database created: `sudo -u postgres psql -p 5433 -c "\l" | grep [customer_name]`
+- [ ] Verify database created: `sudo -u postgres psql -p 5432 -c "\l" | grep [customer_name]`
 - [ ] Test connection with provided credentials
 - [ ] Verify SSL enforced: `sudo cat /etc/postgresql/16/main/pg_hba.conf | grep [customer_name]`
 
@@ -336,14 +336,14 @@ CONNECTION DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Host:     [server_ip]
-Port:     5433
+Port:     5432
 Database: [customer_name]_db
 User:     [customer_name]_user
 Password: [generated_password]
 SSL Mode: require (REQUIRED)
 
 Connection String:
-postgresql://[user]:[password]@[host]:5433/[database]?sslmode=require
+postgresql://[user]:[password]@[host]:5432/[database]?sslmode=require
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 BACKUP DETAILS
