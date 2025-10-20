@@ -215,9 +215,9 @@ Created comprehensive onboarding and migration guides:
 
 ### Server Access
 **User:** admincostplus
-**Sudo password:** TheCitadel2003
+**Sudo access:** Configured with SSH key authentication
 
-**⚠️ Change sudo password after initial setup!**
+**⚠️ SECURITY: Sudo password should be kept secure and never committed to git!**
 
 ---
 

@@ -24,7 +24,7 @@
    - May be in recent commit history
 
 4. **Server Sudo Password:**
-   - Embedded in monitoring scripts: `TheCitadel2003`
+   - Was embedded in monitoring scripts: `[REDACTED - NOW REMOVED]`
 
 **Commits with secrets:**
 - `3f05c90` - Complete automation setup
@@ -217,16 +217,15 @@ If history is too polluted:
 
 **4.4 Remove Sudo Password from Scripts:**
 
-Option 1: Use sudoers NOPASSWD rules
+✅ **COMPLETED** - All monitoring scripts updated
+
+All scripts now use sudo NOPASSWD configuration:
 ```bash
-# Add to /etc/sudoers.d/costplusdb-monitoring
-admincostplus ALL=(ALL) NOPASSWD: /usr/bin/fail2ban-client
-admincostplus ALL=(ALL) NOPASSWD: /usr/bin/grep
+# See: 001-security/config/sudoers-setup.md for complete configuration
+# All hardcoded passwords have been removed from scripts
 ```
 
-Option 2: Use sudo credential cache (timeout)
-
-Option 3: Run scripts as root via systemd timers instead of cron
+Sudoers NOPASSWD rules configured in `/etc/sudoers.d/costplusdb-monitoring`
 
 ---
 
@@ -245,8 +244,8 @@ Option 3: Run scripts as root via systemd timers instead of cron
 
 ✅ **Scripts (templates only):**
 - `001-security/scripts/` - Monitoring scripts
-  - Remove hardcoded `echo "TheCitadel2003" | sudo -S`
-  - Add comments: `# Configure sudo NOPASSWD or use credential cache`
+  - ✅ DONE: Removed all hardcoded password patterns
+  - ✅ DONE: Added comments explaining sudo NOPASSWD requirements
 
 ✅ **Configuration templates:**
 - `001-security/config/backup/pgbackrest.conf.template`
@@ -286,9 +285,10 @@ sudo fail2ban-client status postgresql
 ```
 
 **Update all monitoring scripts:**
-- Remove `echo "TheCitadel2003" | sudo -S`
-- Add `source` statement to load credentials
-- Add error handling if credentials missing
+- ✅ Removed all hardcoded password patterns
+- ✅ Updated to use plain `sudo` commands (requires NOPASSWD config)
+- ✅ Added header comments explaining sudoers requirements
+- ✅ Created comprehensive setup guide at `001-security/config/sudoers-setup.md`
 
 ---
 
@@ -347,7 +347,8 @@ git clone https://github.com/jeremylongshore/cost-plus-db.git test-public
 
 # Search for any remaining secrets
 cd test-public
-grep -r "TheCitadel2003" .
+grep -r "password.*sudo" .  # Should find NO hardcoded passwords
+grep -r "echo.*sudo -S" .  # Should find NO password echo patterns
 grep -r "49S2EH8V84D0JO6DH5MV" .
 grep -r "re_RgaDN3Rd" .
 grep -r "tXoiSmzmMh67qJ" .

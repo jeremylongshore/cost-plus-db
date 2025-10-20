@@ -233,7 +233,7 @@ Jeremy
 
 4. **Restore to CostPlusDB:**
    ```bash
-   echo 'TheCitadel2003' | sudo -S -u postgres pg_restore \
+   sudo -u postgres pg_restore \
      -h localhost \
      -p 5432 \
      -U customer_user \
@@ -253,7 +253,7 @@ Jeremy
    # Get customer's row counts from old database
    # Compare with new database
 
-   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
+   sudo -u postgres psql -p 5432 -d customer_db -c \
      "SELECT schemaname, tablename, n_live_tup
       FROM pg_stat_user_tables
       ORDER BY schemaname, tablename;"
@@ -313,14 +313,14 @@ Jeremy
 **[ ] Monitor database activity:**
 ```bash
 # Check active connections
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -c \
+sudo -u postgres psql -p 5432 -c \
   "SELECT datname, usename, count(*)
    FROM pg_stat_activity
    WHERE datname = 'customer_db'
    GROUP BY datname, usename;"
 
 # Check for errors in PostgreSQL log
-echo 'TheCitadel2003' | sudo -S tail -100 /var/log/postgresql/postgresql-18-main.log | grep customer_db
+sudo tail -100 /var/log/postgresql/postgresql-18-main.log | grep customer_db
 ```
 
 **[ ] Check first backup:**
@@ -356,10 +356,10 @@ Jeremy
 **Solution:**
 ```bash
 # Install extension on your CostPlusDB server
-echo 'TheCitadel2003' | sudo -S apt-get install postgresql-18-[extension-name]
+sudo apt-get install postgresql-18-[extension-name]
 
 # Enable for customer database
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
+sudo -u postgres psql -p 5432 -d customer_db -c \
   "CREATE EXTENSION IF NOT EXISTS [extension-name];"
 ```
 
@@ -392,7 +392,7 @@ echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
    SELECT count(*) FROM important_table;
 
    # On CostPlusDB
-   echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
+   sudo -u postgres psql -p 5432 -d customer_db -c \
      "SELECT count(*) FROM important_table;"
    ```
 
@@ -404,10 +404,10 @@ echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
 
 **Solution:** Rebuild indexes and analyze
 ```bash
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
+sudo -u postgres psql -p 5432 -d customer_db -c \
   "REINDEX DATABASE customer_db;"
 
-echo 'TheCitadel2003' | sudo -S -u postgres psql -p 5432 -d customer_db -c \
+sudo -u postgres psql -p 5432 -d customer_db -c \
   "ANALYZE;"
 ```
 

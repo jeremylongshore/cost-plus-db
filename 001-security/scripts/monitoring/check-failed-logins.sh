@@ -1,6 +1,12 @@
 #!/bin/bash
-# Check for failed PostgreSQL authentication attempts
-# Runs every 5 minutes via cron
+# CostPlusDB Security Monitoring Script - Failed Login Detection
+#
+# IMPORTANT: This script requires sudo NOPASSWD configuration
+# Add to /etc/sudoers.d/costplusdb-monitoring:
+#
+#   admincostplus ALL=(ALL) NOPASSWD: /usr/bin/grep /var/log/postgresql/*
+#
+# See 001-security/config/sudoers-setup.md for complete setup instructions
 
 THRESHOLD=5
 LOG_FILE="/var/log/postgresql/postgresql-16-main.log"
@@ -14,7 +20,7 @@ if [ ! -f "$LOG_FILE" ]; then
 fi
 
 # Count failed attempts in last 5 minutes
-FAILED_COUNT=$(echo "TheCitadel2003" | sudo -S grep "FATAL.*password authentication failed" "$LOG_FILE" 2>/dev/null | grep "$(date '+%Y-%m-%d %H:%M' --date='5 minutes ago')" | wc -l)
+FAILED_COUNT=$(sudo grep "FATAL.*password authentication failed" "$LOG_FILE" 2>/dev/null | grep "$(date '+%Y-%m-%d %H:%M' --date='5 minutes ago')" | wc -l)
 
 echo "[$(date)] Checked failed logins: $FAILED_COUNT attempts in last 5 minutes" >> "$OUTPUT_LOG"
 

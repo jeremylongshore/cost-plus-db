@@ -1,6 +1,12 @@
 #!/bin/bash
-# Check PostgreSQL SSL certificate expiration
-# Runs every 6 hours via cron
+# CostPlusDB Security Monitoring Script - SSL Certificate Expiry
+#
+# IMPORTANT: This script requires sudo NOPASSWD configuration
+# Add to /etc/sudoers.d/costplusdb-monitoring:
+#
+#   admincostplus ALL=(ALL) NOPASSWD: /usr/bin/openssl
+#
+# See 001-security/config/sudoers-setup.md for complete setup instructions
 
 CERT_FILE="/var/lib/postgresql/18/main/ssl/server.crt"
 ALERT_SCRIPT="/home/admincostplus/projects/costplusdb/001-security/alerts/scripts/send-alert-email.sh"
@@ -13,7 +19,7 @@ if [ ! -f "$CERT_FILE" ]; then
 fi
 
 # Get expiration date
-EXPIRY_DATE=$(echo "TheCitadel2003" | sudo -S openssl x509 -in "$CERT_FILE" -noout -enddate 2>/dev/null | cut -d= -f2)
+EXPIRY_DATE=$(sudo openssl x509 -in "$CERT_FILE" -noout -enddate 2>/dev/null | cut -d= -f2)
 EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s)
 CURRENT_EPOCH=$(date +%s)
 DAYS_UNTIL_EXPIRY=$(( ($EXPIRY_EPOCH - $CURRENT_EPOCH) / 86400 ))

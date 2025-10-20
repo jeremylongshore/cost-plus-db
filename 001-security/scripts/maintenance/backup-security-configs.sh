@@ -1,6 +1,15 @@
 #!/bin/bash
-# Backup all security configurations daily
-# Runs at 2 AM daily (after database backup)
+# CostPlusDB Security Monitoring Script - Backup Security Configs
+#
+# IMPORTANT: This script requires sudo NOPASSWD configuration
+# Add to /etc/sudoers.d/costplusdb-monitoring:
+#
+#   admincostplus ALL=(ALL) NOPASSWD: /usr/sbin/ufw status*
+#   admincostplus ALL=(ALL) NOPASSWD: /bin/cp /etc/fail2ban/* *
+#   admincostplus ALL=(ALL) NOPASSWD: /bin/cp /etc/pgbackrest.conf *
+#   admincostplus ALL=(ALL) NOPASSWD: /bin/cp /etc/postgresql/* *
+#
+# See 001-security/config/sudoers-setup.md for complete setup instructions
 
 BACKUP_DIR="/home/admincostplus/projects/costplusdb/001-security/backups/daily/$(date +%Y-%m-%d)"
 OUTPUT_LOG="/home/admincostplus/projects/costplusdb/001-security/logs/backups/config-backups.log"
@@ -11,19 +20,19 @@ echo "[$(date)] Starting security config backup" >> "$OUTPUT_LOG"
 mkdir -p "$BACKUP_DIR"
 
 # Backup firewall rules
-echo "TheCitadel2003" | sudo -S ufw status verbose > "$BACKUP_DIR/ufw-rules.txt" 2>&1
+sudo ufw status verbose > "$BACKUP_DIR/ufw-rules.txt" 2>&1
 
 # Backup fail2ban config
-echo "TheCitadel2003" | sudo -S cp /etc/fail2ban/jail.d/postgresql.local "$BACKUP_DIR/fail2ban-postgresql.conf" 2>/dev/null
+sudo cp /etc/fail2ban/jail.d/postgresql.local "$BACKUP_DIR/fail2ban-postgresql.conf" 2>/dev/null
 
 # Backup pgbackrest config
-echo "TheCitadel2003" | sudo -S cp /etc/pgbackrest.conf "$BACKUP_DIR/pgbackrest.conf" 2>/dev/null
+sudo cp /etc/pgbackrest.conf "$BACKUP_DIR/pgbackrest.conf" 2>/dev/null
 
 # Backup PostgreSQL pg_hba.conf
-echo "TheCitadel2003" | sudo -S cp /etc/postgresql/16/main/pg_hba.conf "$BACKUP_DIR/pg_hba.conf" 2>/dev/null
+sudo cp /etc/postgresql/16/main/pg_hba.conf "$BACKUP_DIR/pg_hba.conf" 2>/dev/null
 
 # Backup PostgreSQL config
-echo "TheCitadel2003" | sudo -S cp /etc/postgresql/16/main/postgresql.conf "$BACKUP_DIR/postgresql.conf" 2>/dev/null
+sudo cp /etc/postgresql/16/main/postgresql.conf "$BACKUP_DIR/postgresql.conf" 2>/dev/null
 
 # Compress backup
 tar -czf "$BACKUP_DIR.tar.gz" -C "$(dirname $BACKUP_DIR)" "$(basename $BACKUP_DIR)" 2>&1 >> "$OUTPUT_LOG"

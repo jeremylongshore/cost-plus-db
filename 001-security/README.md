@@ -139,7 +139,7 @@ sudo -u postgres psql -p 5433 -c "SELECT datname, usename, application_name, cli
 
 ```bash
 cd /home/admincostplus/projects/costplusdb/001-security/procedures
-SUDO_PASS='TheCitadel2003' ./provision-customer-database.sh <customer_name>
+./provision-customer-database.sh <customer_name>
 ```
 
 ### Run Backup

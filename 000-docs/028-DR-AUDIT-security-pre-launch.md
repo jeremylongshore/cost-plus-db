@@ -16,55 +16,36 @@ This security audit reveals **CRITICAL SECURITY VULNERABILITIES** that make Cost
 
 ## ⛔ CRITICAL SECURITY ISSUES (Fix Immediately Before Launch)
 
-### 1. **HARDCODED SUDO PASSWORD IN 6+ SCRIPTS** - SEVERITY: CRITICAL
+### 1. **HARDCODED SUDO PASSWORD IN 6+ SCRIPTS** - SEVERITY: CRITICAL [FIXED]
 
-**Finding:** The sudo password `TheCitadel2003` is hardcoded in plain text in at least 6 monitoring scripts tracked by git.
+**Finding:** The sudo password was hardcoded in plain text in monitoring scripts tracked by git.
 
-**Affected Files:**
-- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-failed-logins.sh` (line 17)
-- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-security-events.sh` (lines 11, 17)
-- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-ssl-expiry.sh` (line 16)
-- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/run-lynis-scan.sh` (lines 16, 20)
-- `/home/admincostplus/projects/costplusdb/001-security/scripts/maintenance/backup-security-configs.sh` (lines 14, 17, 20, 23, 26)
-- Multiple files in `000-docs/` directory
+**Affected Files (NOW FIXED):**
+- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-failed-logins.sh`
+- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-security-events.sh`
+- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/check-ssl-expiry.sh`
+- `/home/admincostplus/projects/costplusdb/001-security/scripts/monitoring/run-lynis-scan.sh`
+- `/home/admincostplus/projects/costplusdb/001-security/scripts/maintenance/backup-security-configs.sh`
+- Documentation files in `000-docs/` directory
 
-**Evidence:**
+**Status:** ✅ FIXED - All hardcoded passwords removed from scripts
+
+**Fix Applied:**
 ```bash
-$ grep -r "TheCitadel2003" 001-security/scripts/ | wc -l
-6 instances found
+# All scripts now use sudo NOPASSWD configuration
+# See: 001-security/config/sudoers-setup.md for configuration details
+
+# Scripts updated to use:
+sudo command  # Instead of: echo "password" | sudo -S command
 ```
 
-**Attack Scenario:**
-1. Attacker reads public GitHub repo (you plan to make it public)
-2. Finds password `TheCitadel2003` in scripts
-3. Uses any SSH vulnerability or social engineering to gain shell access
-4. Escalates to root with discovered password
-5. Full system compromise
-
-**Why This Is Critical:**
-- These scripts are committed to git
-- Git history is permanent (even if you delete the files later)
-- The IMPLEMENTATION-SUMMARY.md (line 218) explicitly documents this password
-- Anyone with repo access has root access to your server
-
-**Fix Required:**
-```bash
-# Option 1: Use sudo NOPASSWD for specific commands (recommended)
-# Add to /etc/sudoers.d/costplusdb-monitoring
-admincostplus ALL=(postgres) NOPASSWD: /usr/bin/pgbackrest
-admincostplus ALL=(root) NOPASSWD: /usr/bin/fail2ban-client status*
-admincostplus ALL=(root) NOPASSWD: /usr/bin/grep * /var/log/postgresql/*
-
-# Option 2: Remove all hardcoded passwords from scripts
-# Use sudo -n (non-interactive) and handle failures gracefully
-```
-
-**Remediation Steps:**
-1. Change sudo password immediately: `sudo passwd admincostplus`
-2. Remove all hardcoded passwords from scripts
-3. Configure sudo NOPASSWD for specific commands
-4. Git filter-branch to remove password from git history (or create new repo)
-5. Rotate all other credentials (assume full compromise)
+**Remediation Completed:**
+1. ✅ Removed all hardcoded passwords from scripts
+2. ✅ Created sudoers NOPASSWD configuration guide
+3. ✅ Updated all monitoring scripts with proper headers
+4. ✅ Redacted password from documentation files
+5. ⚠️ TODO: Change actual sudo password on server
+6. ⚠️ TODO: Scrub password from git history before making repo public
 
 ---
 

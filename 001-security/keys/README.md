@@ -47,9 +47,9 @@ All keys and passphrases are stored **on the server only**, not in the git repos
 
 ### Sudo Password
 **Location:** Memory only (not stored on disk)
-**Current:** `TheCitadel2003`
+**Current:** [REDACTED - Store in password manager]
 
-⚠️ **Change this after initial setup!**
+⚠️ **SECURITY:** Never commit sudo password to git! Store in password manager only.
 
 ---
 

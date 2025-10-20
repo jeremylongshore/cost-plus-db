@@ -60,7 +60,7 @@
 
 <h3>Backup Security & Transparency</h3>
 
-<p><strong>Backup Schedule:</strong> Daily automated backups at 1 AM CT</p>
+<p><strong>Backup Schedule:</strong> Backup infrastructure configured (automated scheduling in progress)</p>
 
 <table>
 <thead>
@@ -88,7 +88,7 @@
 </tr>
 <tr>
 <td>Retention</td>
-<td>30 days rolling (1 backup per day, oldest deleted automatically)</td>
+<td>2 local backups + 4 cloud backups (expanding to 30-day retention)</td>
 </tr>
 <tr>
 <td>Point-in-Time Recovery</td>
@@ -107,11 +107,11 @@
 
 <p><strong>What this means for you:</strong></p>
 <ul>
-<li>Your data is backed up every single day automatically</li>
-<li>We keep 30 days of backups (you can restore from any day in the past month)</li>
+<li>Your data will be backed up every single day automatically (infrastructure configured, automation in progress)</li>
+<li>We maintain 2 local + 4 cloud backups (expanding to 30-day retention)</li>
 <li>All backups are encrypted before storage (even we can't read them without the key)</li>
 <li>Backups are stored in 2 locations (local server + cloud S3)</li>
-<li>If your database is corrupted at 2 PM today, we can restore it to 1:59 PM (point-in-time recovery)</li>
+<li>Point-in-time recovery capability via WAL archives (7 days)</li>
 <li>We regularly test restores to ensure backups actually work when needed</li>
 </ul>
 
@@ -160,25 +160,15 @@
 <td>Email alert with details</td>
 </tr>
 <tr>
-<td>Backup Verification</td>
-<td>Daily at 2:05 AM</td>
-<td>Backup fails or missing</td>
-<td>Email alert + investigation</td>
-</tr>
-<tr>
 <td>Security Hardening Score</td>
 <td>1st of month at 3 AM</td>
 <td>Lynis score &lt;70</td>
 <td>Email report + remediation</td>
 </tr>
-<tr>
-<td>Uptime</td>
-<td>Every 30 seconds</td>
-<td>Service unreachable</td>
-<td>SMS + email to operator</td>
-</tr>
 </tbody>
 </table>
+
+<p><strong>Note:</strong> Additional monitoring capabilities (real-time uptime checks, automated backup verification) are currently in development and will be added soon.</p>
 
 <p><strong>All alerts include:</strong></p>
 <ul>
