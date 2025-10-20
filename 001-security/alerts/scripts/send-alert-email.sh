@@ -1,23 +1,31 @@
 #!/bin/bash
-# Send security alert via email
-# For now, logs to file until email is configured
+# Send security alert via email using Resend API
+# Configured: 2025-10-19
 
 SUBJECT="$1"
 MESSAGE="$2"
-TO_EMAIL="jeremy@intentsolutions.io"
-FROM_EMAIL="alerts@costplusdb.dev"
 ALERT_LOG="/home/admincostplus/projects/costplusdb/001-security/logs/alerts/email-alerts.log"
 PENDING_LOG="/home/admincostplus/projects/costplusdb/001-security/logs/alerts/pending-emails.log"
+RESEND_CONFIG="/home/admincostplus/projects/costplusdb/001-security/keys/api-tokens/resend-api-key"
 
-# Log alert
-echo "[$(date)] ALERT SENT: $SUBJECT - $MESSAGE" >> "$ALERT_LOG"
+# Load Resend credentials
+if [ -f "$RESEND_CONFIG" ]; then
+    source "$RESEND_CONFIG"
+else
+    echo "[$(date)] ERROR: Resend config not found: $RESEND_CONFIG" >> "$ALERT_LOG"
+    exit 1
+fi
 
-# Create email message (for when email is configured)
-cat >> "$PENDING_LOG" <<EMAILEND
+# Validate API key is configured
+if [ "$RESEND_API_KEY" == "YOUR_RESEND_API_KEY" ] || [ -z "$RESEND_API_KEY" ]; then
+    echo "[$(date)] WARNING: Resend API key not configured - logging only" >> "$ALERT_LOG"
+
+    # Log to pending emails
+    cat >> "$PENDING_LOG" <<EMAILEND
 
 ================================================================================
-TO: $TO_EMAIL
-FROM: $FROM_EMAIL
+TO: $RESEND_TO_EMAIL
+FROM: $RESEND_FROM_EMAIL
 SUBJECT: [CostPlusDB Security Alert] $SUBJECT
 DATE: $(date)
 ================================================================================
@@ -33,20 +41,67 @@ For security issues, contact: jeremy@intentsolutions.io
 ================================================================================
 
 EMAILEND
+    echo "[$(date)] Alert logged to pending (API key not configured)" >> "$ALERT_LOG"
+    exit 0
+fi
 
-# TODO: Configure actual email sending
-# Options:
-# 1. Mailgun API
-# 2. SendGrid API
-# 3. AWS SES
-# 4. Local sendmail/postfix
-#
-# Example with mailgun (when configured):
-# curl -s --user "api:YOUR_API_KEY" \
-#   https://api.mailgun.net/v3/YOUR_DOMAIN/messages \
-#   -F from="$FROM_EMAIL" \
-#   -F to="$TO_EMAIL" \
-#   -F subject="[CostPlusDB] $SUBJECT" \
-#   -F text="$MESSAGE"
+# Build email HTML body
+EMAIL_HTML="<h2>CostPlusDB Security Alert</h2>
+<p><strong>Subject:</strong> $SUBJECT</p>
+<hr>
+<p>$MESSAGE</p>
+<hr>
+<p><small>
+Automated alert from CostPlusDB Security Monitoring System<br>
+Server: $(hostname)<br>
+IP: $(hostname -I | awk '{print $1}')<br>
+Timestamp: $(date)<br>
+<br>
+For security issues, contact: jeremy@intentsolutions.io
+</small></p>"
 
-echo "[$(date)] Alert logged - Email sending not yet configured" >> "$ALERT_LOG"
+# Build JSON payload for Resend API
+JSON_PAYLOAD=$(cat <<EOF
+{
+  "from": "$RESEND_FROM_EMAIL",
+  "to": ["$RESEND_TO_EMAIL"],
+  "subject": "[CostPlusDB] $SUBJECT",
+  "html": "$EMAIL_HTML"
+}
+EOF
+)
+
+# Send via Resend API
+RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "https://api.resend.com/emails" \
+  -H "Authorization: Bearer $RESEND_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "$JSON_PAYLOAD")
+
+HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+RESPONSE_BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
+
+if [ "$HTTP_STATUS" == "200" ]; then
+    echo "[$(date)] ✅ Email sent successfully via Resend: $SUBJECT" >> "$ALERT_LOG"
+    echo "[$(date)] Response: $RESPONSE_BODY" >> "$ALERT_LOG"
+else
+    echo "[$(date)] ❌ Email send FAILED (HTTP $HTTP_STATUS): $SUBJECT" >> "$ALERT_LOG"
+    echo "[$(date)] Error response: $RESPONSE_BODY" >> "$ALERT_LOG"
+
+    # Fallback: log to pending emails
+    cat >> "$PENDING_LOG" <<EMAILEND
+
+================================================================================
+FAILED TO SEND (HTTP $HTTP_STATUS)
+TO: $RESEND_TO_EMAIL
+FROM: $RESEND_FROM_EMAIL
+SUBJECT: [CostPlusDB Security Alert] $SUBJECT
+DATE: $(date)
+ERROR: $RESPONSE_BODY
+================================================================================
+
+$MESSAGE
+
+================================================================================
+
+EMAILEND
+fi
