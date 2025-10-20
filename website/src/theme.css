@@ -84,6 +84,42 @@ a:link, a:visited {
 @media screen and (max-width: 768px) {
   .nav-simple {
     font-size: 14px;
+    overflow-x: auto;
+  }
+
+  /* Center the pages section heading */
+  .pages-section h2 {
+    text-align: center;
+  }
+
+  /* Make centered figures/boxes scrollable if needed */
+  figure {
+    overflow-x: auto;
+    margin: calc(var(--line-height) * 2) 0;
+  }
+
+  /* Ensure centered pre blocks don't break layout */
+  figure pre {
+    min-width: max-content;
+  }
+
+  /* Make tables scrollable on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Extra small screens */
+@media screen and (max-width: 480px) {
+  .nav-simple {
+    font-size: 12px;
+  }
+
+  /* Reduce CTA font size slightly on very small screens */
+  p[style*="font-size: 1.5rem"] {
+    font-size: 1.2rem !important;
   }
 }
 
