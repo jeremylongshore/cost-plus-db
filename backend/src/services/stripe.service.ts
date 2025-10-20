@@ -1,21 +1,24 @@
 /**
  * Stripe Service
  *
- * Handles payment processing via Stripe:
- * - Payment link generation
- * - Customer creation in Stripe
- * - Subscription management
- * - Webhook event processing
- * - Billing record synchronization
+ * High-level service layer for Stripe operations.
+ * Wraps the Stripe integration client and provides business logic.
+ *
+ * This service coordinates between:
+ * - Stripe integration client (src/integrations/stripe/client.ts)
+ * - Database operations
+ * - Email notifications
+ * - Activity logging
  *
  * @module services/stripe
  */
 
-import Stripe from 'stripe';
 import Database from 'better-sqlite3';
+import { stripeClient } from '../integrations/stripe/client.js';
 import { config } from '../config/index.js';
 import { ExternalServiceError, NotFoundError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
+import type { PaymentLinkOptions, SubscriptionOptions } from '../integrations/stripe/types.js';
 
 /**
  * Payment link result
@@ -48,48 +51,22 @@ export interface SubscriptionResult {
 }
 
 /**
- * Webhook event types we handle
- * (Currently unused - reserved for future webhook routing)
- */
-// type WebhookEventType =
-//   | 'payment_intent.succeeded'
-//   | 'payment_intent.payment_failed'
-//   | 'customer.subscription.created'
-//   | 'customer.subscription.updated'
-//   | 'customer.subscription.deleted'
-//   | 'invoice.payment_succeeded'
-//   | 'invoice.payment_failed';
-
-/**
  * Stripe service class
  */
 export class StripeService {
-  private stripe: Stripe;
-
-  constructor(private db: Database.Database) {
-    this.stripe = new Stripe(config.STRIPE_SECRET_KEY, {
-      apiVersion: '2023-10-16',
-    });
-  }
+  constructor(private db: Database.Database) {}
 
   /**
    * Create payment link for customer
    *
-   * Generates a Stripe Payment Link for one-time or subscription payment.
+   * Generates a Stripe Payment Link for one-time payment.
+   * This method wraps the Stripe client and adds database integration.
    *
    * @param customerId - Internal customer ID
-   * @param amount - Amount in dollars
-   * @param description - Payment description
-   * @param metadata - Additional metadata
    * @returns Payment link details
    */
-  async createPaymentLink(
-    customerId: number,
-    amount: number,
-    description: string,
-    metadata?: Record<string, string>
-  ): Promise<PaymentLinkResult> {
-    logger.info('Creating Stripe payment link', { customerId, amount });
+  async createPaymentLinkForCustomer(customerId: number): Promise<PaymentLinkResult> {
+    logger.info('Creating payment link for customer', { customerId });
 
     try {
       // Get customer
@@ -99,11 +76,13 @@ export class StripeService {
       let stripeCustomerId = await this.getStripeCustomerId(customerId);
 
       if (!stripeCustomerId) {
-        const stripeCustomer = await this.stripe.customers.create({
+        const stripeCustomer = await stripeClient.createCustomer({
           email: customer.email,
           name: customer.company_name,
+          phone: customer.phone || undefined,
           metadata: {
             internal_customer_id: customerId.toString(),
+            tier: customer.tier,
           },
         });
 
@@ -111,43 +90,41 @@ export class StripeService {
         await this.saveStripeCustomerId(customerId, stripeCustomerId);
       }
 
-      // Create price for the payment link
-      const price = await this.stripe.prices.create({
-        unit_amount: Math.round(amount * 100), // Convert to cents
+      // Calculate amount based on tier
+      // TODO: Get this from BillingService instead
+      const tierPrices: Record<string, number> = {
+        shared: 49,
+        dedicated: 89,
+        pro: 129,
+        enterprise: 149,
+      };
+      const amount = tierPrices[customer.tier] || 49;
+
+      // Create payment link using Stripe client
+      const paymentLinkOptions: PaymentLinkOptions = {
+        customerId: stripeCustomerId,
+        amount,
         currency: 'usd',
-        product_data: {
-          name: description,
-        },
+        description: `CostPlusDB ${customer.tier} tier - Monthly subscription`,
         metadata: {
           customer_id: customerId.toString(),
-          ...metadata,
+          tier: customer.tier,
+          type: 'monthly_subscription',
         },
+        successUrl: `${config.API_BASE_URL}/payment/success?customer_id=${customerId}`,
+      };
+
+      const paymentLink = await stripeClient.createPaymentLink(paymentLinkOptions);
+
+      // Log activity
+      await this.logActivity(customerId, 'payment_link_created', {
+        payment_link_id: paymentLink.id,
+        amount,
       });
 
-      // Create payment link
-      const paymentLink = await this.stripe.paymentLinks.create({
-        line_items: [
-          {
-            price: price.id,
-            quantity: 1,
-          },
-        ],
-        after_completion: {
-          type: 'redirect',
-          redirect: {
-            url: `${config.API_BASE_URL}/payment/success?customer_id=${customerId}`,
-          },
-        },
-        metadata: {
-          customer_id: customerId.toString(),
-          ...metadata,
-        },
-      });
-
-      logger.info('Payment link created', {
+      logger.info('Payment link created successfully', {
         customerId,
         paymentLinkId: paymentLink.id,
-        amount,
       });
 
       return {
@@ -157,11 +134,122 @@ export class StripeService {
         currency: 'USD',
       };
     } catch (error) {
-      logger.error('Failed to create payment link', {
+      logger.error('Failed to create payment link for customer', {
         customerId,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw new ExternalServiceError('Stripe', 'Failed to create payment link');
+    }
+  }
+
+  /**
+   * Handle successful payment
+   *
+   * Called when a payment succeeds (via webhook or manual processing).
+   * Updates billing records and customer status.
+   *
+   * @param paymentIntentId - Stripe payment intent ID
+   */
+  async handlePaymentSuccess(paymentIntentId: string): Promise<void> {
+    logger.info('Handling payment success', { paymentIntentId });
+
+    try {
+      // Retrieve payment intent from Stripe
+      const paymentIntent = await stripeClient.retrievePaymentIntent(paymentIntentId);
+
+      // Extract customer ID from metadata
+      const customerId = paymentIntent.metadata.customer_id;
+      if (!customerId) {
+        throw new Error('customer_id not found in payment intent metadata');
+      }
+
+      const customerIdNum = parseInt(customerId, 10);
+
+      // Update billing record
+      await this.updateBillingRecordByStripePaymentIntent(
+        paymentIntentId,
+        'paid',
+        customerIdNum
+      );
+
+      // Update customer status to active if not already
+      const customer = await this.getCustomer(customerIdNum);
+      if (customer.status === 'provisioning' || customer.status === 'approved') {
+        await this.updateCustomerStatus(customerIdNum, 'active');
+      }
+
+      // Log activity
+      await this.logActivity(customerIdNum, 'payment_succeeded', {
+        payment_intent_id: paymentIntentId,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+      });
+
+      logger.info('Payment success handled', {
+        paymentIntentId,
+        customerId: customerIdNum,
+        amount: paymentIntent.amount / 100,
+      });
+    } catch (error) {
+      logger.error('Failed to handle payment success', {
+        paymentIntentId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Handle failed payment
+   *
+   * Called when a payment fails (via webhook or manual processing).
+   * Updates billing records and may suspend customer.
+   *
+   * @param paymentIntentId - Stripe payment intent ID
+   */
+  async handlePaymentFailure(paymentIntentId: string): Promise<void> {
+    logger.warn('Handling payment failure', { paymentIntentId });
+
+    try {
+      // Retrieve payment intent from Stripe
+      const paymentIntent = await stripeClient.retrievePaymentIntent(paymentIntentId);
+
+      // Extract customer ID from metadata
+      const customerId = paymentIntent.metadata.customer_id;
+      if (!customerId) {
+        throw new Error('customer_id not found in payment intent metadata');
+      }
+
+      const customerIdNum = parseInt(customerId, 10);
+
+      // Update billing record
+      await this.updateBillingRecordByStripePaymentIntent(
+        paymentIntentId,
+        'failed',
+        customerIdNum
+      );
+
+      // Log activity
+      await this.logActivity(customerIdNum, 'payment_failed', {
+        payment_intent_id: paymentIntentId,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+        failure_message: paymentIntent.last_payment_error?.message,
+      });
+
+      // TODO: Implement dunning logic
+      // TODO: Send payment failure notification email
+
+      logger.warn('Payment failure handled', {
+        paymentIntentId,
+        customerId: customerIdNum,
+      });
+    } catch (error) {
+      logger.error('Failed to handle payment failure', {
+        paymentIntentId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
     }
   }
 
@@ -179,7 +267,7 @@ export class StripeService {
     logger.info('Creating Stripe customer', { customerId: customerData.customer_id });
 
     try {
-      const createParams: Stripe.CustomerCreateParams = {
+      const customerOptions: any = {
         email: customerData.email,
         name: customerData.name,
         metadata: {
@@ -187,11 +275,11 @@ export class StripeService {
         },
       };
 
-      if (customerData.phone) {
-        createParams.phone = customerData.phone;
+      if (customerData.phone !== undefined) {
+        customerOptions.phone = customerData.phone;
       }
 
-      const stripeCustomer = await this.stripe.customers.create(createParams);
+      const stripeCustomer = await stripeClient.createCustomer(customerOptions);
 
       await this.saveStripeCustomerId(customerData.customer_id, stripeCustomer.id);
 
@@ -233,16 +321,19 @@ export class StripeService {
         throw new NotFoundError('Stripe customer not found. Create customer first.');
       }
 
-      const subscriptionParams: Stripe.SubscriptionCreateParams = {
-        customer: stripeCustomerId,
-        items: [{ price: priceId }],
+      const subscriptionOptions: SubscriptionOptions = {
+        customerId: stripeCustomerId,
+        priceId,
         metadata: {
           internal_customer_id: customerId.toString(),
         },
-        ...(trialDays && { trial_period_days: trialDays }),
       };
 
-      const subscription = await this.stripe.subscriptions.create(subscriptionParams);
+      if (trialDays !== undefined) {
+        subscriptionOptions.trialPeriodDays = trialDays;
+      }
+
+      const subscription = await stripeClient.createSubscription(subscriptionOptions);
 
       logger.info('Subscription created', {
         customerId,
@@ -269,192 +360,6 @@ export class StripeService {
     }
   }
 
-  /**
-   * Handle webhook event from Stripe
-   *
-   * Processes webhook events and updates billing records accordingly.
-   *
-   * @param rawBody - Raw request body (for signature verification)
-   * @param signature - Stripe signature header
-   * @returns Processing result
-   */
-  async handleWebhookEvent(rawBody: string, signature: string): Promise<void> {
-    logger.info('Processing Stripe webhook event');
-
-    let event: Stripe.Event;
-
-    try {
-      // Verify webhook signature
-      event = this.stripe.webhooks.constructEvent(
-        rawBody,
-        signature,
-        config.STRIPE_WEBHOOK_SECRET
-      );
-    } catch (error) {
-      logger.error('Webhook signature verification failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw new ExternalServiceError('Stripe', 'Invalid webhook signature');
-    }
-
-    logger.info('Webhook event received', { type: event.type, id: event.id });
-
-    // Route to appropriate handler
-    try {
-      switch (event.type) {
-        case 'payment_intent.succeeded':
-          await this.handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
-          break;
-
-        case 'payment_intent.payment_failed':
-          await this.handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
-          break;
-
-        case 'customer.subscription.created':
-        case 'customer.subscription.updated':
-          await this.handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
-          break;
-
-        case 'customer.subscription.deleted':
-          await this.handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
-          break;
-
-        case 'invoice.payment_succeeded':
-          await this.handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
-          break;
-
-        case 'invoice.payment_failed':
-          await this.handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-          break;
-
-        default:
-          logger.debug('Unhandled webhook event type', { type: event.type });
-      }
-    } catch (error) {
-      logger.error('Error processing webhook event', {
-        type: event.type,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // WEBHOOK EVENT HANDLERS
-  // ============================================================================
-
-  private async handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent): Promise<void> {
-    logger.info('Processing payment_intent.succeeded', { id: paymentIntent.id });
-
-    const customerId = paymentIntent.metadata.customer_id;
-
-    if (!customerId) {
-      logger.warn('No customer_id in payment intent metadata', { id: paymentIntent.id });
-      return;
-    }
-
-    // Update billing record
-    await this.updateBillingRecordByStripePaymentIntent(
-      paymentIntent.id,
-      'paid',
-      parseInt(customerId)
-    );
-
-    // Log activity
-    await this.logActivity(parseInt(customerId), 'payment_succeeded', {
-      payment_intent_id: paymentIntent.id,
-      amount: paymentIntent.amount / 100,
-    });
-  }
-
-  private async handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent): Promise<void> {
-    logger.warn('Processing payment_intent.payment_failed', { id: paymentIntent.id });
-
-    const customerId = paymentIntent.metadata.customer_id;
-
-    if (!customerId) {
-      logger.warn('No customer_id in payment intent metadata', { id: paymentIntent.id });
-      return;
-    }
-
-    // Update billing record
-    await this.updateBillingRecordByStripePaymentIntent(
-      paymentIntent.id,
-      'failed',
-      parseInt(customerId)
-    );
-
-    // Log activity
-    await this.logActivity(parseInt(customerId), 'payment_failed', {
-      payment_intent_id: paymentIntent.id,
-      amount: paymentIntent.amount / 100,
-    });
-  }
-
-  private async handleSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
-    logger.info('Processing subscription updated', { id: subscription.id });
-
-    const customerId = subscription.metadata.internal_customer_id;
-
-    if (!customerId) {
-      logger.warn('No internal_customer_id in subscription metadata', { id: subscription.id });
-      return;
-    }
-
-    // Log activity
-    await this.logActivity(parseInt(customerId), 'subscription_updated', {
-      subscription_id: subscription.id,
-      status: subscription.status,
-    });
-  }
-
-  private async handleSubscriptionDeleted(subscription: Stripe.Subscription): Promise<void> {
-    logger.warn('Processing subscription deleted', { id: subscription.id });
-
-    const customerId = subscription.metadata.internal_customer_id;
-
-    if (!customerId) {
-      logger.warn('No internal_customer_id in subscription metadata', { id: subscription.id });
-      return;
-    }
-
-    // Update customer status to suspended
-    await this.updateCustomerStatus(parseInt(customerId), 'suspended');
-
-    // Log activity
-    await this.logActivity(parseInt(customerId), 'subscription_cancelled', {
-      subscription_id: subscription.id,
-    });
-  }
-
-  private async handleInvoicePaymentSucceeded(invoice: Stripe.Invoice): Promise<void> {
-    logger.info('Processing invoice.payment_succeeded', { id: invoice.id });
-
-    const customerId = invoice.metadata?.customer_id;
-
-    if (!customerId) {
-      logger.warn('No customer_id in invoice metadata', { id: invoice.id });
-      return;
-    }
-
-    // Update or create billing record
-    await this.upsertBillingRecordFromInvoice(invoice, parseInt(customerId), 'paid');
-  }
-
-  private async handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
-    logger.warn('Processing invoice.payment_failed', { id: invoice.id });
-
-    const customerId = invoice.metadata?.customer_id;
-
-    if (!customerId) {
-      logger.warn('No customer_id in invoice metadata', { id: invoice.id });
-      return;
-    }
-
-    // Update or create billing record
-    await this.upsertBillingRecordFromInvoice(invoice, parseInt(customerId), 'failed');
-  }
-
   // ============================================================================
   // DATABASE HELPERS
   // ============================================================================
@@ -472,14 +377,15 @@ export class StripeService {
 
   private async getStripeCustomerId(_customerId: number): Promise<string | null> {
     // TODO: Store stripe_customer_id in customers table or separate table
-    // For now, query Stripe API
-    logger.warn('TODO: Implement stripe_customer_id storage in database');
+    // For now, return null (will create new customer each time)
+    logger.debug('TODO: Implement stripe_customer_id storage in database');
     return null;
   }
 
   private async saveStripeCustomerId(_customerId: number, _stripeCustomerId: string): Promise<void> {
     // TODO: Store in database
-    logger.warn('TODO: Implement stripe_customer_id storage', {
+    // This should add a column to customers table or create a separate stripe_customers table
+    logger.debug('TODO: Implement stripe_customer_id storage', {
       _customerId,
       _stripeCustomerId,
     });
@@ -496,54 +402,12 @@ export class StripeService {
           stripe_payment_intent_id = ?,
           updated_at = CURRENT_TIMESTAMP
       WHERE customer_id = ?
-        AND stripe_payment_intent_id IS NULL
+        AND (stripe_payment_intent_id IS NULL OR stripe_payment_intent_id = ?)
       ORDER BY created_at DESC
       LIMIT 1
     `);
 
-    stmt.run(status, paymentIntentId, customerId);
-  }
-
-  private async upsertBillingRecordFromInvoice(
-    invoice: Stripe.Invoice,
-    customerId: number,
-    status: 'paid' | 'failed'
-  ): Promise<void> {
-    // Check if record exists
-    const existing = this.db
-      .prepare('SELECT id FROM billing_records WHERE stripe_invoice_id = ?')
-      .get(invoice.id);
-
-    if (existing) {
-      // Update
-      const stmt = this.db.prepare(`
-        UPDATE billing_records
-        SET status = ?,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE stripe_invoice_id = ?
-      `);
-      stmt.run(status, invoice.id);
-    } else {
-      // Insert
-      const stmt = this.db.prepare(`
-        INSERT INTO billing_records (
-          customer_id, amount, currency, status,
-          stripe_invoice_id, stripe_payment_intent_id,
-          billing_period_start, billing_period_end
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      stmt.run(
-        customerId,
-        invoice.amount_paid / 100,
-        invoice.currency,
-        status,
-        invoice.id,
-        invoice.payment_intent as string | null,
-        new Date(invoice.period_start * 1000).toISOString(),
-        new Date(invoice.period_end * 1000).toISOString()
-      );
-    }
+    stmt.run(status, paymentIntentId, customerId, paymentIntentId);
   }
 
   private async updateCustomerStatus(customerId: number, status: string): Promise<void> {

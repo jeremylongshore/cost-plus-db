@@ -5,18 +5,22 @@
 
 import Stripe from 'stripe';
 import { stripeClient } from './client';
-import { db } from '../../database';
 import { logger } from '../../utils/logger';
 import { resendClient } from '../resend/client';
 import { provisioningStartedTemplate } from '../resend/templates';
 import type {
-  WebhookEvent,
-  WebhookEventType,
   WebhookProcessingResult,
-  PaymentIntentData,
-  SubscriptionData,
-  InvoiceData,
 } from './types';
+
+// TODO: Implement database client with required methods
+const db = {
+  updateCustomer: async (_id: string, _data: any): Promise<void> => { throw new Error('Not implemented'); },
+  updateWorkflowState: async (_id: string, _state: string): Promise<void> => { throw new Error('Not implemented'); },
+  getCustomer: async (_id: string): Promise<any> => { throw new Error('Not implemented'); },
+  logPayment: async (_data: any): Promise<void> => { throw new Error('Not implemented'); },
+  query: async (_sql: string, _params: any[]): Promise<any[]> => { throw new Error('Not implemented'); },
+  execute: async (_sql: string, _params: any[]): Promise<void> => { throw new Error('Not implemented'); },
+};
 
 export class StripeWebhookHandler {
   private stripe: Stripe;

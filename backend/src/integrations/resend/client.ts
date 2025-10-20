@@ -15,16 +15,16 @@ export class ResendClient {
   private retryDelay: number = 1000; // Base delay in ms
 
   constructor() {
-    if (!config.resend.apiKey) {
+    if (!config.RESEND_API_KEY) {
       throw new Error('Resend API key is not configured');
     }
 
-    this.client = new Resend(config.resend.apiKey);
-    this.defaultFrom = config.resend.fromEmail || 'CostPlusDB <noreply@costplusdb.com>';
+    this.client = new Resend(config.RESEND_API_KEY);
+    this.defaultFrom = config.RESEND_FROM_EMAIL || 'CostPlusDB <noreply@costplusdb.com>';
 
     logger.info('Resend client initialized', {
       from: this.defaultFrom,
-      apiKeyLength: config.resend.apiKey.length,
+      apiKeyLength: config.RESEND_API_KEY.length,
     });
   }
 
@@ -32,18 +32,20 @@ export class ResendClient {
    * Send an email with retry logic
    */
   async sendEmail(options: EmailOptions): Promise<EmailResult> {
-    const emailOptions = {
+    const emailOptions: any = {
       from: options.from || this.defaultFrom,
       to: options.to,
       subject: options.subject,
       html: options.html,
-      text: options.text,
-      cc: options.cc,
-      bcc: options.bcc,
-      reply_to: options.reply_to,
-      tags: options.tags,
-      attachments: options.attachments,
     };
+
+    // Only add optional properties if they are defined
+    if (options.text !== undefined) emailOptions.text = options.text;
+    if (options.cc !== undefined) emailOptions.cc = options.cc;
+    if (options.bcc !== undefined) emailOptions.bcc = options.bcc;
+    if (options.reply_to !== undefined) emailOptions.reply_to = options.reply_to;
+    if (options.tags !== undefined) emailOptions.tags = options.tags;
+    if (options.attachments !== undefined) emailOptions.attachments = options.attachments;
 
     let lastError: Error | null = null;
 
@@ -58,13 +60,13 @@ export class ResendClient {
         const response = await this.client.emails.send(emailOptions);
 
         logger.info('Email sent successfully', {
-          id: response.id,
+          id: response.data?.id,
           to: options.to,
           subject: options.subject,
         });
 
         return {
-          id: response.id!,
+          id: response.data?.id || '',
           success: true,
         };
       } catch (error) {

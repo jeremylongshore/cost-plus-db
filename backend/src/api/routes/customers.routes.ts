@@ -89,13 +89,13 @@ router.get('/search', searchCustomers);
 router.get('/:id', getCustomer);
 
 /**
- * PUT /api/customers/:id
+ * PATCH /api/customers/:id
  *
  * Update customer
  *
  * Body: CustomerUpdateData
  */
-router.put('/:id', updateCustomer);
+router.patch('/:id', updateCustomer);
 
 /**
  * DELETE /api/customers/:id

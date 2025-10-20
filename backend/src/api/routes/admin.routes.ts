@@ -11,6 +11,7 @@
 import { Router } from 'express';
 import {
   approveCustomer,
+  sendPaymentLink,
   provisionDatabase,
   getDashboard,
   getActivityLog,
@@ -76,7 +77,7 @@ router.get('/dashboard', getDashboard);
 router.get('/activity', getActivityLog);
 
 /**
- * POST /api/admin/approve/:id
+ * POST /api/admin/customers/:id/approve
  *
  * Approve customer and move to provisioning
  *
@@ -87,10 +88,23 @@ router.get('/activity', getActivityLog);
  * 4. Create Stripe payment link
  * 5. Send payment request email
  */
-router.post('/approve/:id', approveCustomer);
+router.post('/customers/:id/approve', approveCustomer);
 
 /**
- * POST /api/admin/provision/:id
+ * POST /api/admin/customers/:id/send-payment-link
+ *
+ * Send payment link to customer
+ *
+ * Workflow:
+ * 1. Verify customer is in 'approved' status
+ * 2. Generate Stripe payment link with transparent pricing
+ * 3. Send payment link email to customer
+ * 4. Log payment link sent event
+ */
+router.post('/customers/:id/send-payment-link', sendPaymentLink);
+
+/**
+ * POST /api/admin/customers/:id/provision
  *
  * Provision database for customer
  *
@@ -103,24 +117,24 @@ router.post('/approve/:id', approveCustomer);
  * 6. Update status to 'active'
  * 7. Send connection details email
  */
-router.post('/provision/:id', provisionDatabase);
+router.post('/customers/:id/provision', provisionDatabase);
 
 /**
- * POST /api/admin/suspend/:id
+ * POST /api/admin/customers/:id/suspend
  *
  * Suspend customer service (typically due to payment issues)
  *
  * Body:
  * - reason: Reason for suspension (optional)
  */
-router.post('/suspend/:id', suspendCustomer);
+router.post('/customers/:id/suspend', suspendCustomer);
 
 /**
- * POST /api/admin/reactivate/:id
+ * POST /api/admin/customers/:id/reactivate
  *
  * Reactivate suspended customer service
  */
-router.post('/reactivate/:id', reactivateCustomer);
+router.post('/customers/:id/reactivate', reactivateCustomer);
 
 logger.info('Admin routes registered');
 

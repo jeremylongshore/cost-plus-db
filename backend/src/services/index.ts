@@ -50,5 +50,5 @@ export type {
 export type {
   WorkflowCheckpoint,
   WorkflowStatus,
-  Blocker,
+  BlockerType,
 } from './workflow.service.js';

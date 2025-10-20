@@ -218,3 +218,170 @@ export function generateWebhookIdempotencyKey(
 ): string {
   return `${provider}:${eventId}`;
 }
+
+/**
+ * Express middleware functions for webhook validation
+ */
+import type { Request, Response, NextFunction } from 'express';
+
+/**
+ * Middleware to validate Stripe webhook events
+ *
+ * Validates req.body against Stripe webhook event schema.
+ * Used for POST /api/webhooks/stripe
+ *
+ * Note: This validates the structure of the webhook payload.
+ * Signature verification should happen before this middleware.
+ */
+export function validateStripeWebhookMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = stripeWebhookEventSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate GitHub webhook events
+ *
+ * Validates req.body against GitHub webhook event schema.
+ * Used for POST /api/webhooks/github
+ *
+ * Note: This validates the structure of the webhook payload.
+ * Signature verification should happen before this middleware.
+ */
+export function validateGitHubWebhookMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = githubWebhookEventSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate webhook signature data
+ *
+ * Validates webhook signature verification inputs.
+ * This is a helper for custom signature verification logic.
+ */
+export function validateWebhookSignatureMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    // Extract signature from headers and validate
+    const signature = req.headers['stripe-signature'] || req.headers['x-hub-signature-256'];
+    const timestamp = Date.now();
+    const body = JSON.stringify(req.body);
+
+    const validationData = {
+      signature: signature as string,
+      timestamp,
+      body,
+    };
+
+    webhookSignatureSchema.parse(validationData);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Specific Stripe object validators as middleware
+ */
+
+/**
+ * Middleware to validate Stripe invoice webhook data
+ *
+ * Used when processing invoice-specific events.
+ */
+export function validateStripeInvoiceMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    // Validate the data.object from the webhook event
+    if (req.body.data && req.body.data.object) {
+      req.body.data.object = stripeInvoiceSchema.parse(req.body.data.object);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate Stripe subscription webhook data
+ *
+ * Used when processing subscription-specific events.
+ */
+export function validateStripeSubscriptionMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    // Validate the data.object from the webhook event
+    if (req.body.data && req.body.data.object) {
+      req.body.data.object = stripeSubscriptionSchema.parse(req.body.data.object);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate Stripe payment intent webhook data
+ *
+ * Used when processing payment intent-specific events.
+ */
+export function validateStripePaymentIntentMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    // Validate the data.object from the webhook event
+    if (req.body.data && req.body.data.object) {
+      req.body.data.object = stripePaymentIntentSchema.parse(req.body.data.object);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate Stripe checkout session webhook data
+ *
+ * Used when processing checkout session-specific events.
+ */
+export function validateStripeCheckoutSessionMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    // Validate the data.object from the webhook event
+    if (req.body.data && req.body.data.object) {
+      req.body.data.object = stripeCheckoutSessionSchema.parse(req.body.data.object);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}

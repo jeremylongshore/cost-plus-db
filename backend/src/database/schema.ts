@@ -121,6 +121,38 @@ export interface ActivityLog {
 }
 
 /**
+ * Customer workflow checkpoints
+ */
+export interface CustomerWorkflow {
+  id: number;
+  customer_id: number;
+  current_stage: string;
+
+  // 12 Checkpoint timestamps
+  form_submitted: string | null;
+  consultation_scheduled: string | null;
+  consultation_completed: string | null;
+  payment_link_sent: string | null;
+  payment_received: string | null;
+  provisioning_started: string | null;
+  database_created: string | null;
+  backups_configured: string | null;
+  credentials_sent: string | null;
+  onboarding_completed: string | null;
+  first_month_milestone: string | null;
+  three_month_milestone: string | null;
+
+  // Blocker tracking
+  is_blocked: boolean;
+  blocker_type: string | null;
+  blocker_reason: string | null;
+  blocker_set_at: string | null;
+
+  created_at: string;
+  updated_at: string;
+}
+
+/**
  * Schema migrations tracking
  */
 export interface SchemaMigration {

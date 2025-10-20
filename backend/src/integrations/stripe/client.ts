@@ -17,18 +17,18 @@ export class StripeClient {
   private stripe: Stripe;
 
   constructor() {
-    if (!config.stripe.secretKey) {
+    if (!config.STRIPE_SECRET_KEY) {
       throw new Error('Stripe secret key is not configured');
     }
 
-    this.stripe = new Stripe(config.stripe.secretKey, {
-      apiVersion: '2024-12-18.acacia',
+    this.stripe = new Stripe(config.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
       typescript: true,
     });
 
     logger.info('Stripe client initialized', {
-      apiVersion: '2024-12-18.acacia',
-      keyPrefix: config.stripe.secretKey.substring(0, 12) + '...',
+      apiVersion: '2023-10-16',
+      keyPrefix: config.STRIPE_SECRET_KEY.substring(0, 12) + '...',
     });
   }
 
@@ -42,13 +42,16 @@ export class StripeClient {
         name: options.name,
       });
 
-      const customer = await this.stripe.customers.create({
+      const createOptions: Stripe.CustomerCreateParams = {
         email: options.email,
         name: options.name,
-        phone: options.phone,
-        description: options.description,
         metadata: options.metadata || {},
-      });
+      };
+
+      if (options.phone !== undefined) createOptions.phone = options.phone;
+      if (options.description !== undefined) createOptions.description = options.description;
+
+      const customer = await this.stripe.customers.create(createOptions);
 
       logger.info('Stripe customer created', {
         customerId: customer.id,
@@ -97,7 +100,7 @@ export class StripeClient {
         after_completion: {
           type: 'redirect',
           redirect: {
-            url: options.successUrl || config.stripe.successUrl || 'https://costplusdb.com/thank-you',
+            url: options.successUrl || 'https://costplusdb.com/thank-you',
           },
         },
       });
@@ -129,7 +132,7 @@ export class StripeClient {
         priceId: options.priceId,
       });
 
-      const subscription = await this.stripe.subscriptions.create({
+      const subscriptionOptions: Stripe.SubscriptionCreateParams = {
         customer: options.customerId,
         items: [
           {
@@ -137,13 +140,17 @@ export class StripeClient {
           },
         ],
         metadata: options.metadata || {},
-        trial_period_days: options.trialPeriodDays,
-        automatic_tax: options.automaticTax
-          ? {
-              enabled: true,
-            }
-          : undefined,
-      });
+      };
+
+      if (options.trialPeriodDays !== undefined) {
+        subscriptionOptions.trial_period_days = options.trialPeriodDays;
+      }
+
+      if (options.automaticTax) {
+        subscriptionOptions.automatic_tax = { enabled: true };
+      }
+
+      const subscription = await this.stripe.subscriptions.create(subscriptionOptions);
 
       logger.info('Stripe subscription created', {
         subscriptionId: subscription.id,
@@ -280,13 +287,16 @@ export class StripeClient {
    */
   private parseStripeError(error: any): StripeErrorDetails {
     if (error instanceof Stripe.errors.StripeError) {
-      return {
+      const errorDetails: StripeErrorDetails = {
         type: error.type,
-        code: error.code,
         message: error.message,
-        statusCode: error.statusCode,
-        requestId: error.requestId,
       };
+
+      if (error.code !== undefined) errorDetails.code = error.code;
+      if (error.statusCode !== undefined) errorDetails.statusCode = error.statusCode;
+      if (error.requestId !== undefined) errorDetails.requestId = error.requestId;
+
+      return errorDetails;
     }
 
     return {

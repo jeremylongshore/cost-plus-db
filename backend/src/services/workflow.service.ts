@@ -2,21 +2,24 @@
  * Workflow Service
  *
  * Manages customer onboarding workflow and status transitions:
- * - Workflow checkpoint tracking
+ * - 12-checkpoint customer journey tracking
+ * - Workflow initialization and advancement
  * - Status transition validation
- * - Blocker detection
+ * - Blocker detection and management
  * - Automated notifications
+ * - Workflow metrics and reporting
  *
  * @module services/workflow
  */
 
 import Database from 'better-sqlite3';
-import { CustomerStatus } from '../database/schema.js';
+import { CustomerStatus, CustomerWorkflow } from '../database/schema.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
+import { EmailService } from './email.service.js';
 
 /**
- * Workflow checkpoints in customer journey
+ * Workflow checkpoints in customer journey (12 total)
  */
 export type WorkflowCheckpoint =
   | 'form_submitted'
@@ -28,46 +31,27 @@ export type WorkflowCheckpoint =
   | 'database_created'
   | 'backups_configured'
   | 'credentials_sent'
-  | 'onboarding_complete';
+  | 'onboarding_completed'
+  | 'first_month_milestone'
+  | 'three_month_milestone';
 
 /**
- * Workflow status record
+ * Ordered list of checkpoints for validation
  */
-export interface WorkflowStatus {
-  customer_id: number;
-  current_status: CustomerStatus;
-  checkpoints: Array<{
-    checkpoint: WorkflowCheckpoint;
-    completed_at: string;
-  }>;
-  blockers: Blocker[];
-  next_steps: string[];
-  progress_percentage: number;
-}
-
-/**
- * Workflow blocker
- */
-export interface Blocker {
-  type: 'payment_pending' | 'consultation_overdue' | 'provisioning_failed' | 'manual_intervention';
-  description: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  detected_at: string;
-  resolution_steps: string[];
-}
-
-/**
- * Valid status transitions
- */
-const VALID_TRANSITIONS: Record<CustomerStatus, CustomerStatus[]> = {
-  prospect: ['consultation', 'churned'],
-  consultation: ['approved', 'churned'],
-  approved: ['provisioning', 'churned'],
-  provisioning: ['active', 'approved'], // Can roll back to approved on failure
-  active: ['suspended', 'churned'],
-  suspended: ['active', 'churned'],
-  churned: [], // Terminal state
-};
+const CHECKPOINT_ORDER: WorkflowCheckpoint[] = [
+  'form_submitted',
+  'consultation_scheduled',
+  'consultation_completed',
+  'payment_link_sent',
+  'payment_received',
+  'provisioning_started',
+  'database_created',
+  'backups_configured',
+  'credentials_sent',
+  'onboarding_completed',
+  'first_month_milestone',
+  'three_month_milestone',
+];
 
 /**
  * Checkpoint to status mapping
@@ -82,280 +66,516 @@ const CHECKPOINT_STATUS_MAP: Record<WorkflowCheckpoint, CustomerStatus> = {
   database_created: 'provisioning',
   backups_configured: 'provisioning',
   credentials_sent: 'active',
-  onboarding_complete: 'active',
+  onboarding_completed: 'active',
+  first_month_milestone: 'active',
+  three_month_milestone: 'active',
 };
+
+/**
+ * Workflow status response
+ */
+export interface WorkflowStatus {
+  customer_id: number;
+  current_stage: WorkflowCheckpoint;
+  checkpoints: {
+    [K in WorkflowCheckpoint]?: string; // Timestamp if completed
+  };
+  completion_percentage: number;
+  is_blocked: boolean;
+  blocker?: {
+    type: string;
+    reason: string;
+    set_at: string;
+  };
+  next_checkpoint: WorkflowCheckpoint | null;
+}
+
+/**
+ * Workflow metrics response
+ */
+export interface WorkflowMetrics {
+  total_customers: number;
+  by_stage: Record<string, number>;
+  average_time_by_checkpoint: Record<WorkflowCheckpoint, number>;
+  bottlenecks: Array<{
+    checkpoint: WorkflowCheckpoint;
+    average_days: number;
+    customer_count: number;
+  }>;
+  blocked_count: number;
+  completion_rate: number;
+}
+
+/**
+ * Blocker type
+ */
+export type BlockerType =
+  | 'payment_pending'
+  | 'consultation_overdue'
+  | 'provisioning_failed'
+  | 'manual_intervention'
+  | 'customer_unresponsive'
+  | 'technical_issue';
 
 /**
  * Workflow service class
  */
 export class WorkflowService {
-  constructor(private db: Database.Database) {}
+  private emailService: EmailService;
+
+  constructor(private db: Database.Database) {
+    this.emailService = new EmailService();
+  }
 
   /**
-   * Update workflow checkpoint
+   * Initialize workflow for a new customer
    *
-   * Records that a customer has reached a specific checkpoint in the workflow.
+   * Creates the workflow record and sets the first checkpoint (form_submitted).
    *
    * @param customerId - Customer ID
-   * @param checkpoint - Checkpoint reached
-   * @returns Updated workflow status
+   * @returns Created workflow record
    */
-  async updateWorkflowCheckpoint(
-    customerId: number,
-    checkpoint: WorkflowCheckpoint
-  ): Promise<WorkflowStatus> {
-    logger.info('Updating workflow checkpoint', { customerId, checkpoint });
+  async initializeWorkflow(customerId: number): Promise<CustomerWorkflow> {
+    logger.info('Initializing workflow', { customerId });
 
     // Verify customer exists
-    const customer = await this.getCustomer(customerId);
+    await this.getCustomer(customerId);
 
-    // Validate checkpoint matches current status
-    const expectedStatus = CHECKPOINT_STATUS_MAP[checkpoint];
-    if (customer.status !== expectedStatus) {
-      logger.warn('Checkpoint status mismatch', {
-        customerId,
-        checkpoint,
-        customerStatus: customer.status,
-        expectedStatus,
-      });
+    // Check if workflow already exists
+    const existing = this.db
+      .prepare('SELECT id FROM customer_workflow WHERE customer_id = ?')
+      .get(customerId);
+
+    if (existing) {
+      throw new ValidationError(`Workflow already exists for customer ${customerId}`);
     }
 
-    // Store checkpoint in activity log
-    await this.logCheckpoint(customerId, checkpoint);
+    // Create workflow record with first checkpoint
+    const now = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      INSERT INTO customer_workflow (
+        customer_id,
+        current_stage,
+        form_submitted,
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?)
+    `);
 
-    // Get updated workflow status
+    const result = stmt.run(customerId, 'form_submitted', now, now, now);
+
+    // Log activity
+    await this.logActivity(customerId, 'workflow_initialized', {
+      checkpoint: 'form_submitted',
+      timestamp: now,
+    });
+
+    logger.info('Workflow initialized', { customerId, workflowId: result.lastInsertRowid });
+
+    // Get and return the created workflow
+    return this.getWorkflowRecord(customerId);
+  }
+
+  /**
+   * Advance workflow to next checkpoint
+   *
+   * Validates checkpoint order, updates timestamp, and triggers automatic actions.
+   *
+   * @param customerId - Customer ID
+   * @param checkpoint - Target checkpoint
+   * @param metadata - Optional metadata for the checkpoint
+   * @returns Updated workflow status
+   */
+  async advanceWorkflow(
+    customerId: number,
+    checkpoint: WorkflowCheckpoint,
+    metadata?: Record<string, any>
+  ): Promise<WorkflowStatus> {
+    logger.info('Advancing workflow', { customerId, checkpoint, metadata });
+
+    // Get current workflow
+    const workflow = await this.getWorkflowRecord(customerId);
+
+    // Validate checkpoint order
+    this.validateCheckpointOrder(workflow, checkpoint);
+
+    // Update checkpoint timestamp and current_stage
+    const now = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      UPDATE customer_workflow
+      SET ${checkpoint} = ?,
+          current_stage = ?,
+          updated_at = ?
+      WHERE customer_id = ?
+    `);
+
+    stmt.run(now, checkpoint, now, customerId);
+
+    // Log to activity_log
+    await this.logActivity(customerId, 'workflow_checkpoint_reached', {
+      checkpoint,
+      timestamp: now,
+      metadata,
+    });
+
+    // Update customer status if needed
+    const expectedStatus = CHECKPOINT_STATUS_MAP[checkpoint];
+    const customer = await this.getCustomer(customerId);
+    if (customer.status !== expectedStatus) {
+      await this.updateCustomerStatus(customerId, expectedStatus);
+    }
+
+    // Trigger automatic actions based on checkpoint
+    await this.triggerAutomaticActions(customerId, checkpoint, metadata);
+
+    logger.info('Workflow advanced', { customerId, checkpoint });
+
+    // Return updated status
     return this.getWorkflowStatus(customerId);
   }
 
   /**
    * Get workflow status for customer
    *
+   * Returns current stage, all checkpoint timestamps, and progress metrics.
+   *
    * @param customerId - Customer ID
-   * @returns Current workflow status
+   * @returns Workflow status with progress
    */
   async getWorkflowStatus(customerId: number): Promise<WorkflowStatus> {
     logger.debug('Getting workflow status', { customerId });
 
+    const workflow = await this.getWorkflowRecord(customerId);
+
+    // Build checkpoints object
+    const checkpoints: WorkflowStatus['checkpoints'] = {};
+    for (const checkpoint of CHECKPOINT_ORDER) {
+      const timestamp = workflow[checkpoint as keyof CustomerWorkflow];
+      if (timestamp && typeof timestamp === 'string') {
+        checkpoints[checkpoint] = timestamp;
+      }
+    }
+
+    // Calculate completion percentage
+    const completedCount = Object.keys(checkpoints).length;
+    const completion_percentage = Math.round((completedCount / CHECKPOINT_ORDER.length) * 100);
+
+    // Find next checkpoint
+    const currentIndex = CHECKPOINT_ORDER.indexOf(workflow.current_stage as WorkflowCheckpoint);
+    const next_checkpoint =
+      currentIndex < CHECKPOINT_ORDER.length - 1 ? CHECKPOINT_ORDER[currentIndex + 1] : null;
+
+    // Build blocker info
+    const blocker = workflow.is_blocked
+      ? {
+          type: workflow.blocker_type!,
+          reason: workflow.blocker_reason!,
+          set_at: workflow.blocker_set_at!,
+        }
+      : undefined;
+
+    const status: WorkflowStatus = {
+      customer_id: customerId,
+      current_stage: workflow.current_stage as WorkflowCheckpoint,
+      checkpoints,
+      completion_percentage,
+      is_blocked: Boolean(workflow.is_blocked),
+      next_checkpoint: next_checkpoint || null,
+    };
+
+    if (blocker !== undefined) {
+      status.blocker = blocker;
+    }
+
+    return status;
+  }
+
+  /**
+   * Set workflow blocker
+   *
+   * Marks workflow as blocked with reason and sends admin alert.
+   *
+   * @param customerId - Customer ID
+   * @param blockerType - Type of blocker
+   * @param reason - Detailed reason for blocker
+   */
+  async setWorkflowBlocker(
+    customerId: number,
+    blockerType: BlockerType,
+    reason: string
+  ): Promise<void> {
+    logger.warn('Setting workflow blocker', { customerId, blockerType, reason });
+
+    // Verify workflow exists
+    await this.getWorkflowRecord(customerId);
+
+    const now = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      UPDATE customer_workflow
+      SET is_blocked = 1,
+          blocker_type = ?,
+          blocker_reason = ?,
+          blocker_set_at = ?,
+          updated_at = ?
+      WHERE customer_id = ?
+    `);
+
+    stmt.run(blockerType, reason, now, now, customerId);
+
+    // Log activity
+    await this.logActivity(customerId, 'workflow_blocked', {
+      blocker_type: blockerType,
+      reason,
+      timestamp: now,
+    });
+
+    // Send admin alert
     const customer = await this.getCustomer(customerId);
+    await this.emailService.sendAdminAlert(
+      `Workflow Blocked: ${blockerType}`,
+      `Customer ${customerId} (${customer.company_name}) - ${reason}`,
+      'warning'
+    );
 
-    // Get completed checkpoints from activity log
-    const checkpoints = await this.getCompletedCheckpoints(customerId);
+    logger.info('Workflow blocker set', { customerId, blockerType });
+  }
 
-    // Detect blockers
-    const blockers = await this.detectBlockers(customerId);
+  /**
+   * Clear workflow blocker
+   *
+   * Removes blocker and resumes normal workflow.
+   *
+   * @param customerId - Customer ID
+   */
+  async clearWorkflowBlocker(customerId: number): Promise<void> {
+    logger.info('Clearing workflow blocker', { customerId });
 
-    // Calculate next steps
-    const nextSteps = this.calculateNextSteps(customer.status as CustomerStatus, checkpoints);
+    // Verify workflow exists
+    const workflow = await this.getWorkflowRecord(customerId);
 
-    // Calculate progress
-    const progressPercentage = this.calculateProgress(checkpoints);
+    if (!workflow.is_blocked) {
+      logger.warn('Workflow not blocked, nothing to clear', { customerId });
+      return;
+    }
+
+    const stmt = this.db.prepare(`
+      UPDATE customer_workflow
+      SET is_blocked = 0,
+          blocker_type = NULL,
+          blocker_reason = NULL,
+          blocker_set_at = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE customer_id = ?
+    `);
+
+    stmt.run(customerId);
+
+    // Log activity
+    await this.logActivity(customerId, 'workflow_blocker_cleared', {
+      previous_blocker_type: workflow.blocker_type,
+      timestamp: new Date().toISOString(),
+    });
+
+    logger.info('Workflow blocker cleared', { customerId });
+  }
+
+  /**
+   * Get workflow metrics
+   *
+   * Returns admin dashboard metrics including bottlenecks and completion rates.
+   *
+   * @returns Workflow metrics
+   */
+  async getWorkflowMetrics(): Promise<WorkflowMetrics> {
+    logger.debug('Getting workflow metrics');
+
+    // Total customers with workflows
+    const totalResult = this.db
+      .prepare('SELECT COUNT(*) as count FROM customer_workflow')
+      .get() as { count: number };
+    const total_customers = totalResult.count;
+
+    // Count by stage
+    const stageResults = this.db
+      .prepare(
+        `SELECT current_stage, COUNT(*) as count
+         FROM customer_workflow
+         GROUP BY current_stage`
+      )
+      .all() as Array<{ current_stage: string; count: number }>;
+
+    const by_stage: Record<string, number> = {};
+    for (const row of stageResults) {
+      by_stage[row.current_stage] = row.count;
+    }
+
+    // Average time between checkpoints
+    const average_time_by_checkpoint = await this.calculateAverageTimeBetweenCheckpoints();
+
+    // Identify bottlenecks (checkpoints taking >7 days on average)
+    const bottlenecks: WorkflowMetrics['bottlenecks'] = [];
+    for (const [checkpoint, avgDays] of Object.entries(average_time_by_checkpoint)) {
+      if (avgDays > 7) {
+        const count =
+          by_stage[checkpoint] || 0;
+        bottlenecks.push({
+          checkpoint: checkpoint as WorkflowCheckpoint,
+          average_days: avgDays,
+          customer_count: count,
+        });
+      }
+    }
+
+    // Blocked count
+    const blockedResult = this.db
+      .prepare('SELECT COUNT(*) as count FROM customer_workflow WHERE is_blocked = 1')
+      .get() as { count: number };
+    const blocked_count = blockedResult.count;
+
+    // Completion rate (customers who reached onboarding_completed)
+    const completedResult = this.db
+      .prepare('SELECT COUNT(*) as count FROM customer_workflow WHERE onboarding_completed IS NOT NULL')
+      .get() as { count: number };
+    const completion_rate =
+      total_customers > 0 ? (completedResult.count / total_customers) * 100 : 0;
 
     return {
-      customer_id: customerId,
-      current_status: customer.status as CustomerStatus,
-      checkpoints,
-      blockers,
-      next_steps: nextSteps,
-      progress_percentage: progressPercentage,
+      total_customers,
+      by_stage,
+      average_time_by_checkpoint,
+      bottlenecks,
+      blocked_count,
+      completion_rate,
     };
   }
 
-  /**
-   * Detect workflow blockers
-   *
-   * Analyzes customer state to identify issues blocking progress.
-   *
-   * @param customerId - Customer ID
-   * @returns List of detected blockers
-   */
-  async detectBlockers(customerId: number): Promise<Blocker[]> {
-    logger.debug('Detecting workflow blockers', { customerId });
-
-    const customer = await this.getCustomer(customerId);
-    const blockers: Blocker[] = [];
-
-    // Check for payment pending
-    if (customer.status === 'approved') {
-      const hasPayment = await this.hasReceivedPayment(customerId);
-      if (!hasPayment) {
-        const daysSinceApproval = this.getDaysSince(customer.updated_at);
-        if (daysSinceApproval > 7) {
-          blockers.push({
-            type: 'payment_pending',
-            description: 'Payment pending for more than 7 days',
-            severity: 'high',
-            detected_at: new Date().toISOString(),
-            resolution_steps: [
-              'Send payment reminder email',
-              'Contact customer via phone',
-              'Verify payment link is still valid',
-            ],
-          });
-        }
-      }
-    }
-
-    // Check for consultation overdue
-    if (customer.status === 'consultation') {
-      const daysSinceConsultation = this.getDaysSince(customer.updated_at);
-      if (daysSinceConsultation > 3) {
-        blockers.push({
-          type: 'consultation_overdue',
-          description: 'Consultation status for more than 3 days',
-          severity: 'medium',
-          detected_at: new Date().toISOString(),
-          resolution_steps: [
-            'Follow up with customer to schedule consultation',
-            'Check calendar for available slots',
-          ],
-        });
-      }
-    }
-
-    // Check for provisioning stuck
-    if (customer.status === 'provisioning') {
-      const daysSinceProvisioning = this.getDaysSince(customer.updated_at);
-      if (daysSinceProvisioning > 1) {
-        blockers.push({
-          type: 'provisioning_failed',
-          description: 'Provisioning stuck for more than 1 day',
-          severity: 'critical',
-          detected_at: new Date().toISOString(),
-          resolution_steps: [
-            'Check provisioning logs',
-            'Verify VPS availability',
-            'Manual intervention required',
-          ],
-        });
-      }
-    }
-
-    return blockers;
-  }
+  // ============================================================================
+  // PRIVATE HELPERS
+  // ============================================================================
 
   /**
-   * Transition customer status
-   *
-   * Validates and performs status transition with logging.
-   *
-   * @param customerId - Customer ID
-   * @param newStatus - Target status
-   * @throws ValidationError if transition is invalid
+   * Validate checkpoint order
    */
-  async transitionStatus(customerId: number, newStatus: CustomerStatus): Promise<void> {
-    logger.info('Transitioning customer status', { customerId, newStatus });
+  private validateCheckpointOrder(workflow: CustomerWorkflow, targetCheckpoint: WorkflowCheckpoint): void {
+    const currentIndex = CHECKPOINT_ORDER.indexOf(workflow.current_stage as WorkflowCheckpoint);
+    const targetIndex = CHECKPOINT_ORDER.indexOf(targetCheckpoint);
 
-    const customer = await this.getCustomer(customerId);
-    const currentStatus = customer.status as CustomerStatus;
-
-    // Validate transition
-    if (!this.isValidTransition(currentStatus, newStatus)) {
+    // Allow setting current or future checkpoints, but not past ones
+    if (targetIndex < currentIndex) {
       throw new ValidationError(
-        `Invalid status transition from ${currentStatus} to ${newStatus}`
+        `Cannot advance to ${targetCheckpoint} - already past this checkpoint (current: ${workflow.current_stage})`
       );
     }
 
-    // Update status
-    await this.updateCustomerStatus(customerId, newStatus);
-
-    // Log transition
-    await this.logActivity(customerId, 'status_transitioned', {
-      from: currentStatus,
-      to: newStatus,
-    });
-
-    // Send notification
-    await this.sendStatusNotification(customerId, newStatus);
-
-    logger.info('Status transition completed', { customerId, from: currentStatus, to: newStatus });
-  }
-
-  /**
-   * Validate status transition
-   */
-  private isValidTransition(from: CustomerStatus, to: CustomerStatus): boolean {
-    const validTargets = VALID_TRANSITIONS[from] || [];
-    return validTargets.includes(to);
-  }
-
-  /**
-   * Calculate next steps based on current status
-   */
-  private calculateNextSteps(
-    status: CustomerStatus,
-    checkpoints: Array<{ checkpoint: WorkflowCheckpoint; completed_at: string }>
-  ): string[] {
-    const completedCheckpoints = new Set(checkpoints.map(c => c.checkpoint));
-
-    switch (status) {
-      case 'prospect':
-        return [
-          'Review intake form details',
-          'Schedule consultation call',
-          'Prepare pricing proposal',
-        ];
-
-      case 'consultation':
-        if (!completedCheckpoints.has('consultation_completed')) {
-          return [
-            'Complete consultation call',
-            'Finalize requirements',
-            'Approve customer for provisioning',
-          ];
-        }
-        return ['Approve customer for provisioning'];
-
-      case 'approved':
-        if (!completedCheckpoints.has('payment_link_sent')) {
-          return ['Generate and send payment link'];
-        }
-        if (!completedCheckpoints.has('payment_received')) {
-          return ['Wait for payment confirmation'];
-        }
-        return ['Begin database provisioning'];
-
-      case 'provisioning':
-        const provisioningSteps = [];
-        if (!completedCheckpoints.has('database_created')) {
-          provisioningSteps.push('Create PostgreSQL database');
-        }
-        if (!completedCheckpoints.has('backups_configured')) {
-          provisioningSteps.push('Configure pgBackRest backups');
-        }
-        if (!completedCheckpoints.has('credentials_sent')) {
-          provisioningSteps.push('Send welcome email with credentials');
-        }
-        return provisioningSteps.length > 0 ? provisioningSteps : ['Complete onboarding'];
-
-      case 'active':
-        return ['Monitor database health', 'Provide ongoing support'];
-
-      case 'suspended':
-        return ['Resolve payment issue', 'Reactivate service'];
-
-      case 'churned':
-        return ['No further action required'];
-
-      default:
-        return [];
+    // Check if previous checkpoint is completed (allow skipping only 1 checkpoint)
+    if (targetIndex > currentIndex + 1) {
+      const previousCheckpoint = CHECKPOINT_ORDER[targetIndex - 1];
+      const previousTimestamp = workflow[previousCheckpoint as keyof CustomerWorkflow];
+      if (!previousTimestamp) {
+        logger.warn('Skipping checkpoint', {
+          customer_id: workflow.customer_id,
+          skipped: previousCheckpoint,
+          target: targetCheckpoint,
+        });
+      }
     }
   }
 
   /**
-   * Calculate progress percentage
+   * Trigger automatic actions based on checkpoint
    */
-  private calculateProgress(
-    checkpoints: Array<{ checkpoint: WorkflowCheckpoint; completed_at: string }>
-  ): number {
-    const totalCheckpoints = 10; // Total checkpoints in workflow
-    const completedCount = checkpoints.length;
-    return Math.round((completedCount / totalCheckpoints) * 100);
+  private async triggerAutomaticActions(
+    customerId: number,
+    checkpoint: WorkflowCheckpoint,
+    metadata?: Record<string, any>
+  ): Promise<void> {
+    const customer = await this.getCustomer(customerId);
+
+    switch (checkpoint) {
+      case 'form_submitted':
+        // Send intake confirmation email
+        await this.emailService.sendIntakeConfirmation(customer, metadata);
+        break;
+
+      case 'payment_link_sent':
+        // Payment link email sent externally via payment service
+        logger.info('Payment link sent checkpoint reached', { customerId });
+        break;
+
+      case 'provisioning_started':
+        // Send provisioning started notification
+        logger.info('Provisioning started checkpoint reached', { customerId });
+        // Note: Provisioning updates are sent by the provisioning service
+        break;
+
+      case 'credentials_sent':
+        // Welcome email with credentials sent externally
+        logger.info('Credentials sent checkpoint reached', { customerId });
+        break;
+
+      case 'onboarding_completed':
+        // Send admin notification
+        await this.emailService.sendAdminAlert(
+          'Onboarding Completed',
+          `Customer ${customerId} (${customer.company_name}, ${customer.tier}) completed onboarding`,
+          'info'
+        );
+        break;
+    }
   }
 
-  // ============================================================================
-  // DATABASE HELPERS
-  // ============================================================================
+  /**
+   * Calculate average time between checkpoints
+   */
+  private async calculateAverageTimeBetweenCheckpoints(): Promise<Record<WorkflowCheckpoint, number>> {
+    const averages: Record<string, number> = {};
 
+    for (let i = 1; i < CHECKPOINT_ORDER.length; i++) {
+      const prevCheckpoint = CHECKPOINT_ORDER[i - 1];
+      const currCheckpoint = CHECKPOINT_ORDER[i];
+
+      if (!prevCheckpoint || !currCheckpoint) {
+        continue;
+      }
+
+      const rows = this.db
+        .prepare(
+          `SELECT
+            julianday(${currCheckpoint}) - julianday(${prevCheckpoint}) as days
+           FROM customer_workflow
+           WHERE ${prevCheckpoint} IS NOT NULL
+             AND ${currCheckpoint} IS NOT NULL`
+        )
+        .all() as Array<{ days: number }>;
+
+      if (rows.length > 0) {
+        const totalDays = rows.reduce((sum, row) => sum + row.days, 0);
+        averages[currCheckpoint] = Math.round(totalDays / rows.length);
+      } else {
+        averages[currCheckpoint] = 0;
+      }
+    }
+
+    return averages as Record<WorkflowCheckpoint, number>;
+  }
+
+  /**
+   * Get workflow record
+   */
+  private async getWorkflowRecord(customerId: number): Promise<CustomerWorkflow> {
+    const stmt = this.db.prepare('SELECT * FROM customer_workflow WHERE customer_id = ?');
+    const workflow = stmt.get(customerId) as CustomerWorkflow | undefined;
+
+    if (!workflow) {
+      throw new NotFoundError(`Workflow not found for customer ${customerId}`);
+    }
+
+    return workflow;
+  }
+
+  /**
+   * Get customer record
+   */
   private async getCustomer(customerId: number): Promise<any> {
     const stmt = this.db.prepare('SELECT * FROM customers WHERE id = ?');
     const customer = stmt.get(customerId);
@@ -367,6 +587,9 @@ export class WorkflowService {
     return customer;
   }
 
+  /**
+   * Update customer status
+   */
   private async updateCustomerStatus(customerId: number, status: CustomerStatus): Promise<void> {
     const stmt = this.db.prepare(`
       UPDATE customers
@@ -375,63 +598,13 @@ export class WorkflowService {
     `);
 
     stmt.run(status, customerId);
+
+    logger.info('Customer status updated', { customerId, status });
   }
 
-  private async logCheckpoint(customerId: number, checkpoint: WorkflowCheckpoint): Promise<void> {
-    const stmt = this.db.prepare(`
-      INSERT INTO activity_log (customer_id, actor, action, resource_type, details)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      customerId,
-      'system',
-      'workflow_checkpoint',
-      'workflow',
-      JSON.stringify({ checkpoint })
-    );
-  }
-
-  private async getCompletedCheckpoints(
-    customerId: number
-  ): Promise<Array<{ checkpoint: WorkflowCheckpoint; completed_at: string }>> {
-    const stmt = this.db.prepare(`
-      SELECT details, created_at
-      FROM activity_log
-      WHERE customer_id = ?
-        AND action = 'workflow_checkpoint'
-      ORDER BY created_at ASC
-    `);
-
-    const rows = stmt.all(customerId) as Array<{ details: string; created_at: string }>;
-
-    return rows.map(row => {
-      const details = JSON.parse(row.details);
-      return {
-        checkpoint: details.checkpoint,
-        completed_at: row.created_at,
-      };
-    });
-  }
-
-  private async hasReceivedPayment(customerId: number): Promise<boolean> {
-    const stmt = this.db.prepare(`
-      SELECT COUNT(*) as count
-      FROM billing_records
-      WHERE customer_id = ? AND status = 'paid'
-    `);
-
-    const result = stmt.get(customerId) as { count: number };
-    return result.count > 0;
-  }
-
-  private getDaysSince(timestamp: string): number {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  }
-
+  /**
+   * Log activity to activity_log table
+   */
   private async logActivity(
     customerId: number,
     action: string,
@@ -442,17 +615,6 @@ export class WorkflowService {
       VALUES (?, ?, ?, ?, ?)
     `);
 
-    stmt.run(
-      customerId,
-      'system',
-      action,
-      'workflow',
-      JSON.stringify(details)
-    );
-  }
-
-  private async sendStatusNotification(customerId: number, status: CustomerStatus): Promise<void> {
-    // TODO: Integrate with EmailService to send notifications
-    logger.info('TODO: Send status notification email', { customerId, status });
+    stmt.run(customerId, 'system', action, 'workflow', JSON.stringify(details));
   }
 }

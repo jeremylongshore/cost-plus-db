@@ -34,9 +34,11 @@ export class TursoClient {
   private isConnected: boolean = false;
 
   constructor(url?: string, authToken?: string, syncUrl?: string) {
-    this.url = url || config.turso.databaseUrl;
-    this.authToken = authToken || config.turso.authToken;
-    this.syncUrl = syncUrl || config.turso.syncUrl;
+    this.url = url || config.TURSO_DATABASE_URL || '';
+    this.authToken = authToken || config.TURSO_AUTH_TOKEN || '';
+    if (syncUrl !== undefined) {
+      this.syncUrl = syncUrl;
+    }
 
     if (!this.url || !this.authToken) {
       throw new Error('Turso database URL and auth token are required');

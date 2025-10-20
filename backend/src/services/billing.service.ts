@@ -276,6 +276,114 @@ export class BillingService {
   }
 
   /**
+   * Create invoice for customer billing period
+   *
+   * Convenience method that calculates pricing and generates invoice.
+   *
+   * @param customerId - Customer ID
+   * @param billingPeriod - Billing period (e.g., '2025-01')
+   * @returns Invoice ID
+   */
+  async createInvoice(customerId: number, billingPeriod: string): Promise<number> {
+    logger.info('Creating invoice for billing period', { customerId, billingPeriod });
+
+    // Get customer to determine tier and addons
+    const customer = await this.getCustomer(customerId);
+
+    // Parse billing period (format: YYYY-MM)
+    const parts = billingPeriod.split('-').map(Number);
+    const year = parts[0];
+    const month = parts[1];
+
+    if (!year || !month || month < 1 || month > 12) {
+      throw new Error(`Invalid billing period format: ${billingPeriod}. Expected YYYY-MM`);
+    }
+
+    const billingPeriodStart = new Date(year, month - 1, 1);
+    const billingPeriodEnd = new Date(year, month, 0, 23, 59, 59);
+
+    // Calculate pricing based on customer's tier
+    // For now, use basic tier pricing without addons
+    // TODO: Store customer addons and infrastructure preferences
+    const pricing = this.calculatePricing(
+      customer.tier as keyof typeof TIER_PRICES,
+      {}, // Empty addons for now
+      'contabo' // Default infrastructure
+    );
+
+    // Generate invoice
+    const invoice = await this.generateInvoice(
+      customerId,
+      pricing,
+      billingPeriodStart,
+      billingPeriodEnd
+    );
+
+    return invoice.id;
+  }
+
+  /**
+   * Get customer billing information
+   *
+   * Returns customer billing details including payment method and next billing date.
+   *
+   * @param customerId - Customer ID
+   * @returns Customer billing info
+   */
+  async getCustomerBilling(customerId: number): Promise<{
+    customer_id: number;
+    tier: string;
+    monthly_amount: number;
+    next_billing_date: string | null;
+    payment_method: string | null;
+    billing_history: BillingRecord[];
+  }> {
+    logger.debug('Getting customer billing info', { customerId });
+
+    // Verify customer exists and get details
+    const customer = await this.getCustomer(customerId);
+
+    // Calculate current monthly amount
+    const pricing = this.calculatePricing(
+      customer.tier as keyof typeof TIER_PRICES,
+      {}, // TODO: Get addons from customer config
+      'contabo'
+    );
+
+    // Get billing history
+    const billingHistory = await this.getCustomerBillingHistory(customerId);
+
+    // Calculate next billing date (30 days from last paid invoice or today)
+    let nextBillingDate: string | null = null;
+    if (billingHistory.length > 0) {
+      const lastPaidInvoice = billingHistory.find(record => record.status === 'paid');
+      if (lastPaidInvoice) {
+        const lastBillingEnd = new Date(lastPaidInvoice.billing_period_end);
+        const nextDate = new Date(lastBillingEnd);
+        nextDate.setDate(nextDate.getDate() + 1);
+        nextBillingDate = nextDate.toISOString();
+      }
+    } else {
+      // First billing - set to 30 days from now
+      const nextDate = new Date();
+      nextDate.setDate(nextDate.getDate() + 30);
+      nextBillingDate = nextDate.toISOString();
+    }
+
+    // TODO: Get payment method from Stripe
+    const paymentMethod = null; // Placeholder
+
+    return {
+      customer_id: customerId,
+      tier: customer.tier,
+      monthly_amount: pricing.total,
+      next_billing_date: nextBillingDate,
+      payment_method: paymentMethod,
+      billing_history: billingHistory,
+    };
+  }
+
+  /**
    * Get billing record by ID
    */
   async getBillingRecord(id: number): Promise<BillingRecord> {

@@ -83,6 +83,7 @@ export interface InvoiceData {
 }
 
 export interface StripeCustomerMetadata {
+  [key: string]: string;
   customerDbId?: string;
   tier?: string;
   planName?: string;
@@ -90,6 +91,7 @@ export interface StripeCustomerMetadata {
 }
 
 export interface StripePaymentMetadata {
+  [key: string]: string;
   customerDbId: string;
   customerId: string;
   tier: string;

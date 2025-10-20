@@ -97,7 +97,7 @@ export class MigrationRunner {
    */
   private extractVersion(filename: string): number {
     const match = filename.match(/^(\d+)_/);
-    if (!match) {
+    if (!match || !match[1]) {
       throw new Error(`Invalid migration filename format: ${filename}`);
     }
     return parseInt(match[1], 10);
@@ -164,7 +164,7 @@ export class MigrationRunner {
  * CLI entry point
  */
 async function main() {
-  const dbPath = process.env.DATABASE_URL?.replace('file:', '') || '../../../002-clients/database/costplusdb.db';
+  const dbPath = (process.env.DATABASE_URL?.replace('file:', '')) || '../../../002-clients/database/costplusdb.db';
   const db = new Database(dbPath);
 
   const runner = new MigrationRunner(db);

@@ -3,11 +3,9 @@
  * Handles bi-directional sync between local SQLite and Turso edge database
  */
 
-import { Database } from 'better-sqlite3';
 import { TursoClient } from './client';
 import { logger } from '../../utils/logger';
 import * as fs from 'fs';
-import * as path from 'path';
 
 export interface SyncResult {
   success: boolean;
@@ -366,7 +364,7 @@ export class TursoSync {
       const pushResult = await this.syncLocalToTurso(localDbPath);
       const pullResult = await this.syncTursoToLocal(localDbPath);
 
-      return {
+      const result: SyncResult = {
         success: pushResult.success && pullResult.success,
         direction: 'bidirectional',
         tablesProcessed: pushResult.tablesProcessed + pullResult.tablesProcessed,
@@ -375,8 +373,14 @@ export class TursoSync {
         rowsDeleted: pushResult.rowsDeleted + pullResult.rowsDeleted,
         duration: pushResult.duration + pullResult.duration,
         timestamp: new Date(),
-        error: pushResult.error || pullResult.error,
       };
+
+      const combinedError = pushResult.error || pullResult.error;
+      if (combinedError !== undefined) {
+        result.error = combinedError;
+      }
+
+      return result;
     }
   }
 
@@ -463,12 +467,17 @@ export class TursoSync {
 
       const row = result.rows[0];
 
-      return {
-        lastSyncTimestamp: row.last_sync ? new Date(row.last_sync) : undefined,
+      const stats: SyncStats = {
         totalSyncs: row.total_syncs || 0,
         successfulSyncs: row.successful_syncs || 0,
         failedSyncs: (row.total_syncs || 0) - (row.successful_syncs || 0),
       };
+
+      if (row.last_sync) {
+        stats.lastSyncTimestamp = new Date(row.last_sync);
+      }
+
+      return stats;
     } catch (error) {
       logger.error('Failed to get sync stats', { error });
       return {

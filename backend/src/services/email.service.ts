@@ -11,23 +11,29 @@
  * @module services/email
  */
 
-import { Resend } from 'resend';
+import { resendClient } from '../integrations/resend/client.js';
+import {
+  intakeConfirmationTemplate,
+  paymentRequestTemplate,
+  provisioningStartedTemplate,
+  credentialsDeliveredTemplate,
+  welcomeEmailTemplate,
+  adminNotificationTemplate,
+} from '../integrations/resend/templates.js';
+import type {
+  CustomerEmailData,
+  PricingEmailData,
+  CredentialsEmailData,
+  AdminNotificationData,
+} from '../integrations/resend/types.js';
 import { config } from '../config/index.js';
 import { ExternalServiceError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * Email recipient
+ * Database record for customer
  */
-interface EmailRecipient {
-  email: string;
-  name?: string;
-}
-
-/**
- * Customer data for emails
- */
-interface CustomerEmailData {
+interface CustomerRecord {
   id: number;
   company_name: string;
   email: string;
@@ -36,12 +42,21 @@ interface CustomerEmailData {
 }
 
 /**
- * Database credentials for welcome email
+ * Database record for database instance
  */
-interface DatabaseCredentials {
+interface DatabaseRecord {
+  id: number;
+  customer_id: number;
   database_name: string;
   host: string;
   port: number;
+  status: string;
+}
+
+/**
+ * Database credentials structure
+ */
+interface DatabaseCredentials {
   username: string;
   password: string;
   connection_string: string;
@@ -49,44 +64,91 @@ interface DatabaseCredentials {
 }
 
 /**
+ * Pricing information for payment requests
+ */
+interface PricingInfo {
+  total: number;
+  tier: string;
+  billing_period: string;
+  setup_fee?: number;
+  monthly_price?: number;
+  features?: string[];
+}
+
+/**
  * Email service class
  */
 export class EmailService {
-  private resend: Resend;
-  private fromEmail: string;
   private adminEmail: string;
 
   constructor() {
-    this.resend = new Resend(config.RESEND_API_KEY);
-    this.fromEmail = config.RESEND_FROM_EMAIL;
     this.adminEmail = config.RESEND_ADMIN_EMAIL;
+    logger.info('Email service initialized', {
+      adminEmail: this.adminEmail,
+      notificationsEnabled: config.ENABLE_EMAIL_NOTIFICATIONS,
+    });
   }
 
   /**
    * Send intake confirmation to customer
    *
    * Sent immediately after customer submits intake form.
+   * Returns true if email was sent successfully, false otherwise.
    */
-  async sendIntakeConfirmation(customer: CustomerEmailData): Promise<void> {
-    logger.info('Sending intake confirmation', { customerId: customer.id, email: customer.email });
+  async sendIntakeConfirmation(
+    customer: CustomerRecord,
+    _formData?: Record<string, any>
+  ): Promise<boolean> {
+    if (!config.ENABLE_EMAIL_NOTIFICATIONS) {
+      logger.info('Email notifications disabled, skipping intake confirmation');
+      return true;
+    }
 
-    const subject = 'Welcome to CostPlusDB - Intake Received';
-    const html = this.buildIntakeConfirmationEmail(customer);
+    logger.info('Sending intake confirmation', {
+      customerId: customer.id,
+      email: customer.email,
+    });
 
     try {
-      await this.sendEmail({
-        to: { email: customer.email, name: customer.contact_name || customer.company_name },
-        subject,
-        html,
+      // Map customer record to email data
+      const emailData: CustomerEmailData = {
+        email: customer.email,
+        name: customer.contact_name || customer.company_name,
+        company: customer.company_name,
+        tier: customer.tier,
+      };
+
+      // Generate email template
+      const template = intakeConfirmationTemplate(emailData);
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: customer.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'intake_confirmation' },
+          { name: 'customer_id', value: customer.id.toString() },
+        ],
       });
 
-      logger.info('Intake confirmation sent', { customerId: customer.id });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Intake confirmation sent successfully', {
+        customerId: customer.id,
+        emailId: result.id,
+      });
+
+      return true;
     } catch (error) {
       logger.error('Failed to send intake confirmation', {
         customerId: customer.id,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      throw new ExternalServiceError('Resend', 'Failed to send intake confirmation email');
+      return false;
     }
   }
 
@@ -94,417 +156,415 @@ export class EmailService {
    * Send payment request to customer
    *
    * Sent after customer is approved with Stripe payment link.
+   * Returns true if email was sent successfully, false otherwise.
    */
   async sendPaymentRequest(
-    customer: CustomerEmailData,
+    customer: CustomerRecord,
     paymentLink: string,
-    pricing: {
-      total: number;
-      tier: string;
-      billing_period: string;
+    pricing: PricingInfo
+  ): Promise<boolean> {
+    if (!config.ENABLE_EMAIL_NOTIFICATIONS) {
+      logger.info('Email notifications disabled, skipping payment request');
+      return true;
     }
-  ): Promise<void> {
-    logger.info('Sending payment request', { customerId: customer.id, email: customer.email });
 
-    const subject = 'CostPlusDB - Payment Request for Your Database';
-    const html = this.buildPaymentRequestEmail(customer, paymentLink, pricing);
+    logger.info('Sending payment request', {
+      customerId: customer.id,
+      email: customer.email,
+      amount: pricing.total,
+    });
 
     try {
-      await this.sendEmail({
-        to: { email: customer.email, name: customer.contact_name || customer.company_name },
-        subject,
-        html,
+      // Map customer record to email data
+      const emailData: CustomerEmailData = {
+        email: customer.email,
+        name: customer.contact_name || customer.company_name,
+        company: customer.company_name,
+        tier: customer.tier,
+      };
+
+      // Map pricing data
+      const pricingData: PricingEmailData = {
+        tier: pricing.tier,
+        monthlyPrice: pricing.monthly_price || pricing.total,
+        setupFee: pricing.setup_fee || 0,
+        totalFirstMonth: pricing.total,
+        features: pricing.features || this.getDefaultFeatures(pricing.tier),
+      };
+
+      // Generate email template
+      const template = paymentRequestTemplate(emailData, paymentLink, pricingData);
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: customer.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'payment_request' },
+          { name: 'customer_id', value: customer.id.toString() },
+          { name: 'amount', value: pricing.total.toFixed(2) },
+        ],
       });
 
-      logger.info('Payment request sent', { customerId: customer.id });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Payment request sent successfully', {
+        customerId: customer.id,
+        emailId: result.id,
+        amount: pricing.total,
+      });
+
+      return true;
     } catch (error) {
       logger.error('Failed to send payment request', {
         customerId: customer.id,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      throw new ExternalServiceError('Resend', 'Failed to send payment request email');
+      return false;
     }
   }
 
   /**
-   * Send provisioning update to customer
+   * Send provisioning notification to customer
    *
-   * Sent during database provisioning to keep customer informed.
+   * Sent when database provisioning starts.
+   * Returns true if email was sent successfully, false otherwise.
    */
-  async sendProvisioningUpdate(
-    customer: CustomerEmailData,
-    status: 'started' | 'in_progress' | 'completed' | 'failed',
-    message?: string
-  ): Promise<void> {
-    logger.info('Sending provisioning update', {
+  async sendProvisioningNotification(
+    customer: CustomerRecord,
+    database: DatabaseRecord
+  ): Promise<boolean> {
+    if (!config.ENABLE_EMAIL_NOTIFICATIONS) {
+      logger.info('Email notifications disabled, skipping provisioning notification');
+      return true;
+    }
+
+    logger.info('Sending provisioning notification', {
       customerId: customer.id,
+      databaseId: database.id,
       email: customer.email,
-      status,
     });
 
-    const subject = `CostPlusDB - Database Provisioning ${this.capitalizeFirst(status)}`;
-    const html = this.buildProvisioningUpdateEmail(customer, status, message);
-
     try {
-      await this.sendEmail({
-        to: { email: customer.email, name: customer.contact_name || customer.company_name },
-        subject,
-        html,
+      // Map customer record to email data
+      const emailData: CustomerEmailData = {
+        email: customer.email,
+        name: customer.contact_name || customer.company_name,
+        company: customer.company_name,
+        tier: customer.tier,
+      };
+
+      // Generate email template
+      const template = provisioningStartedTemplate(emailData);
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: customer.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'provisioning_started' },
+          { name: 'customer_id', value: customer.id.toString() },
+          { name: 'database_id', value: database.id.toString() },
+        ],
       });
 
-      logger.info('Provisioning update sent', { customerId: customer.id, status });
-    } catch (error) {
-      logger.error('Failed to send provisioning update', {
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Provisioning notification sent successfully', {
         customerId: customer.id,
+        databaseId: database.id,
+        emailId: result.id,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to send provisioning notification', {
+        customerId: customer.id,
+        databaseId: database.id,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      // Don't throw - provisioning updates are non-critical
+      // Don't throw - provisioning notifications are non-critical
+      return false;
     }
   }
 
   /**
-   * Send welcome email with database credentials
+   * Send database credentials to customer
    *
    * Sent after successful provisioning with connection details.
    * CRITICAL: Contains sensitive credentials.
+   * Returns true if email was sent successfully, false otherwise.
    */
-  async sendWelcomeEmail(
-    customer: CustomerEmailData,
+  async sendCredentials(
+    customer: CustomerRecord,
+    database: DatabaseRecord,
     credentials: DatabaseCredentials
-  ): Promise<void> {
-    logger.info('Sending welcome email with credentials', {
+  ): Promise<boolean> {
+    if (!config.ENABLE_EMAIL_NOTIFICATIONS) {
+      logger.warn(
+        'Email notifications disabled but credentials need to be sent - this should not happen in production'
+      );
+      return false;
+    }
+
+    logger.info('Sending database credentials', {
+      customerId: customer.id,
+      databaseId: database.id,
+      email: customer.email,
+    });
+
+    try {
+      // Map customer record to email data
+      const emailData: CustomerEmailData = {
+        email: customer.email,
+        name: customer.contact_name || customer.company_name,
+        company: customer.company_name,
+        tier: customer.tier,
+      };
+
+      // Map credentials data
+      const credentialsData: CredentialsEmailData = {
+        host: database.host,
+        port: database.port,
+        database: database.database_name,
+        username: credentials.username,
+        password: credentials.password,
+        sslRequired: credentials.ssl_enabled,
+        connectionString: credentials.connection_string,
+      };
+
+      // Generate email template
+      const template = credentialsDeliveredTemplate(emailData, credentialsData);
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: customer.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'credentials_delivered' },
+          { name: 'customer_id', value: customer.id.toString() },
+          { name: 'database_id', value: database.id.toString() },
+          { name: 'security', value: 'sensitive' },
+        ],
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Database credentials sent successfully', {
+        customerId: customer.id,
+        databaseId: database.id,
+        emailId: result.id,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('CRITICAL: Failed to send database credentials', {
+        customerId: customer.id,
+        databaseId: database.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      // This is critical - throw error so caller can handle
+      throw new ExternalServiceError(
+        'Resend',
+        'Failed to send database credentials email'
+      );
+    }
+  }
+
+  /**
+   * Send welcome email to customer
+   *
+   * Sent after credentials are delivered as a final onboarding step.
+   * Returns true if email was sent successfully, false otherwise.
+   */
+  async sendWelcomeEmail(customer: CustomerRecord): Promise<boolean> {
+    if (!config.ENABLE_EMAIL_NOTIFICATIONS) {
+      logger.info('Email notifications disabled, skipping welcome email');
+      return true;
+    }
+
+    logger.info('Sending welcome email', {
       customerId: customer.id,
       email: customer.email,
     });
 
-    const subject = 'Welcome to CostPlusDB - Your Database is Ready!';
-    const html = this.buildWelcomeEmail(customer, credentials);
-
     try {
-      await this.sendEmail({
-        to: { email: customer.email, name: customer.contact_name || customer.company_name },
-        subject,
-        html,
+      // Map customer record to email data
+      const emailData: CustomerEmailData = {
+        email: customer.email,
+        name: customer.contact_name || customer.company_name,
+        company: customer.company_name,
+        tier: customer.tier,
+      };
+
+      // Generate email template
+      const template = welcomeEmailTemplate(emailData);
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: customer.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'welcome' },
+          { name: 'customer_id', value: customer.id.toString() },
+        ],
       });
 
-      logger.info('Welcome email sent', { customerId: customer.id });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Welcome email sent successfully', {
+        customerId: customer.id,
+        emailId: result.id,
+      });
+
+      return true;
     } catch (error) {
-      logger.error('CRITICAL: Failed to send welcome email with credentials', {
+      logger.error('Failed to send welcome email', {
         customerId: customer.id,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      throw new ExternalServiceError('Resend', 'Failed to send welcome email with credentials');
+      // Welcome emails are non-critical
+      return false;
     }
   }
 
   /**
-   * Send admin notification
+   * Send admin alert notification
    *
-   * Internal notifications for admins (new customers, issues, etc.)
+   * Internal notifications for admins (new customers, errors, etc.)
+   * Returns true if email was sent successfully, false otherwise.
    */
-  async sendAdminNotification(
-    type: 'new_customer' | 'payment_received' | 'provisioning_failed' | 'support_ticket',
-    data: Record<string, any>
-  ): Promise<void> {
-    logger.info('Sending admin notification', { type, data });
-
-    const subject = `CostPlusDB Admin Alert: ${this.formatNotificationType(type)}`;
-    const html = this.buildAdminNotificationEmail(type, data);
+  async sendAdminAlert(
+    subject: string,
+    message: string,
+    severity: 'info' | 'warning' | 'error' | 'critical' = 'info'
+  ): Promise<boolean> {
+    logger.info('Sending admin alert', { subject, severity });
 
     try {
-      await this.sendEmail({
-        to: { email: this.adminEmail, name: 'CostPlusDB Admin' },
-        subject,
-        html,
+      // Build admin notification data
+      const notificationData: AdminNotificationData = {
+        type: severity === 'error' || severity === 'critical' ? 'error' : 'new_customer',
+        customerEmail: 'system@costplusdb.com',
+        customerName: 'System Alert',
+        details: {
+          subject,
+          message,
+          severity,
+          timestamp: new Date().toISOString(),
+        },
+        timestamp: new Date(),
+      };
+
+      // Generate email template
+      const template = adminNotificationTemplate(notificationData);
+
+      // Override subject with provided subject
+      const fullSubject = `[CostPlusDB ${severity.toUpperCase()}] ${subject}`;
+
+      // Send email via Resend client
+      const result = await resendClient.sendEmail({
+        to: this.adminEmail,
+        subject: fullSubject,
+        html: template.html,
+        text: template.text,
+        tags: [
+          { name: 'type', value: 'admin_alert' },
+          { name: 'severity', value: severity },
+        ],
       });
 
-      logger.info('Admin notification sent', { type });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      logger.info('Admin alert sent successfully', {
+        subject,
+        severity,
+        emailId: result.id,
+      });
+
+      return true;
     } catch (error) {
-      logger.error('Failed to send admin notification', {
-        type,
+      logger.error('Failed to send admin alert', {
+        subject,
+        severity,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
-      // Don't throw - admin notifications shouldn't block customer workflows
+      // Don't throw - admin alerts shouldn't block customer workflows
+      return false;
     }
   }
+
+  // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
 
   /**
-   * Send email via Resend API
+   * Get default features for a pricing tier
    */
-  private async sendEmail(params: {
-    to: EmailRecipient;
-    subject: string;
-    html: string;
-  }): Promise<void> {
-    const { to, subject, html } = params;
+  private getDefaultFeatures(tier: string): string[] {
+    const tierLower = tier.toLowerCase();
 
-    const response = await this.resend.emails.send({
-      from: this.fromEmail,
-      to: to.email,
-      subject,
-      html,
-    });
+    const baseFeatures = [
+      'PostgreSQL 16 (latest stable)',
+      'Daily automated backups',
+      'SSL/TLS encryption',
+      '24/7 monitoring and alerts',
+    ];
 
-    if (!response.data) {
-      throw new Error('Failed to send email: No response data');
+    if (tierLower === 'shared') {
+      return [
+        ...baseFeatures,
+        'Shared VPS instance',
+        '2GB RAM / 1 vCPU',
+        '25GB storage',
+        'Email support',
+      ];
+    } else if (tierLower === 'dedicated') {
+      return [
+        ...baseFeatures,
+        'Dedicated VPS instance',
+        '4GB RAM / 2 vCPU',
+        '50GB storage',
+        'Priority email support',
+      ];
+    } else if (tierLower === 'pro') {
+      return [
+        ...baseFeatures,
+        'High-performance VPS',
+        '8GB RAM / 4 vCPU',
+        '100GB storage',
+        'Phone + email support',
+        'Custom backups',
+      ];
+    } else if (tierLower === 'enterprise') {
+      return [
+        ...baseFeatures,
+        'Custom infrastructure',
+        'Custom specifications',
+        'Unlimited storage',
+        'Dedicated support',
+        'SLA guarantees',
+      ];
     }
 
-    logger.debug('Email sent via Resend', { messageId: response.data.id });
-  }
-
-  // ============================================================================
-  // EMAIL TEMPLATES
-  // ============================================================================
-
-  private buildIntakeConfirmationEmail(customer: CustomerEmailData): string {
-    const greeting = customer.contact_name
-      ? `Hi ${customer.contact_name},`
-      : `Hi there,`;
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: monospace; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .footer { border-top: 1px solid #ccc; padding-top: 10px; margin-top: 30px; font-size: 0.9em; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>CostPlusDB - Intake Received</h2>
-          </div>
-
-          <p>${greeting}</p>
-
-          <p>Thank you for your interest in CostPlusDB! We've received your intake form for <strong>${customer.company_name}</strong>.</p>
-
-          <p><strong>What's Next:</strong></p>
-          <ul>
-            <li>We'll review your requirements within 2 business hours</li>
-            <li>Schedule a brief consultation call to finalize details</li>
-            <li>Provide transparent pricing breakdown</li>
-            <li>Provision your database within 24 hours of payment</li>
-          </ul>
-
-          <p><strong>Selected Tier:</strong> ${customer.tier.toUpperCase()}</p>
-
-          <p>If you have any questions in the meantime, simply reply to this email.</p>
-
-          <div class="footer">
-            <p>CostPlusDB - Transparent, Affordable PostgreSQL<br>
-            <a href="https://costplusdb.com">costplusdb.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private buildPaymentRequestEmail(
-    customer: CustomerEmailData,
-    paymentLink: string,
-    pricing: { total: number; tier: string; billing_period: string }
-  ): string {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: monospace; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .pricing { background: #f5f5f5; padding: 15px; margin: 20px 0; }
-          .cta { background: #000; color: #fff; padding: 15px 30px; text-decoration: none; display: inline-block; margin: 20px 0; }
-          .footer { border-top: 1px solid #ccc; padding-top: 10px; margin-top: 30px; font-size: 0.9em; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>CostPlusDB - Payment Request</h2>
-          </div>
-
-          <p>Hi ${customer.contact_name || 'there'},</p>
-
-          <p>Great news! Your database has been approved and is ready to provision.</p>
-
-          <div class="pricing">
-            <p><strong>Pricing Breakdown:</strong></p>
-            <p>Tier: ${pricing.tier.toUpperCase()}<br>
-            Billing Period: ${pricing.billing_period}<br>
-            <strong>Total: $${pricing.total.toFixed(2)} USD</strong></p>
-          </div>
-
-          <p>Please complete payment to begin provisioning:</p>
-
-          <a href="${paymentLink}" class="cta">Complete Payment →</a>
-
-          <p>Once payment is confirmed, we'll provision your database within 30 minutes.</p>
-
-          <div class="footer">
-            <p>CostPlusDB - Transparent, Affordable PostgreSQL<br>
-            <a href="https://costplusdb.com">costplusdb.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private buildProvisioningUpdateEmail(
-    customer: CustomerEmailData,
-    status: string,
-    message?: string
-  ): string {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: monospace; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .status { background: #f5f5f5; padding: 15px; margin: 20px 0; }
-          .footer { border-top: 1px solid #ccc; padding-top: 10px; margin-top: 30px; font-size: 0.9em; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>CostPlusDB - Provisioning Update</h2>
-          </div>
-
-          <p>Hi ${customer.contact_name || 'there'},</p>
-
-          <div class="status">
-            <p><strong>Status:</strong> ${this.capitalizeFirst(status)}</p>
-            ${message ? `<p>${message}</p>` : ''}
-          </div>
-
-          <p>We'll notify you as soon as your database is ready.</p>
-
-          <div class="footer">
-            <p>CostPlusDB - Transparent, Affordable PostgreSQL<br>
-            <a href="https://costplusdb.com">costplusdb.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private buildWelcomeEmail(customer: CustomerEmailData, credentials: DatabaseCredentials): string {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: monospace; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .credentials { background: #f5f5f5; padding: 15px; margin: 20px 0; font-family: monospace; }
-          .warning { background: #fffacd; padding: 10px; margin: 15px 0; border-left: 4px solid #ffa500; }
-          .footer { border-top: 1px solid #ccc; padding-top: 10px; margin-top: 30px; font-size: 0.9em; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>Welcome to CostPlusDB!</h2>
-          </div>
-
-          <p>Hi ${customer.contact_name || 'there'},</p>
-
-          <p>Your PostgreSQL database is ready! Here are your connection details:</p>
-
-          <div class="credentials">
-            <p><strong>Database Name:</strong> ${credentials.database_name}<br>
-            <strong>Host:</strong> ${credentials.host}<br>
-            <strong>Port:</strong> ${credentials.port}<br>
-            <strong>Username:</strong> ${credentials.username}<br>
-            <strong>Password:</strong> ${credentials.password}<br>
-            <strong>SSL:</strong> ${credentials.ssl_enabled ? 'Required' : 'Optional'}</p>
-
-            <p><strong>Connection String:</strong><br>
-            <code>${credentials.connection_string}</code></p>
-          </div>
-
-          <div class="warning">
-            <p><strong>⚠️ Security Note:</strong> Store these credentials securely. We recommend using environment variables or a secrets manager. Never commit credentials to version control.</p>
-          </div>
-
-          <p><strong>Next Steps:</strong></p>
-          <ul>
-            <li>Test your connection using the credentials above</li>
-            <li>Review our documentation at <a href="https://costplusdb.com/docs">costplusdb.com/docs</a></li>
-            <li>Backups are configured automatically (pgBackRest + S3)</li>
-            <li>Contact support anytime at ${this.adminEmail}</li>
-          </ul>
-
-          <div class="footer">
-            <p>CostPlusDB - Transparent, Affordable PostgreSQL<br>
-            <a href="https://costplusdb.com">costplusdb.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private buildAdminNotificationEmail(type: string, data: Record<string, any>): string {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: monospace; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .data { background: #f5f5f5; padding: 15px; margin: 20px 0; }
-          pre { background: #fff; padding: 10px; border: 1px solid #ccc; overflow-x: auto; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>CostPlusDB Admin Alert</h2>
-          </div>
-
-          <p><strong>Type:</strong> ${this.formatNotificationType(type)}</p>
-
-          <div class="data">
-            <p><strong>Details:</strong></p>
-            <pre>${JSON.stringify(data, null, 2)}</pre>
-          </div>
-
-          <p>Check the admin dashboard for more details.</p>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  // ============================================================================
-  // HELPERS
-  // ============================================================================
-
-  private capitalizeFirst(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  private formatNotificationType(type: string): string {
-    return type
-      .split('_')
-      .map(word => this.capitalizeFirst(word))
-      .join(' ');
+    return baseFeatures;
   }
 }

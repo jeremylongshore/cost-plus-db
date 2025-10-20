@@ -108,7 +108,7 @@ export async function closeDatabase(): Promise<void> {
  */
 export function transaction<T>(fn: (db: Database.Database) => T): T {
   const db = getLocalDb();
-  return db.transaction(fn)();
+  return db.transaction(fn)(db);
 }
 
 /**

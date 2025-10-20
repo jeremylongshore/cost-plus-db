@@ -252,3 +252,30 @@ export function validateIntakeForm(data: unknown): IntakeFormData {
 export function safeValidateIntakeForm(data: unknown) {
   return intakeFormSchema.safeParse(data);
 }
+
+/**
+ * Express middleware for validating intake form data
+ *
+ * Validates req.body against intake form schema.
+ * If validation fails, passes ZodError to error handler.
+ * If validation succeeds, attaches validated data to req.body and proceeds.
+ *
+ * Usage:
+ * ```typescript
+ * router.post('/intake', validateIntakeFormMiddleware, controller);
+ * ```
+ */
+import type { Request, Response, NextFunction } from 'express';
+
+export function validateIntakeFormMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = intakeFormSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}

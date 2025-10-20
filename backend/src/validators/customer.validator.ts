@@ -198,3 +198,129 @@ export function validateAddonsUpdate(data: unknown): AddonsUpdateData {
 export function validateCustomerListFilters(data: unknown): CustomerListFilters {
   return customerListFiltersSchema.parse(data);
 }
+
+/**
+ * Express middleware functions for customer validation
+ */
+import type { Request, Response, NextFunction } from 'express';
+
+/**
+ * Middleware to validate customer update data
+ *
+ * Validates req.body against customer update schema.
+ * Used for PATCH /api/customers/:id
+ */
+export function validateCustomerUpdateMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = customerUpdateSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate customer ID parameter
+ *
+ * Validates req.params.id is a valid positive integer.
+ * Used for GET/PATCH/DELETE /api/customers/:id
+ */
+export const customerIdParamSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+export function validateCustomerIdMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    const validated = customerIdParamSchema.parse(req.params);
+    req.params.id = String(validated.id);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate status transition
+ *
+ * Validates req.body against status transition schema.
+ * Used for POST /api/customers/:id/status
+ */
+export function validateStatusTransitionMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = statusTransitionSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate tier change
+ *
+ * Validates req.body against tier change schema.
+ * Used for POST /api/customers/:id/tier
+ */
+export function validateTierChangeMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = tierChangeSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate add-ons update
+ *
+ * Validates req.body against add-ons update schema.
+ * Used for POST /api/customers/:id/addons
+ */
+export function validateAddonsUpdateMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = addonsUpdateSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate customer list filters
+ *
+ * Validates req.query against customer list filters schema.
+ * Used for GET /api/customers
+ */
+export function validateCustomerListFiltersMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    const validated = customerListFiltersSchema.parse(req.query);
+    // Store validated data in a custom property to avoid type issues
+    (req as any).validatedQuery = validated;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}

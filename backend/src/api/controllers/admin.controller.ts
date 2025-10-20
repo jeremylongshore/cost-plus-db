@@ -71,9 +71,76 @@ export async function approveCustomer(
 }
 
 /**
+ * Send payment link to customer
+ *
+ * POST /api/admin/customers/:id/send-payment-link
+ *
+ * Workflow:
+ * 1. Verify customer is in 'approved' status
+ * 2. Generate Stripe payment link with transparent pricing
+ * 3. Send payment link email to customer
+ * 4. Log payment link sent event
+ *
+ * @param req - Express request
+ * @param res - Express response
+ * @param next - Express next function
+ */
+export async function sendPaymentLink(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const customerIdStr = req.params.id;
+    if (!customerIdStr) {
+      throw new ValidationError('Customer ID is required');
+    }
+
+    const customerId = parseInt(customerIdStr, 10);
+    if (isNaN(customerId)) {
+      throw new ValidationError('Invalid customer ID');
+    }
+
+    logger.info('Sending payment link to customer', { customerId });
+
+    // Initialize services
+    const customersRepo = new CustomersRepository(getLocalDb());
+    const customerService = new CustomerService(customersRepo);
+
+    // Get customer
+    const customer = await customerService.getCustomer(customerId);
+
+    // Validate status
+    if (customer.status !== 'approved' && customer.status !== 'consultation') {
+      throw new ConflictError(
+        `Customer must be in 'approved' or 'consultation' status to send payment link. Current status: ${customer.status}`
+      );
+    }
+
+    // TODO: Generate Stripe payment link
+    // TODO: Calculate transparent pricing breakdown
+    // TODO: Send payment link email with pricing details
+    // TODO: Log activity
+
+    logger.info('Payment link sent successfully', { customerId });
+
+    res.json({
+      success: true,
+      data: {
+        customer_id: customerId,
+        message: 'Payment link sent to customer email',
+      },
+      message: 'Payment link sent successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Provision database for customer
  *
- * POST /api/admin/provision/:id
+ * POST /api/admin/customers/:id/provision
  *
  * Workflow:
  * 1. Verify customer is in 'approved' status

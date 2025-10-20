@@ -240,3 +240,155 @@ export function validateDatabaseConnection(data: unknown): DatabaseConnectionDat
 export function validateDatabaseListFilters(data: unknown): DatabaseListFilters {
   return databaseListFiltersSchema.parse(data);
 }
+
+/**
+ * Express middleware functions for database validation
+ */
+import type { Request, Response, NextFunction } from 'express';
+
+/**
+ * Middleware to validate database creation data
+ *
+ * Validates req.body against database creation schema.
+ * Used for POST /api/databases
+ */
+export function validateDatabaseCreateMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = databaseCreateSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate database update data
+ *
+ * Validates req.body against database update schema.
+ * Used for PATCH /api/databases/:id
+ */
+export function validateDatabaseUpdateMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = databaseUpdateSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate database ID parameter
+ *
+ * Validates req.params.id is a valid positive integer.
+ * Used for GET/PATCH/DELETE /api/databases/:id
+ */
+export const databaseIdParamSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+export function validateDatabaseIdMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    const validated = databaseIdParamSchema.parse(req.params);
+    req.params.id = String(validated.id);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate backup configuration
+ *
+ * Validates req.body against backup config schema.
+ * Used for POST /api/databases/:id/backup-config
+ */
+export function validateBackupConfigMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = backupConfigSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate database connection data
+ *
+ * Validates req.body against database connection schema.
+ * Used for testing database connections.
+ */
+export function validateDatabaseConnectionMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    req.body = databaseConnectionSchema.parse(req.body);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate database list filters
+ *
+ * Validates req.query against database list filters schema.
+ * Used for GET /api/databases
+ */
+export function validateDatabaseListFiltersMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    const validated = databaseListFiltersSchema.parse(req.query);
+    // Store validated data in a custom property to avoid type issues
+    (req as any).validatedQuery = validated;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Middleware to validate database health check query parameters
+ *
+ * Validates req.query for health check endpoints.
+ * Used for GET /api/databases/:id/health
+ */
+export const databaseHealthQuerySchema = z.object({
+  include_metrics: z.coerce.boolean().default(false),
+  include_connections: z.coerce.boolean().default(false),
+});
+
+export function validateDatabaseHealthQueryMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void {
+  try {
+    const validated = databaseHealthQuerySchema.parse(req.query);
+    // Store validated data in a custom property to avoid type issues
+    (req as any).validatedQuery = validated;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
