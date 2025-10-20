@@ -1,0 +1,47 @@
+# Customer Data - NEVER commit to git
+customers/active/*
+customers/prospects/*
+customers/suspended/*
+customers/archived/*
+!customers/*/.gitkeep
+
+# Database Files - Contains customer records
+database/costplusdb.db
+database/*.db
+database/*.db-shm
+database/*.db-wal
+
+# Form Submissions - Contains PII
+forms/form-submissions/*
+!forms/form-submissions/.gitkeep
+
+# Logs - May contain sensitive data
+logs/*
+!logs/.gitkeep
+
+# Credentials and Keys
+*.key
+*.pem
+*.p12
+*.pfx
+*-credentials.json
+*-credentials.txt
+.env
+.env.*
+!.env.example
+
+# Temporary Files
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+
+# Node modules (if scripts use npm)
+node_modules/
+
+# Backup Files
+*.backup
+*.sql.gz
+*.tar.gz
+backup-*/

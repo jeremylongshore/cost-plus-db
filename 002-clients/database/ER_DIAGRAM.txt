@@ -1,0 +1,424 @@
+================================================================================
+COSTPLUSDB DATABASE - ENTITY RELATIONSHIP DIAGRAM
+================================================================================
+Version: 1.0.0
+Created: 2025-10-20
+================================================================================
+
+LEGEND:
+━━━━━━ Parent-Child Relationship (Foreign Key)
+┈┈┈┈┈┈ One-to-One Relationship
+──────  One-to-Many Relationship
+[PK]    Primary Key
+[FK]    Foreign Key
+[UK]    Unique Key
+*       Required Field (NOT NULL)
+
+================================================================================
+MAIN ENTITY RELATIONSHIP DIAGRAM
+================================================================================
+
+┌─────────────────────────────────────────────────────────────┐
+│                        CUSTOMERS                            │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ [PK] id                    INTEGER                          │
+│ [UK] customer_id*          TEXT                             │
+│ [UK] contact_email*        TEXT                             │
+│      company_name*         TEXT                             │
+│      contact_name*         TEXT                             │
+│      tier*                 TEXT (Shared/Dedicated/Pro/...)  │
+│      status*               TEXT (prospect/active/...)       │
+│      monthly_base_rate*    REAL                             │
+│      infrastructure_prov*  TEXT (Contabo/Hetzner/...)      │
+│      addon_*               INTEGER (boolean flags)          │
+│      is_active             INTEGER (soft delete)            │
+│      created_at            TIMESTAMP                        │
+│      updated_at            TIMESTAMP                        │
+│      activated_at          TIMESTAMP                        │
+│      ... (40+ fields total)                                │
+└─────────────────────────────────────────────────────────────┘
+         │
+         │ (1:N relationships)
+         │
+         ├──────────────────────────────────────────────────────────┐
+         │                                                          │
+         ▼                                                          ▼
+┌────────────────────────┐                          ┌────────────────────────┐
+│      DATABASES         │                          │       BILLING          │
+│━━━━━━━━━━━━━━━━━━━━━━━━│                          │━━━━━━━━━━━━━━━━━━━━━━━━│
+│ [PK] id                │                          │ [PK] id                │
+│ [FK] customer_id*      │◀──── CASCADE DELETE ────│ [FK] customer_id*      │
+│ [UK] database_name*    │                          │      billing_cycle*    │
+│      database_user*    │                          │      payment_method    │
+│      password_hash*    │                          │      payment_status*   │
+│      vps_hostname*     │                          │      base_tier_price*  │
+│      vps_ip_address    │                          │      infra_addon_price │
+│      port              │                          │      feature_addons    │
+│      ssl_enabled       │                          │      extra_storage     │
+│      provision_status* │                          │      total_monthly*    │
+│      health_status     │                          │      discount_percent  │
+│      allocated_ram_gb  │                          │      stripe_customer   │
+│      allocated_storage │                          │      stripe_subscrip   │
+│      backup_enabled    │                          │      next_billing_date │
+│      backup_schedule   │                          │      created_at        │
+│      created_at        │                          │      updated_at        │
+│      updated_at        │                          │      ... (20+ fields)  │
+│      ... (25+ fields)  │                          └────────────────────────┘
+└────────────────────────┘
+
+         │ (continues from CUSTOMERS)
+         │
+         ├──────────────────────────────────────────────────────────┐
+         │                                                          │
+         ▼                                                          ▼
+┌────────────────────────┐                          ┌────────────────────────┐
+│      INVOICES          │                          │   SUPPORT_TICKETS      │
+│━━━━━━━━━━━━━━━━━━━━━━━━│                          │━━━━━━━━━━━━━━━━━━━━━━━━│
+│ [PK] id                │                          │ [PK] id                │
+│ [FK] customer_id*      │◀──── CASCADE DELETE ────│ [FK] customer_id*      │
+│ [UK] invoice_number*   │                          │ [UK] ticket_number*    │
+│      invoice_date*     │                          │      subject*          │
+│      due_date*         │                          │      description*      │
+│      base_amount*      │                          │      ticket_type*      │
+│      addons_amount     │                          │      priority*         │
+│      discounts_amount  │                          │      status*           │
+│      tax_amount        │                          │      assigned_to       │
+│      total_amount*     │                          │      customer_email    │
+│      line_items (JSON) │                          │      slack_thread_url  │
+│      payment_status*   │                          │      resolution_notes  │
+│      paid_date         │                          │      resolved_at       │
+│      paid_amount       │                          │      sla_response_hrs  │
+│      stripe_invoice_id │                          │      first_response_at │
+│      invoice_pdf_path  │                          │      response_time_min │
+│      invoice_sent      │                          │      sla_met           │
+│      created_at        │                          │      created_at        │
+│      updated_at        │                          │      updated_at        │
+│      ... (20+ fields)  │                          │      ... (20+ fields)  │
+└────────────────────────┘                          └────────────────────────┘
+                                                              │
+                                                              │ (1:N)
+                                                              ▼
+                                                    ┌────────────────────────┐
+                                                    │  SUPPORT_MESSAGES      │
+                                                    │━━━━━━━━━━━━━━━━━━━━━━━━│
+                                                    │ [PK] id                │
+                                                    │ [FK] ticket_id*        │
+                                                    │      sender_type*      │
+                                                    │      sender_name       │
+                                                    │      sender_email      │
+                                                    │      message_text*     │
+                                                    │      is_internal       │
+                                                    │      has_attachments   │
+                                                    │      attachment_paths  │
+                                                    │      created_at        │
+                                                    │      ... (10+ fields)  │
+                                                    └────────────────────────┘
+
+         │ (continues from CUSTOMERS)
+         │
+         ├──────────────────────────────────────────────────────────┐
+         │                                                          │
+         ▼                                                          ▼
+┌────────────────────────┐                          ┌────────────────────────┐
+│  CUSTOMER_WORKFLOW     │                          │        NOTES           │
+│━━━━━━━━━━━━━━━━━━━━━━━━│                          │━━━━━━━━━━━━━━━━━━━━━━━━│
+│ [PK] id                │                          │ [PK] id                │
+│ [FK] customer_id* [UK] │◀──── CASCADE DELETE ────│ [FK] customer_id*      │
+│                        │  (1:1 relationship)      │      note_type         │
+│ Workflow Checkpoints:  │                          │      subject           │
+│  form_submitted        │                          │      note_text*        │
+│  form_submitted_at     │                          │      created_by*       │
+│  consultation_sched    │                          │      is_important      │
+│  consultation_sched_at │                          │      is_follow_up      │
+│  consultation_comp     │                          │      follow_up_date    │
+│  consultation_comp_at  │                          │      created_at        │
+│  ... (12 stages × 2)   │                          │      updated_at        │
+│                        │                          │      ... (10+ fields)  │
+│  current_stage         │                          └────────────────────────┘
+│  blocked               │
+│  blocker_reason        │
+│  workflow_notes        │
+│  created_at            │
+│  updated_at            │
+│  ... (35+ fields)      │
+└────────────────────────┘
+
+         │ (continues from CUSTOMERS)
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     ACTIVITY_LOG                            │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ [PK] id                    INTEGER                          │
+│ [FK] customer_id           INTEGER (nullable)               │
+│      entity_type           TEXT (customer/database/...)     │
+│      entity_id             INTEGER                          │
+│      action_type*          TEXT (created/updated/deleted)   │
+│      action_description*   TEXT                             │
+│      old_values (JSON)     TEXT                             │
+│      new_values (JSON)     TEXT                             │
+│      performed_by*         TEXT                             │
+│      ip_address            TEXT                             │
+│      user_agent            TEXT                             │
+│      created_at            TIMESTAMP                        │
+│      ... (12+ fields)                                      │
+└─────────────────────────────────────────────────────────────┘
+                  ▲
+                  │ (ON DELETE SET NULL - preserve audit history)
+                  │
+            (all tables can write here)
+
+================================================================================
+VIEWS (PRE-COMPUTED QUERIES)
+================================================================================
+
+┌────────────────────────────────────────────────────────────┐
+│               v_active_customers                           │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ Joins: customers + billing + databases                     │
+│ Filter: status = 'active' AND is_active = 1                │
+│ Returns: customer info + billing + database health         │
+└────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│            v_customers_by_revenue                          │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ Joins: customers + billing                                 │
+│ Calculates: lifetime_value = days_active * monthly_rate    │
+│ Order: total_monthly_rate DESC                             │
+└────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│           v_open_support_tickets                           │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ Joins: support_tickets + customers                         │
+│ Filter: status IN ('open', 'in_progress', ...)             │
+│ Calculates: hours_open if no first_response                │
+│ Order: priority DESC, created_at ASC                       │
+└────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│            v_onboarding_pipeline                           │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ Joins: customers + customer_workflow                       │
+│ Filter: status IN ('prospect', 'consultation', ...)        │
+│ Calculates: days_in_pipeline                               │
+│ Order: created_at ASC                                      │
+└────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│                v_mrr_summary                               │
+│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
+│ Joins: customers + billing                                 │
+│ Aggregates: COUNT, SUM, AVG by tier                        │
+│ Returns: active_customers, total_mrr, avg_revenue_per_cust │
+│          shared_mrr, dedicated_mrr, pro_mrr, enterprise_mrr│
+└────────────────────────────────────────────────────────────┘
+
+================================================================================
+WORKFLOW STAGE PROGRESSION
+================================================================================
+
+CUSTOMER_WORKFLOW Table - 12 Stage Onboarding Pipeline:
+
+1.  form_submitted              ── Customer fills out intake form
+    form_submitted_at
+
+2.  consultation_scheduled      ── Discovery call scheduled
+    consultation_scheduled_at
+    consultation_date
+
+3.  consultation_completed      ── Discovery call completed
+    consultation_completed_at
+    consultation_notes
+
+4.  pricing_approved           ── Customer accepts quote
+    pricing_approved_at
+
+5.  payment_received           ── First payment processed
+    payment_received_at
+
+6.  database_provisioning_started ── Begin DB setup
+    database_provisioning_started_at
+
+7.  database_provisioned       ── Database is live
+    database_provisioned_at
+
+8.  credentials_sent           ── Connection details sent
+    credentials_sent_at
+
+9.  customer_confirmed_access  ── Customer verified connection
+    customer_confirmed_access_at
+
+10. migration_started          ── Data migration begins
+    migration_started_at
+
+11. migration_completed        ── Migration finished
+    migration_completed_at
+
+12. go_live                    ── Production traffic switched
+    go_live_at
+
+    current_stage              ── Text summary of current position
+    blocked                    ── Is onboarding stuck?
+    blocker_reason             ── Why stuck?
+    workflow_notes             ── General notes
+
+================================================================================
+INVOICE LINE ITEMS (JSON STRUCTURE)
+================================================================================
+
+INVOICES.line_items field contains JSON array showing cost transparency:
+
+[
+  {
+    "description": "Enterprise Tier",
+    "our_cost": 30.00,
+    "your_price": 149.00,
+    "quantity": 1
+  },
+  {
+    "description": "High Availability Add-on",
+    "our_cost": 79.00,
+    "your_price": 99.00,
+    "quantity": 1
+  },
+  {
+    "description": "Extra Storage (+200GB)",
+    "our_cost": 4.00,
+    "your_price": 5.00,
+    "quantity": 1
+  }
+]
+
+This supports CostPlusDB's transparency model: show customers exactly
+what we pay vs. what they pay (cost + 25% markup).
+
+================================================================================
+DATA FLOW EXAMPLE: NEW CUSTOMER ONBOARDING
+================================================================================
+
+Step 1: Prospect fills out form
+    ↓
+    INSERT INTO customers (status = 'prospect', ...)
+    INSERT INTO customer_workflow (form_submitted = 1, ...)
+    INSERT INTO activity_log (action = 'customer_created', ...)
+
+Step 2: Discovery call
+    ↓
+    UPDATE customer_workflow SET consultation_completed = 1, ...
+    INSERT INTO notes (note_type = 'meeting', ...)
+
+Step 3: Customer approves pricing
+    ↓
+    UPDATE customer_workflow SET pricing_approved = 1, ...
+    UPDATE customers SET status = 'approved', ...
+
+Step 4: Payment received
+    ↓
+    UPDATE customer_workflow SET payment_received = 1, ...
+    INSERT INTO billing (payment_method = 'stripe', ...)
+
+Step 5: Provision database
+    ↓
+    UPDATE customer_workflow SET database_provisioned = 1, ...
+    INSERT INTO databases (provision_status = 'active', ...)
+    UPDATE customers SET status = 'provisioning', ...
+
+Step 6: Send credentials
+    ↓
+    UPDATE customer_workflow SET credentials_sent = 1, ...
+    (Email sent to customer with database connection details)
+
+Step 7: Customer confirms access
+    ↓
+    UPDATE customer_workflow SET customer_confirmed_access = 1, ...
+
+Step 8: Migration (if needed)
+    ↓
+    UPDATE customer_workflow SET migration_started = 1, ...
+    UPDATE customer_workflow SET migration_completed = 1, ...
+
+Step 9: Go live!
+    ↓
+    UPDATE customer_workflow SET go_live = 1, current_stage = 'active'
+    UPDATE customers SET status = 'active', activated_at = NOW()
+
+Step 10: Generate first invoice
+    ↓
+    INSERT INTO invoices (invoice_number = 'INV-...', line_items = [...])
+
+================================================================================
+TRIGGER BEHAVIOR
+================================================================================
+
+All UPDATE operations automatically trigger:
+    updated_at = CURRENT_TIMESTAMP
+
+Example:
+    UPDATE customers SET tier = 'Pro' WHERE id = 123;
+    ↓
+    Trigger fires: updated_at = '2025-10-20 15:30:00'
+    Activity log entry: old_values = {"tier": "Dedicated"},
+                       new_values = {"tier": "Pro"}
+
+================================================================================
+INDEX USAGE PATTERNS
+================================================================================
+
+Frequently Queried Paths:
+
+1. Find customer by email:
+   customers.contact_email [INDEXED] → O(log n)
+
+2. Get all active customers:
+   customers.status [INDEXED] + customers.is_active [INDEXED] → O(log n)
+
+3. Get customer's databases:
+   databases.customer_id [INDEXED] → O(log n)
+
+4. Find overdue invoices:
+   invoices.payment_status [INDEXED] + invoices.due_date [INDEXED] → O(log n)
+
+5. Support ticket queue:
+   support_tickets.status [INDEXED] + priority [INDEXED] → O(log n)
+
+6. Audit trail lookup:
+   activity_log.customer_id [INDEXED] + created_at [INDEXED] → O(log n)
+
+Without indexes, all queries would be O(n) table scans.
+
+================================================================================
+CONSTRAINTS SUMMARY
+================================================================================
+
+Foreign Key Constraints (9):
+├─ databases.customer_id → customers.id (CASCADE)
+├─ billing.customer_id → customers.id (CASCADE)
+├─ invoices.customer_id → customers.id (CASCADE)
+├─ support_tickets.customer_id → customers.id (CASCADE)
+├─ support_messages.ticket_id → support_tickets.id (CASCADE)
+├─ customer_workflow.customer_id → customers.id (CASCADE, UNIQUE)
+├─ notes.customer_id → customers.id (CASCADE)
+└─ activity_log.customer_id → customers.id (SET NULL)
+
+Unique Constraints (15+):
+├─ customers.customer_id
+├─ customers.contact_email
+├─ databases.database_name
+├─ invoices.invoice_number
+├─ support_tickets.ticket_number
+├─ customer_workflow.customer_id
+└─ ... (and more)
+
+CHECK Constraints (45+):
+├─ tier IN ('Shared', 'Dedicated', 'Pro', 'Enterprise')
+├─ status IN ('prospect', 'consultation', 'approved', ...)
+├─ payment_status IN ('current', 'past_due', 'suspended', ...)
+├─ priority IN ('low', 'normal', 'high', 'critical')
+├─ is_active IN (0, 1) (boolean constraint)
+└─ ... (and many more)
+
+================================================================================
+END OF ER DIAGRAM
+================================================================================

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="CostPlusDB">
+  <title>Customer Intake Form - CostPlusDB</title>
+  <meta name="description" content="Professional customer onboarding intake for CostPlusDB managed PostgreSQL hosting">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../website/src/reset.css">
+  <link rel="stylesheet" href="../../website/src/index.css">
+  <link rel="stylesheet" href="../../website/src/theme.css">
+
+  <style>
+    fieldset {
+      border: var(--border-thickness) solid var(--text-color);
+      padding: calc(var(--line-height) * 1.5) 2ch;
+      margin: calc(var(--line-height) * 2) 0;
+    }
+
+    legend {
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      padding: 0 1ch;
+      font-size: 1.2rem;
+    }
+
+    .form-group {
+      margin-bottom: calc(var(--line-height) * 1.5);
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2ch;
+      margin-bottom: calc(var(--line-height) * 1.5);
+    }
+
+    @media screen and (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    textarea {
+      width: 100%;
+      min-height: calc(var(--line-height) * 4);
+      padding: calc(var(--line-height) / 2) 1ch;
+      border: var(--border-thickness) solid var(--text-color);
+      font-family: var(--font-family);
+      font-size: inherit;
+      line-height: var(--line-height);
+      background: var(--background-color);
+      color: var(--text-color);
+      resize: vertical;
+    }
+
+    select {
+      width: 100%;
+      height: calc(var(--line-height) * 2);
+      padding: calc(var(--line-height) / 2 - var(--border-thickness)) 1ch;
+      border: var(--border-thickness) solid var(--text-color);
+      font-family: var(--font-family);
+      font-size: inherit;
+      background: var(--background-color);
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    .checkbox-group {
+      margin: calc(var(--line-height) / 2) 0;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: calc(var(--line-height) / 2);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      margin-right: 1ch;
+      margin-top: 0;
+    }
+
+    .checkbox-item label {
+      display: inline;
+      width: auto;
+      font-weight: var(--font-weight-normal);
+      margin: 0;
+    }
+
+    .radio-group {
+      margin: calc(var(--line-height) / 2) 0;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: calc(var(--line-height) / 2);
+    }
+
+    .radio-item input[type="radio"] {
+      margin-right: 1ch;
+      margin-top: 0;
+    }
+
+    .radio-item label {
+      display: inline;
+      width: auto;
+      font-weight: var(--font-weight-normal);
+      margin: 0;
+    }
+
+    .help-text {
+      color: var(--text-color-alt);
+      font-size: 0.9rem;
+      margin-top: calc(var(--line-height) / 2);
+      font-style: italic;
+    }
+
+    .required {
+      color: var(--text-color);
+      font-weight: var(--font-weight-bold);
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      margin-top: calc(var(--line-height) * 2);
+      padding: calc(var(--line-height) / 2) 2ch;
+      font-size: 1.2rem;
+    }
+
+    .form-intro {
+      background: var(--background-color-alt);
+      padding: calc(var(--line-height) * 1.5) 2ch;
+      margin-bottom: calc(var(--line-height) * 2);
+      border: var(--border-thickness) solid var(--text-color);
+    }
+  </style>
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">CostPlusDB</h1>
+      <span class="subtitle">Customer Intake Form</span>
+    </td>
+    <th>Version</th>
+    <td class="width-min">v1.0</td>
+  </tr>
+  <tr>
+    <th>Updated</th>
+    <td class="width-min"><time>10-20<br>2025</time></td>
+  </tr>
+</table>
+
+<div class="form-intro">
+  <h2>Professional PostgreSQL Hosting Intake</h2>
+  <p>Thank you for your interest in CostPlusDB. This intake form helps us understand your database requirements and provide the best possible consultation and service.</p>
+  <p><strong>What to expect:</strong></p>
+  <ul>
+    <li>Completion time: 10-15 minutes</li>
+    <li>Response within 24 hours</li>
+    <li>Personalized consultation call scheduled</li>
+    <li>Custom migration plan if needed</li>
+  </ul>
+  <p><span class="required">*</span> Required fields</p>
+</div>
+
+<form id="customer-intake-form" method="POST" action="/api/intake" novalidate>
+
+  <!-- SECTION 1: COMPANY INFORMATION -->
+  <fieldset>
+    <legend>Company Information</legend>
+
+    <div class="form-group">
+      <label for="company-name">
+        Company Name <span class="required">*</span>
+        <input type="text" id="company-name" name="company_name" required placeholder="Acme Corporation">
+      </label>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="industry">
+          Industry/Sector
+          <input type="text" id="industry" name="industry" placeholder="SaaS, Healthcare, E-commerce, etc.">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="company-size">
+          Company Size (Employees)
+          <select id="company-size" name="company_size">
+            <option value="">Select size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="501+">501+ employees</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="website">
+        Website URL
+        <input type="url" id="website" name="website" placeholder="https://www.example.com">
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="address">
+        Physical Address
+        <textarea id="address" name="address" rows="3" placeholder="Street, City, State/Province, Postal Code, Country"></textarea>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="tax-id">
+        Tax ID / Business Registration Number
+        <input type="text" id="tax-id" name="tax_id" placeholder="EIN, VAT, ABN, etc.">
+      </label>
+      <div class="help-text">For invoicing and compliance purposes</div>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 2: PRIMARY CONTACT -->
+  <fieldset>
+    <legend>Primary Contact</legend>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="primary-name">
+          Full Name <span class="required">*</span>
+          <input type="text" id="primary-name" name="primary_contact_name" required placeholder="Jane Smith">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="primary-title">
+          Title/Role
+          <input type="text" id="primary-title" name="primary_contact_title" placeholder="CTO, Engineering Manager, etc.">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="primary-email">
+          Email <span class="required">*</span>
+          <input type="email" id="primary-email" name="primary_contact_email" required placeholder="jane@example.com">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="primary-phone">
+          Phone Number
+          <input type="tel" id="primary-phone" name="primary_contact_phone" placeholder="+1 (555) 123-4567">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="contact-method">
+          Preferred Contact Method
+          <select id="contact-method" name="preferred_contact_method">
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="slack">Slack</option>
+            <option value="teams">Microsoft Teams</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="timezone">
+          Timezone
+          <select id="timezone" name="timezone">
+            <option value="">Select timezone</option>
+            <option value="America/New_York">Eastern Time (ET)</option>
+            <option value="America/Chicago">Central Time (CT)</option>
+            <option value="America/Denver">Mountain Time (MT)</option>
+            <option value="America/Los_Angeles">Pacific Time (PT)</option>
+            <option value="Europe/London">GMT/BST (London)</option>
+            <option value="Europe/Paris">CET/CEST (Paris)</option>
+            <option value="Asia/Tokyo">JST (Tokyo)</option>
+            <option value="Australia/Sydney">AEST (Sydney)</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 3: TECHNICAL CONTACT -->
+  <fieldset>
+    <legend>Technical Contact (if different from primary)</legend>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tech-name">
+          Full Name
+          <input type="text" id="tech-name" name="tech_contact_name" placeholder="John Doe">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="tech-role">
+          Role
+          <input type="text" id="tech-role" name="tech_contact_role" placeholder="DevOps Engineer, Database Admin, etc.">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="tech-email">
+          Email
+          <input type="email" id="tech-email" name="tech_contact_email" placeholder="john@example.com">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="tech-phone">
+          Phone
+          <input type="tel" id="tech-phone" name="tech_contact_phone" placeholder="+1 (555) 987-6543">
+        </label>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 4: CURRENT DATABASE ENVIRONMENT -->
+  <fieldset>
+    <legend>Current Database Environment</legend>
+
+    <div class="form-group">
+      <label for="current-provider">
+        Current Provider
+        <select id="current-provider" name="current_provider">
+          <option value="">Select provider</option>
+          <option value="heroku">Heroku Postgres</option>
+          <option value="aws-rds">AWS RDS</option>
+          <option value="gcp-cloudsql">GCP Cloud SQL</option>
+          <option value="azure">Azure Database</option>
+          <option value="digitalocean">DigitalOcean Managed DB</option>
+          <option value="self-hosted">Self-hosted</option>
+          <option value="none">No existing database</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="postgres-version">
+          PostgreSQL Version (or other database)
+          <input type="text" id="postgres-version" name="postgres_version" placeholder="PostgreSQL 15, MySQL 8.0, etc.">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="database-size">
+          Database Size (GB)
+          <input type="text" id="database-size" name="database_size" placeholder="50 GB">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="num-databases">
+          Number of Databases
+          <input type="number" id="num-databases" name="num_databases" min="0" placeholder="1">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="avg-connections">
+          Average Connections
+          <input type="number" id="avg-connections" name="avg_connections" min="0" placeholder="50">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="peak-traffic">
+        Peak Traffic Times
+        <input type="text" id="peak-traffic" name="peak_traffic" placeholder="9 AM - 5 PM EST weekdays">
+      </label>
+      <div class="help-text">When does your application experience highest database load?</div>
+    </div>
+
+    <div class="form-group">
+      <label for="performance-requirements">
+        Performance Requirements
+        <textarea id="performance-requirements" name="performance_requirements" rows="3" placeholder="Example: 1000 queries/sec, <100ms response time, 99.9% uptime SLA"></textarea>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 5: MIGRATION DETAILS -->
+  <fieldset>
+    <legend>Migration Details</legend>
+
+    <div class="form-group">
+      <label for="migration-timeline">
+        Migration Timeline
+        <select id="migration-timeline" name="migration_timeline">
+          <option value="">Select timeline</option>
+          <option value="asap">ASAP (within 1 week)</option>
+          <option value="1-2-weeks">1-2 weeks</option>
+          <option value="1-month">Within 1 month</option>
+          <option value="1-3-months">1-3 months</option>
+          <option value="exploring">Just exploring options</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="downtime-window">
+        Acceptable Downtime Window
+        <input type="text" id="downtime-window" name="downtime_window" placeholder="1 hour on Sunday 2-3 AM EST">
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label>
+        Zero-Downtime Requirement?
+      </label>
+      <div class="radio-group">
+        <div class="radio-item">
+          <input type="radio" id="zero-downtime-yes" name="zero_downtime" value="yes">
+          <label for="zero-downtime-yes">Yes - Zero downtime required</label>
+        </div>
+        <div class="radio-item">
+          <input type="radio" id="zero-downtime-no" name="zero_downtime" value="no">
+          <label for="zero-downtime-no">No - Some downtime acceptable</label>
+        </div>
+        <div class="radio-item">
+          <input type="radio" id="zero-downtime-discuss" name="zero_downtime" value="discuss">
+          <label for="zero-downtime-discuss">Let's discuss options</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="data-sensitivity">
+        Data Sensitivity Level
+        <select id="data-sensitivity" name="data_sensitivity">
+          <option value="">Select level</option>
+          <option value="public">Public data</option>
+          <option value="internal">Internal business data</option>
+          <option value="confidential">Confidential data</option>
+          <option value="regulated">Regulated data (HIPAA, PCI, etc.)</option>
+        </select>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 6: SERVICE REQUIREMENTS -->
+  <fieldset>
+    <legend>Service Requirements</legend>
+
+    <div class="form-group">
+      <label for="tier-interest">
+        Tier Interest
+        <select id="tier-interest" name="tier_interest">
+          <option value="">Select tier</option>
+          <option value="shared">Shared - $49/mo (2 vCPU, 4GB RAM, 50GB storage)</option>
+          <option value="dedicated">Dedicated - $89/mo (4 vCPU, 8GB RAM, 200GB storage)</option>
+          <option value="pro">Pro - $129/mo (8 vCPU, 16GB RAM, 500GB storage)</option>
+          <option value="enterprise">Enterprise - $149/mo (16 vCPU, 32GB RAM, 1TB storage)</option>
+          <option value="custom">Custom - Let's discuss</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label>Add-ons Needed (check all that apply)</label>
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <input type="checkbox" id="addon-ha" name="addons[]" value="high-availability">
+          <label for="addon-ha">High Availability (+$99/mo) - Multi-node failover cluster</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="addon-replicas" name="addons[]" value="read-replicas">
+          <label for="addon-replicas">Read Replicas (+$15/mo per replica) - Scale read workloads</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="addon-vpn" name="addons[]" value="vpn">
+          <label for="addon-vpn">VPN Access (+$15/mo) - Private network connectivity</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="addon-compliance" name="addons[]" value="compliance">
+          <label for="addon-compliance">Compliance Package (+$100/mo) - HIPAA, SOC 2, audit logs</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="addon-slack" name="addons[]" value="slack">
+          <label for="addon-slack">Slack Support (+$29/mo) - Direct channel with team</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="infrastructure-pref">
+          Infrastructure Preference
+          <select id="infrastructure-pref" name="infrastructure_preference">
+            <option value="">No preference</option>
+            <option value="contabo">Contabo (default - best value)</option>
+            <option value="hetzner">Hetzner (EU-focused)</option>
+            <option value="digitalocean">DigitalOcean</option>
+            <option value="aws">AWS (premium tier only)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="region-pref">
+          Region Preference
+          <select id="region-pref" name="region_preference">
+            <option value="">Default (US East)</option>
+            <option value="us-east">US East</option>
+            <option value="us-west">US West</option>
+            <option value="eu-central">EU Central (Frankfurt)</option>
+            <option value="asia-pacific">Asia Pacific (Singapore)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 7: COMPLIANCE & SECURITY -->
+  <fieldset>
+    <legend>Compliance & Security</legend>
+
+    <div class="form-group">
+      <label>Compliance Requirements (check all that apply)</label>
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <input type="checkbox" id="compliance-hipaa" name="compliance[]" value="hipaa">
+          <label for="compliance-hipaa">HIPAA - Healthcare data</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="compliance-soc2" name="compliance[]" value="soc2">
+          <label for="compliance-soc2">SOC 2 - Security, availability, confidentiality</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="compliance-gdpr" name="compliance[]" value="gdpr">
+          <label for="compliance-gdpr">GDPR - EU data privacy</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="compliance-pci" name="compliance[]" value="pci">
+          <label for="compliance-pci">PCI-DSS - Payment card data</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="compliance-none" name="compliance[]" value="none">
+          <label for="compliance-none">None - No specific compliance requirements</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="backup-retention">
+          Backup Retention Requirements
+          <select id="backup-retention" name="backup_retention">
+            <option value="30">30 days (default)</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+            <option value="180">180 days</option>
+            <option value="365">1 year</option>
+            <option value="custom">Custom retention period</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="data-residency">
+          Data Residency Requirements
+          <input type="text" id="data-residency" name="data_residency" placeholder="e.g., Must stay in EU, US only, etc.">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="security-certs">
+        Security Certifications Required
+        <textarea id="security-certs" name="security_certifications" rows="2" placeholder="List any required certifications or security standards"></textarea>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 8: BUSINESS DETAILS -->
+  <fieldset>
+    <legend>Business Details</legend>
+
+    <div class="form-group">
+      <label for="referral-source">
+        How did you hear about us?
+        <select id="referral-source" name="referral_source">
+          <option value="">Select source</option>
+          <option value="search">Web search</option>
+          <option value="social">Social media</option>
+          <option value="referral">Referral from colleague</option>
+          <option value="blog">Blog post or article</option>
+          <option value="reddit">Reddit/HackerNews</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="current-spend">
+          Current Monthly Database Spend
+          <input type="text" id="current-spend" name="current_monthly_spend" placeholder="$500/month">
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="budget">
+          Budget for Database Hosting
+          <input type="text" id="budget" name="budget" placeholder="$100-300/month">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="contract-length">
+          Contract Length Preference
+          <select id="contract-length" name="contract_length">
+            <option value="monthly">Monthly (no commitment)</option>
+            <option value="annual">Annual (10% discount)</option>
+            <option value="discuss">Let's discuss</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label for="anticipated-growth">
+          Anticipated Growth (DB size in 12 months)
+          <input type="text" id="anticipated-growth" name="anticipated_growth" placeholder="200 GB">
+        </label>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- SECTION 9: ADDITIONAL INFORMATION -->
+  <fieldset>
+    <legend>Additional Information</legend>
+
+    <div class="form-group">
+      <label for="use-case">
+        Use Case Description
+        <textarea id="use-case" name="use_case" rows="4" placeholder="Tell us about your application and how you use your database. What problem are you solving?"></textarea>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="requirements">
+        Specific Requirements or Questions
+        <textarea id="requirements" name="specific_requirements" rows="4" placeholder="Any special considerations, technical requirements, or questions for us?"></textarea>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="special-considerations">
+        Special Considerations
+        <textarea id="special-considerations" name="special_considerations" rows="3" placeholder="Anything else we should know? (regulatory concerns, unusual workloads, etc.)"></textarea>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- SUBMIT BUTTON -->
+  <button type="submit">Submit Intake Form</button>
+
+  <div class="help-text" style="text-align: center; margin-top: var(--line-height);">
+    By submitting this form, you agree to our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Service</a>.
+  </div>
+
+</form>
+
+<hr>
+
+<footer>
+  <p style="text-align: center;"><strong>CostPlusDB - Customer Intake</strong></p>
+  <p style="text-align: center;">Questions? Email us at <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+  <p style="text-align: center;"><a href="/">← Back to Home</a></p>
+</footer>
+
+<script>
+  // Form validation and submission handler
+  document.getElementById('customer-intake-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get form data
+    const formData = new FormData(this);
+
+    // Convert to JSON for better handling
+    const data = {};
+
+    // Handle regular fields
+    for (let [key, value] of formData.entries()) {
+      if (key.endsWith('[]')) {
+        // Handle checkbox arrays
+        const cleanKey = key.replace('[]', '');
+        if (!data[cleanKey]) {
+          data[cleanKey] = [];
+        }
+        data[cleanKey].push(value);
+      } else {
+        data[key] = value;
+      }
+    }
+
+    // Basic validation
+    const requiredFields = ['company_name', 'primary_contact_name', 'primary_contact_email'];
+    let isValid = true;
+    let firstInvalidField = null;
+
+    requiredFields.forEach(field => {
+      const input = document.querySelector(`[name="${field}"]`);
+      if (!data[field] || data[field].trim() === '') {
+        isValid = false;
+        if (!firstInvalidField) {
+          firstInvalidField = input;
+        }
+        input.style.borderColor = 'red';
+      } else {
+        input.style.borderColor = '';
+      }
+    });
+
+    if (!isValid) {
+      alert('Please fill in all required fields.');
+      if (firstInvalidField) {
+        firstInvalidField.focus();
+        firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.primary_contact_email)) {
+      alert('Please enter a valid email address.');
+      document.getElementById('primary-email').focus();
+      return;
+    }
+
+    // TODO: Replace with actual submission endpoint
+    console.log('Form data:', data);
+
+    // Simulate API call
+    alert('Thank you! Your intake form has been submitted. We will contact you within 24 hours to schedule a consultation.');
+
+    // In production, this would be:
+    /*
+    fetch('/api/intake', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      alert('Thank you! Your intake form has been submitted. We will contact you within 24 hours.');
+      window.location.href = '/thank-you.html';
+    })
+    .catch(error => {
+      alert('There was an error submitting your form. Please try again or email us directly.');
+      console.error('Error:', error);
+    });
+    */
+  });
+
+  // Real-time validation for required fields
+  const requiredInputs = document.querySelectorAll('input[required], select[required]');
+  requiredInputs.forEach(input => {
+    input.addEventListener('blur', function() {
+      if (this.value.trim() === '') {
+        this.style.borderColor = 'red';
+      } else {
+        this.style.borderColor = '';
+      }
+    });
+
+    input.addEventListener('input', function() {
+      if (this.value.trim() !== '') {
+        this.style.borderColor = '';
+      }
+    });
+  });
+
+  // Mutual exclusivity for "none" checkbox in compliance section
+  const complianceNone = document.getElementById('compliance-none');
+  const complianceCheckboxes = document.querySelectorAll('input[name="compliance[]"]:not(#compliance-none)');
+
+  complianceNone?.addEventListener('change', function() {
+    if (this.checked) {
+      complianceCheckboxes.forEach(cb => cb.checked = false);
+    }
+  });
+
+  complianceCheckboxes.forEach(cb => {
+    cb.addEventListener('change', function() {
+      if (this.checked && complianceNone) {
+        complianceNone.checked = false;
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
