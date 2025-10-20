@@ -7,6 +7,7 @@
   <title>Documentation - CostPlusDB</title>
   <meta name="description" content="Complete documentation and answers to common questions about CostPlusDB">
 
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="src/reset.css">
   <link rel="stylesheet" href="src/index.css">
   <link rel="stylesheet" href="src/theme.css">
@@ -69,6 +70,27 @@ Same specs. Same features. 68% cheaper.</p>
 I'm Jeremy - founder, operator, and the person who'll set up your database. Response within 2 hours during business hours.</p>
 
 <p><a href="/">← Back to Home</a></p>
+
+<hr>
+
+<h2>Quick Start (5 Minutes)</h2>
+
+<pre>
+Step 1: Choose your tier
+        <a href="/calculator.html">Use the calculator</a> to pick Shared/Dedicated/Pro/Enterprise
+
+Step 2: Email jeremy@intentsolutions.io
+        Include: tier choice, company name, desired region
+
+Step 3: Get provisioned (24-48 hours)
+        Receive connection details via email
+
+Step 4: Connect your app
+        Standard PostgreSQL connection string provided
+</pre>
+
+<p><strong>Example connection:</strong></p>
+<pre>postgresql://youruser:yourpass@host:5433/yourdb?sslmode=require</pre>
 
 <hr>
 
@@ -196,6 +218,85 @@ I'm Jeremy - founder, operator, and the person who'll set up your database. Resp
 <strong>Phase 2 (12-18 months):</strong> Buy our own servers in a colocation datacenter - your price drops 30-40%<br>
 <strong>Phase 3 (18-36 months):</strong> Multi-region with high-availability across datacenters</p>
 <p><strong>Learn more:</strong> <a href="/about.html#long-term-vision">Long-Term Vision</a> | <a href="/transparency/business-overview.html">Business Plan</a></p>
+</details>
+
+<hr>
+
+<h2>Technical FAQ</h2>
+
+<details>
+<summary><strong>How do I connect from my application?</strong></summary>
+<p>Use the standard PostgreSQL connection string we provide:</p>
+<pre>postgresql://username:password@host:5433/database?sslmode=require</pre>
+<p><strong>Works with:</strong></p>
+<ul>
+<li>Node.js (pg, Sequelize, Prisma, TypeORM)</li>
+<li>Python (psycopg2, SQLAlchemy, Django ORM)</li>
+<li>Ruby (pg gem, ActiveRecord)</li>
+<li>Go (lib/pq, pgx)</li>
+<li>Any PostgreSQL-compatible client</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>Can I migrate from AWS RDS/Heroku/Supabase?</strong></summary>
+<p><strong>Yes. Migration is straightforward:</strong></p>
+<pre>
+# From your old database
+pg_dump -h old-host -U old-user -d old-db -F c -f backup.dump
+
+# To your new CostPlusDB instance
+pg_restore -h new-host -U new-user -d new-db backup.dump
+</pre>
+<p>Email me for migration assistance: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+</details>
+
+<details>
+<summary><strong>What PostgreSQL extensions are supported?</strong></summary>
+<p>All standard extensions included:</p>
+<ul>
+<li><strong>pgvector</strong> - Vector similarity search (for AI/ML)</li>
+<li><strong>PostGIS</strong> - Geographic data types</li>
+<li><strong>pg_cron</strong> - Job scheduling</li>
+<li><strong>uuid-ossp</strong> - UUID generation</li>
+<li><strong>hstore</strong> - Key-value storage</li>
+<li><strong>pg_trgm</strong> - Fuzzy text search</li>
+</ul>
+<p>Need something else? Email me - most extensions can be enabled on request.</p>
+</details>
+
+<details>
+<summary><strong>Do I get superuser access?</strong></summary>
+<p>Yes. You receive superuser credentials to your database.</p>
+<p>This means you can:</p>
+<ul>
+<li>Install extensions</li>
+<li>Create/drop databases</li>
+<li>Manage users and permissions</li>
+<li>Run pg_dump for exports</li>
+<li>Full control over your data</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>How do backups work?</strong></summary>
+<p><strong>Automated daily backups via pgBackRest:</strong></p>
+<ul>
+<li>Full backup: Weekly</li>
+<li>Incremental backup: Daily</li>
+<li>Retention: 30 days</li>
+<li>Point-in-time recovery: 7 days</li>
+<li>Storage: Encrypted in Wasabi S3</li>
+<li>Restoration testing: Monthly (we verify backups work)</li>
+</ul>
+<p>Need a restore? Email me with the date/time you want to restore to.</p>
+</details>
+
+<details>
+<summary><strong>Can I access the server directly via SSH?</strong></summary>
+<p><strong>No.</strong> Direct SSH access is not provided for security reasons.</p>
+<p>You have full PostgreSQL access via standard database connections. This is sufficient for all database operations.</p>
+<p>If you need custom server configuration, email me to discuss: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <hr>
