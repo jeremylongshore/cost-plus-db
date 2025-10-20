@@ -58,23 +58,138 @@
 <li>Principle of least privilege</li>
 </ul>
 
-<h3>Backup Security</h3>
+<h3>Backup Security & Transparency</h3>
+
+<p><strong>Backup Schedule:</strong> Daily automated backups at 1 AM CT</p>
+
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backup Tool</td>
+<td>pgBackRest (industry standard)</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>AES-256-CBC encryption on all backups</td>
+</tr>
+<tr>
+<td>Local Storage</td>
+<td>/var/lib/pgbackrest (primary backup location)</td>
+</tr>
+<tr>
+<td>Cloud Storage</td>
+<td>Wasabi S3 (us-east-1) - multi-region redundancy</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>30 days rolling (1 backup per day, oldest deleted automatically)</td>
+</tr>
+<tr>
+<td>Point-in-Time Recovery</td>
+<td>7 days of WAL archives for transaction-level restore</td>
+</tr>
+<tr>
+<td>Restoration Testing</td>
+<td>Regular restoration tests to verify backups actually work</td>
+</tr>
+<tr>
+<td>Recovery Time</td>
+<td>Full restore: ~15-30 minutes depending on database size</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>What this means for you:</strong></p>
 <ul>
-<li>Encrypted backups with pgBackRest</li>
-<li>Multi-region redundancy (Wasabi S3)</li>
-<li>30-day retention</li>
-<li>Point-in-time recovery (7 days)</li>
-<li>Regular restoration testing to verify backups work</li>
+<li>Your data is backed up every single day automatically</li>
+<li>We keep 30 days of backups (you can restore from any day in the past month)</li>
+<li>All backups are encrypted before storage (even we can't read them without the key)</li>
+<li>Backups are stored in 2 locations (local server + cloud S3)</li>
+<li>If your database is corrupted at 2 PM today, we can restore it to 1:59 PM (point-in-time recovery)</li>
+<li>We regularly test restores to ensure backups actually work when needed</li>
 </ul>
 
-<h3>Monitoring & Response</h3>
+<h3>Automated Monitoring & Alerts</h3>
+
+<p>Our security monitoring runs automatically 24/7. Here's exactly what's monitored and when:</p>
+
+<table>
+<thead>
+<tr>
+<th>Monitor</th>
+<th>Frequency</th>
+<th>Alert Trigger</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Failed Login Attempts</td>
+<td>Every 5 minutes</td>
+<td>&gt;5 failed PostgreSQL logins</td>
+<td>Email alert + log IP addresses</td>
+</tr>
+<tr>
+<td>Disk Space</td>
+<td>Every 15 minutes</td>
+<td>&gt;85% usage</td>
+<td>Email alert to operator</td>
+</tr>
+<tr>
+<td>Memory Usage</td>
+<td>Every 15 minutes</td>
+<td>&gt;90% usage</td>
+<td>Email alert to operator</td>
+</tr>
+<tr>
+<td>SSL Certificate Expiry</td>
+<td>Every 6 hours</td>
+<td>&lt;30 days until expiry</td>
+<td>Email warning to renew</td>
+</tr>
+<tr>
+<td>Security Events</td>
+<td>Every hour</td>
+<td>fail2ban bans, suspicious queries, SSH failures</td>
+<td>Email alert with details</td>
+</tr>
+<tr>
+<td>Backup Verification</td>
+<td>Daily at 2:05 AM</td>
+<td>Backup fails or missing</td>
+<td>Email alert + investigation</td>
+</tr>
+<tr>
+<td>Security Hardening Score</td>
+<td>1st of month at 3 AM</td>
+<td>Lynis score &lt;70</td>
+<td>Email report + remediation</td>
+</tr>
+<tr>
+<td>Uptime</td>
+<td>Every 30 seconds</td>
+<td>Service unreachable</td>
+<td>SMS + email to operator</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>All alerts include:</strong></p>
 <ul>
-<li>24/7 uptime monitoring (Betterstack)</li>
-<li>Automated alerts for issues</li>
-<li>Daily backup verification</li>
-<li>Weekly security patches</li>
-<li>Incident response procedures documented</li>
+<li>Detailed description of the issue</li>
+<li>Server hostname and IP address</li>
+<li>Timestamp of detection</li>
+<li>Recommended actions</li>
+<li>Direct contact information</li>
 </ul>
+
+<p><strong>Alert delivery:</strong> Real-time email alerts via Resend API to operator. Customer notifications sent within minutes of detection for critical issues (P0/P1).</p>
 
 <hr>
 
