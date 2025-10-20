@@ -48,6 +48,67 @@ a:link, a:visited {
   text-align: center;
 }
 
+/* Pages Section - Hard-Right Aligned Navigation */
+.pages-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: calc(var(--line-height) * 2) 0;
+}
+
+.pages-section h2 {
+  text-align: center;
+  margin-bottom: var(--line-height);
+}
+
+.nav-links-container {
+  width: 70ch;
+  max-width: 100%;
+}
+
+.nav-line {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: calc(var(--line-height) / 2);
+  line-height: var(--line-height);
+}
+
+.nav-line::before {
+  content: '..............................................................................';
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  z-index: 1;
+  color: var(--text-color-alt);
+  pointer-events: none;
+}
+
+.nav-line a {
+  flex-shrink: 0;
+  z-index: 2;
+  background: var(--background-color);
+  padding-right: 2px;
+  position: relative;
+}
+
+.nav-line .desc {
+  text-align: right;
+  flex-shrink: 0;
+  z-index: 2;
+  background: var(--background-color);
+  padding-left: 2px;
+  position: relative;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .nav-links-container {
+    width: 90%;
+  }
+}
+
 /* Navigation styling */
 nav ul {
   list-style: none;
