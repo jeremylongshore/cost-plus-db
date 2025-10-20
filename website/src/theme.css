@@ -65,6 +65,7 @@ a:link, a:visited {
   border-collapse: collapse;
   width: 70ch;
   max-width: 100%;
+  table-layout: fixed;
 }
 
 .toc-table tr {
@@ -74,24 +75,26 @@ a:link, a:visited {
 .toc-table td {
   border: none;
   padding: 0;
+  vertical-align: bottom;
+  line-height: 1.8;
 }
 
 .toc-table td:first-child {
   text-align: left;
   white-space: nowrap;
-  padding-right: 4px;
+  width: auto;
 }
 
 .toc-table td:nth-child(2) {
   width: 100%;
-  border-bottom: 2px dotted var(--text-color-alt);
-  padding: 0 4px;
+  border-bottom: 3px dotted var(--text-color-alt);
+  height: 1px;
 }
 
 .toc-table td:last-child {
   text-align: right;
   white-space: nowrap;
-  padding-left: 4px;
+  width: auto;
 }
 
 .toc-table a {
