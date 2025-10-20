@@ -65,6 +65,10 @@ beforeAll(async () => {
  * Cleanup after each test
  */
 afterEach(() => {
+  if (!testDb) {
+    return;
+  }
+
   // Clear all tables between tests (maintain schema)
   const tables = ['activity_log', 'support_tickets', 'billing_records', 'customer_databases', 'customers'];
 
