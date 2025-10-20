@@ -992,22 +992,84 @@ echo "✅ Rollback complete"
 
 ---
 
-## Future Automation
+## Backend API Integration
 
-**Month 3:**
-- Script to automate Steps 1-17
-- Single command: `provision-customer.sh {customer-id}`
-- Interactive prompts for safety checks
+**As of 2025-10-20, backend automation is implemented:**
+
+### API Endpoints for Provisioning
+
+The CostPlusDB backend API now provides programmatic customer management:
+
+**List Customers:**
+```bash
+GET /api/customers
+# Filter by status, tier, pagination support
+```
+
+**Get Customer Details:**
+```bash
+GET /api/customers/:id
+# Retrieve customer information for provisioning
+```
+
+**Update Customer Status:**
+```bash
+PATCH /api/customers/:id
+# Update status from 'approved' to 'provisioning' to 'active'
+```
+
+**Reference:** See `backend/docs/API.md` for complete API documentation.
+
+### Automated Workflows
+
+**1. Customer Intake → Database Record:**
+- Customer submits intake form via website
+- POST /api/intake creates customer record with status='prospect'
+- Auto-confirmation email sent via Resend
+- Admin notified of new customer
+
+**2. Approval → Payment Link:**
+- Admin reviews customer via API
+- Stripe payment link generated
+- Customer receives payment link via email
+- Payment webhook updates status to 'approved'
+
+**3. Provisioning → Credentials Delivery:**
+- Manual database provisioning (this SOP)
+- Update status via API: PATCH /api/customers/:id → 'active'
+- Credentials sent via Resend email service
+- Customer receives setup confirmation
+
+### Integration Scripts
+
+**Location:** `backend/src/scripts/`
+
+**Available Scripts:**
+```bash
+# Initialize database
+npm run db:init
+
+# Run migrations
+npm run db:migrate
+
+# Seed development data
+npm run db:seed
+
+# Sync to Turso Cloud (optional)
+npm run db:sync
+```
+
+### Future Full Automation
 
 **Month 6:**
-- Web dashboard for provisioning
+- Automated database provisioning script integrated with API
 - One-click provisioning after payment confirmed
-- Automatic credential email generation
+- Automatic credential generation and email delivery
 
 **Month 12:**
 - Full self-service customer provisioning
-- API endpoint for programmatic provisioning
-- Integration with billing system
+- Multi-database support per customer
+- Advanced provisioning options (extensions, custom config)
 
 ---
 

@@ -10,35 +10,50 @@
 import { Router } from 'express';
 import { logger } from '../../utils/logger.js';
 
+// Import route modules
+import intakeRoutes from './intake.routes.js';
+import webhooksRoutes from './webhooks.routes.js';
+import customersRoutes from './customers.routes.js';
+import adminRoutes from './admin.routes.js';
+
 const router = Router();
 
 /**
- * API routes will be registered here
- *
- * TODO: Import and register route modules:
- * - import intakeRoutes from './intake.routes.js';
- * - import webhooksRoutes from './webhooks.routes.js';
- * - import customersRoutes from './customers.routes.js';
+ * Health check route
  */
-
-// Health check route (already defined in app.ts, but here for API versioning)
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({
+    success: true,
     status: 'healthy',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
+    endpoints: {
+      intake: '/api/intake',
+      webhooks: '/api/webhooks',
+      customers: '/api/customers',
+      admin: '/api/admin',
+    },
   });
 });
 
 /**
- * TODO: Register route modules
- *
- * Example:
- * router.use('/intake', intakeRoutes);
- * router.use('/webhooks', webhooksRoutes);
- * router.use('/customers', customersRoutes);
+ * Register route modules
  */
 
-logger.info('API routes registered');
+// Customer intake form (public)
+router.use('/intake', intakeRoutes);
+
+// Webhooks from external services (public, but signature-verified)
+router.use('/webhooks', webhooksRoutes);
+
+// Customer management (requires authentication)
+router.use('/customers', customersRoutes);
+
+// Administrative operations (requires admin authentication)
+router.use('/admin', adminRoutes);
+
+logger.info('API routes registered', {
+  routes: ['/intake', '/webhooks', '/customers', '/admin'],
+});
 
 export default router;

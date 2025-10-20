@@ -11,7 +11,7 @@
 
 import { CustomersRepository } from '../database/repositories/customers.repository.js';
 import { Customer, CustomerCreateInput, CustomerStatus } from '../database/schema.js';
-import { ConflictError, NotFoundError } from '../utils/errors.js';
+import { ConflictError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -141,8 +141,8 @@ export class CustomerService {
     const offset = (page - 1) * limit;
 
     const customers = await this.customersRepo.list({
-      status: filters?.status,
-      tier: filters?.tier,
+      ...(filters?.status && { status: filters.status }),
+      ...(filters?.tier && { tier: filters.tier }),
       limit,
       offset,
     });

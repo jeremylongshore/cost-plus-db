@@ -798,22 +798,83 @@ sudo -u postgres pgbackrest info --stanza=main | grep -A 5 "$CUSTOMER_DB"
 
 ---
 
-## Future Improvements
+## Backend Automation (As of 2025-10-20)
 
-**Month 3:**
-- Automate customer directory creation (script)
-- Automate setup confirmation generation (script)
-- Create onboarding dashboard (track status)
+The CostPlusDB backend now provides API-driven automation for customer onboarding:
+
+### Current Automation
+
+**Customer Intake API:**
+```bash
+POST /api/intake
+# Creates customer record, sends confirmation emails
+# Status: 'prospect'
+```
+
+**Customer Management API:**
+```bash
+GET /api/customers              # List all customers
+GET /api/customers/:id          # Get customer details
+PATCH /api/customers/:id        # Update customer (status, tier, etc.)
+DELETE /api/customers/:id       # Delete customer (GDPR)
+GET /api/customers/statistics   # Dashboard metrics
+```
+
+**Integration Services:**
+- **Email (Resend):** Automated intake confirmations, credentials delivery
+- **Payments (Stripe):** Payment link generation, webhook processing
+- **Database (Turso):** Optional cloud sync for edge replication
+
+**Timelines with Automation:**
+
+| Stage | Manual Process | With API Automation | Time Saved |
+|-------|---------------|---------------------|------------|
+| Intake Form Submission | Manual email check | Instant API record | 100% |
+| Confirmation Email | Manual send | Auto-send via Resend | 100% |
+| Customer Record Creation | Manual entry | API creates record | 100% |
+| Status Tracking | Spreadsheet/notes | Database + API queries | 90% |
+| Payment Processing | Manual invoicing | Stripe webhooks | 80% |
+
+**Updated Workflow with Backend:**
+
+1. **Customer submits form** → API creates record (instant)
+2. **Auto-confirmation email** → Resend sends (instant)
+3. **Admin notification** → Email to admin (instant)
+4. **Admin reviews** → Query via API (10 seconds)
+5. **Payment link sent** → Stripe payment link (30 seconds)
+6. **Payment webhook** → Auto-update status (instant)
+7. **Database provisioning** → Manual (this is next to automate)
+8. **Credentials delivery** → Resend email (instant)
+
+**Time to Live Database (with automation):**
+- Best case: 2-4 hours (was 4 hours)
+- Typical: 12-24 hours (was 30 hours)
+- Worst case: 36-48 hours (was 67 hours)
+
+### Documentation References
+
+**Backend Setup and Development:**
+- `043-DR-GUID-local-development-setup.md` - Local dev environment
+- `044-DR-GUID-production-deployment.md` - VPS deployment
+- `045-DR-GUID-cloudflare-workers-deployment.md` - Edge deployment
+- `backend/docs/API.md` - Complete API reference
+
+**Integration Guides:**
+- `046-DR-GUID-resend-email-integration.md` - Email automation
+- `047-DR-GUID-stripe-payment-integration.md` - Payment automation
+- `048-DR-GUID-turso-cloud-integration.md` - Database cloud sync
+
+### Future Improvements
 
 **Month 6:**
-- Self-service onboarding portal
-- Automatic database provisioning (after payment confirmed)
-- Slack bot for onboarding status notifications
+- Automated database provisioning script (integrate with API)
+- Self-service customer portal
+- Real-time onboarding dashboard
 
 **Month 12:**
+- Full end-to-end automation (form → live database)
 - Multi-database support per customer
-- Automated data migration tools
-- Onboarding analytics dashboard
+- Advanced analytics and reporting
 
 ---
 

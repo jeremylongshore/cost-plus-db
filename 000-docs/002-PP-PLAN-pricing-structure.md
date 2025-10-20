@@ -98,6 +98,13 @@ Hetzner (+$20/month)
 ├─ Your price: +$20/month (cost × 0.43 markup)
 └─ Best for: Developer favorite, EU compliance
 
+Rumble Cloud (+$80/month) [IN EVALUATION - Q2 2026]
+├─ Location: United States (multiple regions)
+├─ Our cost: $90/month (includes 1TB backup storage)
+├─ Your price: +$80/month (cost × 0.89 markup)
+├─ Best for: Anti-Big-Tech, transparent fixed pricing
+└─ Note: Testing phase - available after service matures
+
 DigitalOcean (+$40/month)
 ├─ Location: 14 regions worldwide
 ├─ Our cost: $62/month
@@ -129,6 +136,8 @@ Region Selection (+$10/month)
 - **Day 1:** Contabo + Hetzner available
 - **Month 2-3:** Add DigitalOcean
 - **Month 4-6:** Add AWS/GCP
+- **Month 6-12:** Internal testing of Rumble Cloud
+- **Q2 2026:** Rumble Cloud available to customers (if testing successful)
 
 ---
 
