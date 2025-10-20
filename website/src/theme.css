@@ -4,60 +4,25 @@
  * Based on The Monospace Web by Oskar Wickström
  * https://github.com/owickstrom/the-monospace-web
  *
- * Using OG Courier font by Darren Embry
- * https://github.com/dse/font-og-courier
+ * Strict black and white theme
  */
 
-/* OG Courier Font */
-@font-face {
-  font-family: 'OG Courier';
-  src: url('/fonts/og-courier/OGCourierZeroSlash.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'OG Courier';
-  src: url('/fonts/og-courier/OGCourierZeroSlash-Bold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'OG Courier';
-  src: url('/fonts/og-courier/OGCourierZeroSlash-Italic.woff2') format('woff2');
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'OG Courier';
-  src: url('/fonts/og-courier/OGCourierZeroSlash-BoldItalic.woff2') format('woff2');
-  font-weight: bold;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Override colors and font */
+/* Override to strict black and white */
 :root {
-  --font-family: 'OG Courier', 'Courier New', monospace;
-  --background-color: #0f62fe;
-  --text-color: #ffffff;
-  --text-color-alt: rgba(255, 255, 255, 0.7);
-  --background-color-alt: #0353e9;
-  --border-thickness: 1px;
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --text-color-alt: #666666;
+  --background-color-alt: #eeeeee;
+  --border-thickness: 2px;
 }
 
-/* Force theme (no dark mode detection) */
+/* Dark mode: white text on black background */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #0f62fe;
+    --background-color: #000000;
     --text-color: #ffffff;
-    --text-color-alt: rgba(255, 255, 255, 0.7);
-    --background-color-alt: #0353e9;
+    --text-color-alt: #aaaaaa;
+    --background-color-alt: #111111;
   }
 }
 
