@@ -1,0 +1,79 @@
+# ===================================
+# CostPlusDB - Security .gitignore
+# ===================================
+# This file prevents accidental commits of secrets and sensitive data.
+
+# === SECRETS & CREDENTIALS ===
+# API Keys and Tokens
+001-security/keys/
+*.key
+*-credentials
+*-credentials.txt
+api-key*
+*.token
+*.pem
+*.crt
+*.csr
+
+# Backup encryption
+master.key
+encryption-key*
+*passphrase*
+
+# Configuration files with real credentials
+001-security/config/backup/pgbackrest.conf
+001-security/config/fail2ban/jail.local
+
+# Customer data (PII, passwords, database credentials)
+001-security/customers/
+
+# === LOGS (may contain sensitive data) ===
+001-security/logs/
+logs/
+*.log
+
+# === ENVIRONMENT & CONFIG ===
+.env
+.env.*
+!.env.example
+
+# === CLAUDE CODE ===
+.claude/
+
+# === TEMPORARY FILES ===
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# === NODE/NPM ===
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# === PYTHON ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.Python
+
+# === BUILD/DEPLOY ===
+dist/
+build/
+*.egg-info/
+
+# === EDITOR/IDE ===
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# === OS FILES ===
+.DS_Store
+Thumbs.db
+desktop.ini
