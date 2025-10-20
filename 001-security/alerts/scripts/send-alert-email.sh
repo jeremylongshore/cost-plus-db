@@ -46,7 +46,7 @@ EMAILEND
 fi
 
 # Build email HTML body (compact, no newlines for JSON)
-EMAIL_HTML="<h2>CostPlusDB Security Alert</h2><p><strong>Subject:</strong> $SUBJECT</p><hr><p>$MESSAGE</p><hr><p><small>Automated alert from CostPlusDB Security Monitoring System<br>Server: $(hostname)<br>IP: $(hostname -I | awk '{print $1}')<br>Timestamp: $(date)<br><br>For security issues, contact: jeremy@intentsolutions.io</small></p>"
+EMAIL_HTML="<h2>CostPlusDB Security Alert</h2><p><strong>Subject:</strong> $SUBJECT</p><hr><p>$MESSAGE</p><hr><p><small>Automated alert from CostPlusDB Security Monitoring System<br>Server: $(hostname)<br>Timestamp: $(date)<br><br>For security issues, contact: jeremy@intentsolutions.io</small></p>"
 
 # Escape quotes in HTML for JSON
 EMAIL_HTML_ESCAPED=$(echo "$EMAIL_HTML" | sed 's/"/\\"/g')
