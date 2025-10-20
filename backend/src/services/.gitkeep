@@ -1,0 +1,12 @@
+# Services Directory
+
+This directory contains business logic layer implementations.
+
+Service files implement the core business logic:
+- customer.service.ts - Customer operations and workflows
+- provisioning.service.ts - Database provisioning logic
+- billing.service.ts - Billing calculations and management
+- email.service.ts - Email sending via Resend
+- stripe.service.ts - Stripe payment integration
+
+Services orchestrate repositories and external services.

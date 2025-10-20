@@ -1,0 +1,10 @@
+# Validators Directory
+
+This directory contains Zod schema validators for request validation.
+
+Validator files define schemas for:
+- intake-form.validator.ts - Customer intake form validation
+- customer.validator.ts - Customer update validation
+- webhook.validator.ts - Stripe webhook event validation
+
+All input validation should use Zod schemas for type safety.

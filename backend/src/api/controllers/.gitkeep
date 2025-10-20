@@ -1,0 +1,10 @@
+# Controllers Directory
+
+This directory contains HTTP request handlers (route controllers).
+
+Controller files handle API endpoints:
+- intake.controller.ts - Handle intake form submissions
+- webhook.controller.ts - Handle Stripe webhooks
+- customer.controller.ts - Handle customer CRUD operations
+
+Controllers should be thin and delegate business logic to services.

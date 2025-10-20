@@ -1,0 +1,66 @@
+{
+  "name": "costplusdb-backend",
+  "version": "1.0.0",
+  "description": "CostPlusDB Backend - Transparent managed PostgreSQL service",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:watch": "vitest watch",
+    "db:init": "tsx src/scripts/init-database.ts",
+    "db:migrate": "tsx src/database/migrations/migrate.ts",
+    "db:seed": "tsx src/scripts/seed-dev-data.ts",
+    "db:sync": "tsx src/scripts/sync-to-turso.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "postgresql",
+    "database",
+    "managed-db",
+    "transparent-pricing"
+  ],
+  "author": "Jeremy Longshore <jeremy@intentsolutions.io>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.18.0",
+    "better-sqlite3": "^9.2.0",
+    "@libsql/client": "^0.4.0",
+    "zod": "^3.22.0",
+    "dotenv": "^16.3.0",
+    "resend": "^2.0.0",
+    "stripe": "^14.0.0",
+    "argon2": "^0.31.0",
+    "winston": "^3.11.0",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.1.0",
+    "express-async-errors": "^3.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.10.0",
+    "@types/express": "^4.17.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/cors": "^2.8.0",
+    "vitest": "^1.0.0",
+    "supertest": "^6.3.0",
+    "@types/supertest": "^6.0.0",
+    "playwright": "^1.40.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

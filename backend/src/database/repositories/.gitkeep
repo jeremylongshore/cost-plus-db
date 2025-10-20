@@ -1,0 +1,11 @@
+# Repositories Directory
+
+This directory contains data access layer (DAL) implementations.
+
+Each repository handles database operations for a specific table/entity:
+- customers.repository.ts
+- databases.repository.ts
+- billing.repository.ts
+- support.repository.ts
+
+Repositories follow the repository pattern and should NOT contain business logic.
