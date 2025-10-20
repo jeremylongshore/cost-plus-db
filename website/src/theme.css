@@ -48,7 +48,7 @@ a:link, a:visited {
   text-align: center;
 }
 
-/* Pages Section - Table of Contents */
+/* Pages Section - Simple Navigation */
 .pages-section {
   text-align: center;
   margin: calc(var(--line-height) * 2) 0;
@@ -58,59 +58,32 @@ a:link, a:visited {
   margin-bottom: calc(var(--line-height) * 1.5);
 }
 
-.toc-table {
+.nav-simple {
+  display: inline-block;
+  text-align: left;
   font-family: var(--font-family);
   font-size: 18px;
-  margin: 0 auto;
-  border-collapse: collapse;
-  width: 70ch;
-  max-width: 100%;
-  table-layout: fixed;
-}
-
-.toc-table tr {
-  height: 2em;
-}
-
-.toc-table td {
-  border: none;
-  padding: 0;
-  vertical-align: bottom;
   line-height: 1.8;
+  white-space: pre;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
-.toc-table td:first-child {
-  text-align: left;
-  white-space: nowrap;
-  width: auto;
-}
-
-.toc-table td:nth-child(2) {
-  width: 100%;
-  border-bottom: 3px dotted var(--text-color-alt);
-  height: 1px;
-}
-
-.toc-table td:last-child {
-  text-align: right;
-  white-space: nowrap;
-  width: auto;
-}
-
-.toc-table a {
+.nav-simple a {
   color: var(--text-color);
   text-decoration: underline;
 }
 
-.toc-table a:hover {
+.nav-simple a:hover {
   text-decoration: none;
 }
 
 /* Responsive */
 @media screen and (max-width: 768px) {
-  .toc-table {
+  .nav-simple {
     font-size: 14px;
-    width: 95%;
   }
 }
 
