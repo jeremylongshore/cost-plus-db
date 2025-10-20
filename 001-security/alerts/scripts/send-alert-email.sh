@@ -51,11 +51,11 @@ EMAIL_HTML="<h2>CostPlusDB Security Alert</h2><p><strong>Subject:</strong> $SUBJ
 # Escape quotes in HTML for JSON
 EMAIL_HTML_ESCAPED=$(echo "$EMAIL_HTML" | sed 's/"/\\"/g')
 
-# Send via Resend API with inline JSON
+# Send via Resend API with inline JSON (using display name "CostPlusDB")
 RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "https://api.resend.com/emails" \
   -H "Authorization: Bearer $RESEND_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"from\":\"$RESEND_FROM_EMAIL\",\"to\":[\"$RESEND_TO_EMAIL\"],\"subject\":\"[CostPlusDB] $SUBJECT\",\"html\":\"$EMAIL_HTML_ESCAPED\"}")
+  -d "{\"from\":\"CostPlusDB <$RESEND_FROM_EMAIL>\",\"to\":[\"$RESEND_TO_EMAIL\"],\"subject\":\"[CostPlusDB] $SUBJECT\",\"html\":\"$EMAIL_HTML_ESCAPED\"}")
 
 HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
 RESPONSE_BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
