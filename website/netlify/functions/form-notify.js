@@ -255,10 +255,23 @@ exports.handler = async (event) => {
 
   try {
     // Parse the Netlify form submission payload
-    const payload = JSON.parse(event.body);
+    // Netlify sends URL-encoded form data, not JSON
+    let formData = {};
 
-    // Extract form data
-    const formData = payload.data || payload;
+    // Check if it's JSON or URL-encoded
+    const contentType = event.headers['content-type'] || '';
+
+    if (contentType.includes('application/json')) {
+      // JSON format (webhook/direct submission)
+      const payload = JSON.parse(event.body);
+      formData = payload.data || payload;
+    } else {
+      // URL-encoded format (standard Netlify Forms submission)
+      const params = new URLSearchParams(event.body);
+      for (const [key, value] of params.entries()) {
+        formData[key] = value;
+      }
+    }
 
     console.log('📝 Form submission received:', {
       form: payload.form_name || 'unknown',
