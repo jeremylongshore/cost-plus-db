@@ -13,8 +13,14 @@ const https = require('https');
  * Send email via Resend API
  */
 async function sendResendEmail(formData) {
+  // Check if API key is configured
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.includes('placeholder')) {
+    console.log('⚠️ RESEND_API_KEY not configured, skipping email notification');
+    throw new Error('RESEND_API_KEY not configured');
+  }
+
   const emailData = JSON.stringify({
-    from: 'CostPlusDB Alerts <costplusdb@intentsolutions.io>',
+    from: 'CostPlusDB Alerts <alerts@intentsolutions.io>',
     to: ['jeremy@intentsolutions.io'],
     subject: '🔔 New Consultation Request - CostPlusDB',
     html: `
@@ -110,8 +116,14 @@ async function sendResendEmail(formData) {
           console.log('✅ Email sent via Resend:', data);
           resolve(JSON.parse(data));
         } else {
-          console.error('❌ Resend API error:', res.statusCode, data);
-          reject(new Error(`Resend API error: ${res.statusCode}`));
+          console.error('❌ Resend API error:', {
+            statusCode: res.statusCode,
+            response: data,
+            apiKey: process.env.RESEND_API_KEY ? 'configured' : 'missing',
+            from: 'alerts@intentsolutions.io',
+            to: 'jeremy@intentsolutions.io'
+          });
+          reject(new Error(`Resend API error: ${res.statusCode} - ${data}`));
         }
       });
     });
@@ -289,7 +301,10 @@ exports.handler = async (event) => {
     if (emailResult.status === 'fulfilled') {
       console.log('✅ Email notification sent successfully');
     } else {
-      console.error('❌ Email notification failed:', emailResult.reason);
+      console.error('❌ Email notification failed:', {
+        reason: emailResult.reason?.message || emailResult.reason,
+        stack: emailResult.reason?.stack
+      });
     }
 
     if (slackResult.status === 'fulfilled') {
