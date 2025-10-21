@@ -103,6 +103,21 @@ Step 4: Connect your app
 <p><strong>Proof:</strong> Every invoice shows you my exact infrastructure costs. <a href="/transparency/">See our transparency docs</a>.</p>
 </details>
 
+<details open>
+<summary><strong>Do you handle data migration?</strong></summary>
+<p><strong>No - you migrate your data using standard PostgreSQL tools (pg_dump/pg_restore).</strong></p>
+<p><strong>What we provide:</strong></p>
+<ul>
+<li>Step-by-step migration guides for AWS, Heroku, Railway, Supabase</li>
+<li>Connection credentials and examples</li>
+<li>Email support during your migration</li>
+</ul>
+<p><strong>What you handle:</strong> Running the export/import commands and verifying data integrity.</p>
+<p>Most technical founders complete this in 20-60 minutes. <strong>This self-service approach is why we're $89/month instead of $280/month.</strong></p>
+<p><strong>Want hands-off migration?</strong> Professional migration service available: $500 flat fee (any database size).</p>
+<p>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+</details>
+
 <details>
 <summary><strong>What if you go out of business?</strong></summary>
 <p><strong>You own your data.</strong> You have full database access (superuser credentials). Export your data anytime with pg_dump.</p>
@@ -241,7 +256,7 @@ Step 4: Connect your app
 
 <details>
 <summary><strong>Can I migrate from AWS RDS/Heroku/Supabase?</strong></summary>
-<p><strong>Yes. Migration is straightforward:</strong></p>
+<p><strong>Yes. You handle the migration using standard PostgreSQL tools.</strong></p>
 <pre>
 # From your old database
 pg_dump -h old-host -U old-user -d old-db -F c -f backup.dump
@@ -249,7 +264,15 @@ pg_dump -h old-host -U old-user -d old-db -F c -f backup.dump
 # To your new CostPlusDB instance
 pg_restore -h new-host -U new-user -d new-db backup.dump
 </pre>
-<p>Email me for migration assistance: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+<p><strong>What we provide:</strong></p>
+<ul>
+<li>Step-by-step migration guides for common providers (AWS, Heroku, Railway, Supabase)</li>
+<li>Connection credentials and pg_dump/restore examples</li>
+<li>Email support during your migration</li>
+</ul>
+<p><strong>What you handle:</strong> Running the export/import commands and verifying data integrity.</p>
+<p>Most technical founders complete this in 20-60 minutes. This self-service approach is why we're $89/month instead of $280/month.</p>
+<p><strong>Want hands-off migration?</strong> Professional migration service available: $500 (any database size). Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <details>
@@ -331,10 +354,10 @@ pg_restore -h new-host -U new-user -d new-db backup.dump
 <p>Yes. If you're coming from AWS RDS, Heroku Postgres, or another PostgreSQL provider:</p>
 <ol>
 <li>I'll provision your new database</li>
-<li>You can use pg_dump/pg_restore to migrate</li>
-<li>I can assist during your migration window</li>
+<li>You use pg_dump/pg_restore to migrate your data</li>
+<li>I provide migration guides and answer questions via email</li>
 </ol>
-<p>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a> to discuss migration assistance.</p>
+<p><strong>Migration service:</strong> Need hands-off migration? Professional service available for $500. Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <hr>
