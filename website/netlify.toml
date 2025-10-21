@@ -3,6 +3,37 @@
 [build]
   publish = "."
 
+# ============================================================================
+# NETLIFY FUNCTIONS
+# ============================================================================
+[functions]
+  directory = "netlify/functions"
+
+# ============================================================================
+# FORM NOTIFICATIONS (via Netlify Event + Resend API + Slack)
+# ============================================================================
+# Automatically trigger notification function when form is submitted
+
+# Netlify will automatically call /.netlify/functions/form-notify
+# when the consultation-request form is submitted
+
+# SETUP REQUIRED (in Netlify Dashboard UI):
+# 1. Go to: Site settings → Build & deploy → Environment variables
+# 2. Add variable: RESEND_API_KEY = your_resend_api_key (you already have this!)
+# 3. (Optional) Add variable: SLACK_WEBHOOK_URL = https://hooks.slack.com/services/...
+
+# To create Slack webhook:
+# - Go to: https://api.slack.com/apps → Create New App → Incoming Webhooks
+# - Enable webhooks, add to workspace, copy URL
+# - Paste URL into SLACK_WEBHOOK_URL environment variable
+
+# To trigger function on form submission, add to form HTML:
+# <form name="consultation-request" method="POST"
+#       netlify-honeypot="bot-field"
+#       action="/.netlify/functions/form-notify">
+#   ...
+# </form>
+
 # Form submission success redirect
 [[redirects]]
   from = "/database-request"

@@ -11,6 +11,7 @@ import { Router } from 'express';
 import { logger } from '../../utils/logger.js';
 
 // Import route modules
+import authRoutes from './auth.routes.js';
 import intakeRoutes from './intake.routes.js';
 import webhooksRoutes from './webhooks.routes.js';
 import customersRoutes from './customers.routes.js';
@@ -28,6 +29,7 @@ router.get('/health', (_req, res) => {
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     endpoints: {
+      auth: '/api/auth',
       intake: '/api/intake',
       webhooks: '/api/webhooks',
       customers: '/api/customers',
@@ -39,6 +41,9 @@ router.get('/health', (_req, res) => {
 /**
  * Register route modules
  */
+
+// Authentication routes (public - login, logout, token refresh)
+router.use('/auth', authRoutes);
 
 // Customer intake form (public)
 router.use('/intake', intakeRoutes);
@@ -53,7 +58,7 @@ router.use('/customers', customersRoutes);
 router.use('/admin', adminRoutes);
 
 logger.info('API routes registered', {
-  routes: ['/intake', '/webhooks', '/customers', '/admin'],
+  routes: ['/auth', '/intake', '/webhooks', '/customers', '/admin'],
 });
 
 export default router;

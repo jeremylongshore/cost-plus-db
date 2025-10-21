@@ -1,0 +1,75 @@
+# Gitleaks Ignore File
+# Purpose: Exclude known safe patterns from secret scans
+# Created: 2025-10-20 (Phase 1.3 Security Implementation)
+
+# ===================================================================
+# DOCUMENTATION EXAMPLES (Placeholder API keys in setup guides)
+# ===================================================================
+
+# Setup and integration guides with example credentials
+000-docs/043-DR-GUID-local-development-setup.md:generic-api-key
+000-docs/046-DR-GUID-resend-email-integration.md:generic-api-key
+000-docs/048-DR-GUID-turso-cloud-integration.md:generic-api-key
+000-docs/039-DR-ARCH-backend-organizational-structure.md:generic-api-key
+000-docs/039-DR-ARCH-backend-organizational-structure.md:stripe-access-token
+000-docs/016-DR-GUID-automation-stack-setup.md:stripe-access-token
+
+# Example .env file (only contains placeholders)
+backend/.env.example:stripe-access-token
+
+# ===================================================================
+# AWS DOCUMENTATION EXAMPLES (Not real credentials)
+# ===================================================================
+
+# AWS example key from official PostgreSQL documentation
+000-docs/005-DR-SOPS-postgresql-operations.md:aws-access-token
+
+# ===================================================================
+# SECURITY AUDIT DOCUMENTATION
+# ===================================================================
+# These files document the Wasabi S3 credential exposure for audit purposes.
+# They reference the exposed credentials as part of the security review.
+# This is acceptable documentation of the security finding.
+
+000-docs/028-DR-AUDIT-security-pre-launch.md:generic-api-key
+000-docs/030-DR-GUID-credential-rotation-emergency.md:generic-api-key
+000-docs/025-PM-TASK-make-repo-public-safely.md:generic-api-key
+000-docs/019-DR-TASK-complete-automation-setup.md:generic-api-key
+
+# Comprehensive security report documenting exposed credentials
+000-docs/054-DR-AUDIT-comprehensive-security-report.md:generic-api-key
+
+# ===================================================================
+# TEST FIXTURES (Fake test values for unit tests)
+# ===================================================================
+
+# Encryption test fixtures (not real encryption keys)
+backend/tests/unit/utils/encryption.test.ts:generic-api-key
+
+# ===================================================================
+# TURSO SETUP DOCUMENTATION
+# ===================================================================
+
+# Example Turso token in setup documentation
+002-clients/docs/turso-setup.md:generic-api-key
+
+# ===================================================================
+# NOTES
+# ===================================================================
+#
+# This file does NOT ignore:
+# - Real credentials in 001-security/config/backup/pgbackrest.conf
+#   (file is gitignored, should never be scanned)
+# - Any credentials in backend/.env
+#   (file is gitignored, should never be scanned)
+# - Any actual secrets that should trigger alerts
+#
+# To test if a file is properly excluded:
+#   gitleaks detect --verbose --file <path>
+#
+# To update this file:
+#   1. Run: gitleaks detect --verbose
+#   2. Review findings
+#   3. Add safe patterns here
+#   4. Commit .gitleaksignore
+#

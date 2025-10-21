@@ -19,39 +19,26 @@ import {
   reactivateCustomer,
 } from '../controllers/admin.controller.js';
 import { logger } from '../../utils/logger.js';
+import { authenticateJWT, requireRole, requireActive } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
 /**
- * Authentication middleware placeholder
+ * AUTHENTICATION REQUIRED FOR ALL ADMIN ROUTES
  *
- * TODO: Implement proper authentication middleware
- * - Verify JWT token
- * - Check admin role
- * - Attach user to req object
+ * All routes below require:
+ * 1. Valid JWT token (authenticateJWT)
+ * 2. Admin or super_admin role (requireRole)
+ * 3. Active account status (requireActive)
  */
-const requireAuth = (_req: any, _res: any, next: any) => {
-  // TODO: Implement authentication
-  // For now, allow all requests (development only)
-  next();
-};
+router.use(authenticateJWT);
+router.use(requireActive);
+router.use(requireRole('admin'));
 
 /**
- * Admin role middleware placeholder
- *
- * TODO: Implement role-based access control
+ * All routes below are now protected by authentication middleware
+ * No need for per-route authentication checks
  */
-const requireAdmin = (_req: any, _res: any, next: any) => {
-  // TODO: Implement admin check
-  // For now, allow all requests (development only)
-  next();
-};
-
-/**
- * Apply authentication and authorization to all admin routes
- */
-router.use(requireAuth);
-router.use(requireAdmin);
 
 /**
  * GET /api/admin/dashboard

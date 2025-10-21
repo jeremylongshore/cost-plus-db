@@ -60,11 +60,12 @@ a:link, a:visited {
 
 .nav-simple {
   display: inline-block;
-  text-align: left;
+  text-align: justify;
+  text-align-last: justify;
   font-family: var(--font-family);
   font-size: 18px;
   line-height: 1.8;
-  white-space: pre;
+  white-space: pre-wrap;
   margin: 0;
   padding: 0;
   background: transparent;
