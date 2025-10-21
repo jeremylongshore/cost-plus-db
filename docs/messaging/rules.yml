@@ -27,7 +27,7 @@ pricing:
   addons:
     slack:
       price: "$29/month"
-      included_with: ["Pro", "Enterprise"]
+      included_with: ["Pro", "Enterprise", "First 5 Customers (all tiers, for life)"]
     high_availability: "$99/month"
     read_replicas: "$15/month"
     vpn_access: "$15/month"

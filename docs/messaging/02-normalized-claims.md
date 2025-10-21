@@ -31,8 +31,9 @@ Enterprise:  $149/month (32GB RAM, 100GB storage)
 
 **Slack Support:**
 ```
-- Included free: Pro and Enterprise tiers
-- Add-on for Shared/Dedicated: +$29/month
+- Included free: Pro and Enterprise tiers (always)
+- Included free: First 5 customers (all tiers, for life)
+- Add-on for everyone else (Shared/Dedicated): +$29/month
 - Our cost: $10/month (Slack Connect channel)
 - Our margin: $19/month (190%)
 ```
@@ -125,11 +126,16 @@ All Tiers:
 - Email: jeremy@intentsolutions.io (always available)
 - Critical Issues: 24/7 monitoring with phone alerts to founder
 
-Shared/Dedicated Tiers:
-- Email support only (default)
+First 5 Customers:
+- Email + Slack included FREE for life (all tiers)
+- Private Slack Connect channel
+- Real-time collaboration
+
+Shared/Dedicated Tiers (after first 5):
+- Email support (default)
 - Slack available as +$29/month add-on
 
-Pro/Enterprise Tiers:
+Pro/Enterprise Tiers (always):
 - Email + Slack included (no extra charge)
 - Private Slack Connect channel
 - Real-time collaboration
@@ -335,7 +341,7 @@ Pro/Enterprise Also Include:
 What the First 5 Customers Get:
 ✓ Direct founder access (that's me, Jeremy)
 ✓ 30-minute email response times, 7 days a week
-✓ Slack channel included (Pro/Enterprise only)
+✓ Slack channel included FREE for life (all tiers - $29/mo value)
 ✓ 24/7 critical monitoring (alerts go to my phone)
 ✓ Locked-in pricing forever (your rate never increases)
 ✓ Direct input on features (roadmap priority)
