@@ -38,27 +38,27 @@
 <h2>Stop Overpaying for PostgreSQL</h2>
 
 <p><strong>AWS RDS charges $280/month.</strong><br>
-<strong>We charge $89/month.</strong><br>
-Same specs. Same features. 68% cheaper.</p>
+<strong>We charge $119/month.</strong><br>
+Same specs. Same features. 58% cheaper.</p>
 
 <figure>
 <pre>
 ╔════════════════════════════════════════╗
-║  DEDICATED TIER:    $89/MONTH          ║
+║  DEDICATED TIER:    $119/MONTH         ║
 ║  (8GB RAM, 200GB storage, PostgreSQL)  ║
 ║                                        ║
 ║  AWS RDS:           $280/MONTH         ║
-║  YOU SAVE:          $191/MONTH (68%)   ║
+║  YOU SAVE:          $161/MONTH (58%)   ║
 ╚════════════════════════════════════════╝
 </pre>
 </figure>
 
 <ul>
-<li><strong>Daily backups:</strong> 30-day retention</li>
+<li><strong>Daily backups:</strong> 7-day retention (Shared/Dedicated), 30-day retention (Pro/Enterprise)</li>
 <li><strong>Point-in-time recovery:</strong> 7 days</li>
 <li><strong>SSL/TLS:</strong> Enforced on all connections</li>
 <li><strong>24/7 monitoring:</strong> Uptime and performance tracking</li>
-<li><strong>Support:</strong> 2-hour response time</li>
+<li><strong>Support:</strong> 4-hour response time (business hours)</li>
 <li><strong>Transparent invoicing:</strong> See our exact costs every month</li>
 </ul>
 
@@ -108,7 +108,7 @@ Step 4: Connect your app
 <p><strong>Nope - you'll handle migration yourself using standard PostgreSQL tools.</strong></p>
 <p>Here's what I provide: step-by-step guides for AWS/Heroku/Railway/Supabase, your connection credentials, and email support if you get stuck.</p>
 <p>You'll run the pg_dump/pg_restore commands and verify everything transferred correctly. Most people knock this out in 20-60 minutes.</p>
-<p><strong>Why self-service?</strong> It's a big part of how we keep prices at $89/month instead of $280/month.</p>
+<p><strong>Why self-service?</strong> It's a big part of how we keep prices at $119/month instead of $280/month.</p>
 <p><strong>Prefer hands-off?</strong> I offer professional migration service for $500 flat fee (any database size). Just email me at <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
@@ -155,7 +155,8 @@ Step 4: Connect your app
 <p><strong>Backups:</strong></p>
 <ul>
 <li><strong>Daily automated:</strong> pgBackRest system</li>
-<li><strong>Retention:</strong> 30 days</li>
+<li><strong>Retention:</strong> 7 days (Shared/Dedicated), 30 days (Pro/Enterprise)</li>
+<li><strong>Extended retention add-on:</strong> 30-day backup retention available for +$15/mo</li>
 <li><strong>Point-in-time recovery:</strong> 7 days</li>
 <li><strong>Storage:</strong> Encrypted in Wasabi S3</li>
 <li><strong>Testing:</strong> Monthly restoration verification</li>
@@ -166,8 +167,8 @@ Step 4: Connect your app
 <details>
 <summary><strong>Shared vs Dedicated - what's the difference?</strong></summary>
 <ul>
-<li><strong>Shared ($49/mo):</strong> Your database shares one PostgreSQL instance with other customers on the same VPS. Each customer has their own isolated database + user. You can't access other customers' data.</li>
-<li><strong>Dedicated ($89/mo):</strong> You get an entire VPS to yourself. One PostgreSQL instance running only your database(s).</li>
+<li><strong>Shared ($59/mo):</strong> Your database shares one PostgreSQL instance with other customers on the same VPS. Each customer has their own isolated database + user. You can't access other customers' data.</li>
+<li><strong>Dedicated ($119/mo):</strong> You get an entire VPS to yourself. One PostgreSQL instance running only your database(s).</li>
 <li><strong>Pro/Enterprise:</strong> Same as Dedicated but with more resources (CPU/RAM/storage).</li>
 </ul>
 <p><a href="/calculator.html">See all tiers in the calculator</a></p>
@@ -296,7 +297,7 @@ pg_restore -h new-host -U new-user -d new-db backup.dump
 <ul>
 <li>Full backup: Weekly</li>
 <li>Incremental backup: Daily</li>
-<li>Retention: 30 days</li>
+<li>Retention: 7 days (Shared/Dedicated), 30 days (Pro/Enterprise or +$15/mo)</li>
 <li>Point-in-time recovery: 7 days</li>
 <li>Storage: Encrypted in Wasabi S3</li>
 <li>Restoration testing: Monthly (we verify backups work)</li>

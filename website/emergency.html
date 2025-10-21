@@ -272,11 +272,11 @@ SELECT pg_size_pretty(pg_database_size(current_database()));
    <li>Available for: Last 7 days</li>
    </ul>
 </li>
-<li><strong>Option B - Full Backup Restoration (30 days):</strong>
+<li><strong>Option B - Full Backup Restoration:</strong>
    <ul>
    <li>Restore from daily backup (2am UTC snapshot)</li>
    <li>Downtime: 30-90 minutes</li>
-   <li>Available for: Last 30 days</li>
+   <li>Available for: Last 7 days (Shared/Dedicated), Last 30 days (Pro/Enterprise)</li>
    </ul>
 </li>
 <li><strong>Option C - Table-Level Export (if available):</strong>
@@ -585,7 +585,7 @@ ALTER DATABASE your_database_name SET default_transaction_read_only = off;
 <ul>
 <li>CostPlusDB is not HIPAA-compliant at launch</li>
 <li>Planned for Month 12+ with AWS/GCP infrastructure upgrade</li>
-<li>BAA signing available with Enterprise tier ($149/mo) + AWS upgrade (+$91/mo)</li>
+<li>BAA signing available with Enterprise tier ($299/mo) + AWS upgrade (+$91/mo)</li>
 </ul>
 
 <hr>
