@@ -1,0 +1,135 @@
+# Service Messaging Guardrails
+# Automated checks to prevent messaging conflicts
+
+version: 1.0
+last_updated: 2025-10-21
+
+# Pricing claims to monitor
+pricing:
+  tiers:
+    shared:
+      canonical: "$49/month"
+      ram: "2GB"
+      storage: "5GB"
+    dedicated:
+      canonical: "$89/month"
+      ram: "8GB"
+      storage: "25GB"
+    pro:
+      canonical: "$129/month"
+      ram: "16GB"
+      storage: "50GB"
+    enterprise:
+      canonical: "$149/month"
+      ram: "32GB"
+      storage: "100GB"
+
+  addons:
+    slack:
+      price: "$29/month"
+      included_with: ["Pro", "Enterprise"]
+    high_availability: "$99/month"
+    read_replicas: "$15/month"
+    vpn_access: "$15/month"
+    compliance_package: "$100/month"
+
+# Response time SLA
+support:
+  first_5_customers:
+    response_time: "30 minutes"
+    availability: "7 days a week"
+    channels: ["email"]
+
+  inquiry_forms:
+    response_time: "2 hours"
+    context: "consultation requests, calculator form submissions"
+
+  after_scale:
+    response_time: "4 hours"
+    availability: "M-F, 9am-6pm ET"
+    channels: ["email", "slack"]
+
+# Uptime commitments
+uptime:
+  sla: "99.9%"
+  measurement: "monthly"
+  we_do_not_promise: "99.999%"
+
+# Backup specifications
+backups:
+  schedule: "Daily at 2:00 AM UTC"
+  retention: "30 days"
+  point_in_time_recovery: "7 days"
+  testing: "Monthly restoration test"
+
+# Forbidden claims (will trigger CI failure)
+forbidden_claims:
+  - "99.999% uptime"
+  - "instant failover"
+  - "phone support"
+  - "HIPAA compliant"  # Until certified
+  - "SOC 2 certified"   # Until certified
+  - "24/7 human support"  # Monitoring is 24/7, human response has SLA
+
+# Regex patterns to detect conflicts
+conflict_patterns:
+  response_time:
+    - pattern: '(\d+)\s*(minute|hour|min|hr).*response'
+      allowed_values: ["30 minute", "2 hour", "4 hour"]
+      context_required: true
+
+  pricing:
+    - pattern: '\$(\d+)\/mo'
+      check: "Must match canonical pricing"
+
+  storage:
+    - pattern: '(\d+)GB storage'
+      check: "Must match tier specifications"
+
+  uptime:
+    - pattern: '99\.(\d+)%'
+      allowed_values: ["99.9%"]
+      forbidden_values: ["99.99%", "99.999%"]
+
+# Files to monitor
+monitored_files:
+  - "website/*.html"
+  - "website/transparency/*.html"
+  - "README.md"
+  - "CLAUDE.md"
+  - "000-docs/*.md"
+
+# CI check configuration
+ci_check:
+  enabled: true
+  fail_on_conflict: true
+  report_format: "markdown"
+  output_file: "docs/messaging/conflict-check-report.md"
+
+# Exemptions (files allowed to have variations)
+exemptions:
+  - file: "000-docs/*HAND*.md"
+    reason: "Historical session handoffs, frozen in time"
+  - file: "000-docs/01-conflict-report.md"
+    reason: "Documents conflicts, not source of truth"
+
+# Change approval workflow
+approval:
+  required_for:
+    - "pricing changes"
+    - "SLA changes"
+    - "tier specifications"
+
+  approver: "jeremy@intentsolutions.io"
+
+  process:
+    - "Update docs/messaging/02-normalized-claims.md first"
+    - "Get founder approval"
+    - "Propagate changes to all properties"
+    - "Run CI check to verify consistency"
+
+# Contact for questions
+contact:
+  owner: "Jeremy Longshore"
+  email: "jeremy@intentsolutions.io"
+  role: "Founder"
