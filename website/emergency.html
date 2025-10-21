@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Emergency Procedures - CostPlusDB</title>
+  <meta name="description" content="Emergency contact information and incident response procedures for CostPlusDB customers.">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Emergency Procedures</h1>
+      <span class="subtitle">Critical incident response & contact information</span>
+    </td>
+    <th>Status</th>
+    <td class="width-min"><a href="https://status.costplusdb.dev" target="_blank">Live</a></td>
+  </tr>
+  <tr>
+    <th>Updated</th>
+    <td class="width-min"><time>2025-10-21</time></td>
+  </tr>
+</table>
+
+<p><a href="/">← Back to Home</a></p>
+
+<hr>
+
+<h2>🚨 Critical Emergency Contact</h2>
+
+<p><strong>Database Down? Data Loss? Security Breach?</strong></p>
+
+<pre>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIMARY CONTACT (Jeremy Longshore)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email:    jeremy@intentsolutions.io
+Response: Within 30 minutes (first 5 customers)
+          7 days a week, including holidays
+
+EMERGENCY BACKUP OPERATOR (If no response >24 hours)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Activated automatically if primary contact unavailable
+You will receive notification if EBO activates
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+</pre>
+
+<hr>
+
+<h2>Severity Levels</h2>
+
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Definition</th>
+<th>Examples</th>
+<th>Response Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0 - CRITICAL</strong></td>
+<td>Service down, data loss</td>
+<td>Database offline, data breach, backup failure causing data loss</td>
+<td><strong>30 minutes</strong></td>
+</tr>
+<tr>
+<td><strong>P1 - HIGH</strong></td>
+<td>Degraded service</td>
+<td>Slow queries, disk space >90%, backup failure (data safe)</td>
+<td><strong>2 hours</strong></td>
+</tr>
+<tr>
+<td><strong>P2 - MEDIUM</strong></td>
+<td>Non-critical issue</td>
+<td>Configuration question, performance tuning request</td>
+<td><strong>4 hours</strong></td>
+</tr>
+<tr>
+<td><strong>P3 - LOW</strong></td>
+<td>General inquiry</td>
+<td>Feature request, documentation question</td>
+<td><strong>Next business day</strong></td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Emergency Scenarios</h2>
+
+<details open>
+<summary><strong>Scenario 1: My Database is Down (P0)</strong></summary>
+
+<h3>Immediate Actions You Can Take</h3>
+
+<pre>
+1. Check your connection string
+   - Verify host, port, username, password
+   - Test: psql "postgresql://user:pass@host:5432/db"
+
+2. Check your application logs
+   - Look for connection errors
+   - Note exact error message
+
+3. Verify our status page
+   - Visit: https://status.costplusdb.dev
+   - Check if system-wide outage
+</pre>
+
+<h3>Contact Us</h3>
+
+<p><strong>Email:</strong> jeremy@intentsolutions.io</p>
+<p><strong>Subject:</strong> "P0 CRITICAL - Database Down - [Your Company Name]"</p>
+
+<p><strong>Include:</strong></p>
+<ul>
+<li>Your database name/ID</li>
+<li>When did it stop working? (exact time)</li>
+<li>Error message you're seeing</li>
+<li>Your contact phone number</li>
+</ul>
+
+<h3>What We'll Do</h3>
+
+<ol>
+<li><strong>0-5 min:</strong> Acknowledge your email, confirm we're investigating</li>
+<li><strong>5-15 min:</strong> Diagnose issue (check PostgreSQL status, disk space, logs)</li>
+<li><strong>15-30 min:</strong> Resolve issue (restart service, restore from backup, fix configuration)</li>
+<li><strong>30 min:</strong> Send resolution email with root cause analysis</li>
+</ol>
+
+<p><strong>Expected Resolution Time:</strong> 30 minutes or less (99% of cases)</p>
+</details>
+
+<details>
+<summary><strong>Scenario 2: Suspected Data Breach (P0)</strong></summary>
+
+<h3>Signs of a Security Incident</h3>
+
+<ul>
+<li>Unexpected data modifications</li>
+<li>Unknown database users or connections</li>
+<li>Unusual query patterns in logs</li>
+<li>Alert from your security monitoring</li>
+</ul>
+
+<h3>Immediate Actions</h3>
+
+<pre>
+1. DO NOT delete anything (preserve evidence)
+2. Document what you observed (screenshots, log excerpts)
+3. Change your database password immediately
+4. Disconnect affected applications if possible
+</pre>
+
+<h3>Contact Us Immediately</h3>
+
+<p><strong>Email:</strong> jeremy@intentsolutions.io</p>
+<p><strong>Subject:</strong> "P0 SECURITY - Suspected Data Breach - [Your Company Name]"</p>
+
+<p><strong>Include:</strong></p>
+<ul>
+<li>What did you observe? (be specific)</li>
+<li>When did you first notice? (exact time)</li>
+<li>What data may be affected?</li>
+<li>Have you changed passwords yet? (yes/no)</li>
+</ul>
+
+<h3>What We'll Do</h3>
+
+<ol>
+<li><strong>0-15 min:</strong> Isolate your database (block all connections except yours)</li>
+<li><strong>15-30 min:</strong> Forensic analysis (review access logs, identify intrusion vector)</li>
+<li><strong>30-60 min:</strong> Secure system (rotate credentials, patch vulnerability)</li>
+<li><strong>1-2 hours:</strong> Restore from pre-breach backup if needed</li>
+<li><strong>24 hours:</strong> Full incident report with timeline and recommendations</li>
+</ol>
+
+<p><strong>Your Responsibilities (GDPR/Privacy Laws):</strong></p>
+<ul>
+<li>If customer data accessed: Notify your customers within 72 hours</li>
+<li>We provide breach notification template and assistance</li>
+<li>Document incident for compliance purposes</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>Scenario 3: Slow Performance / Queries Timing Out (P1)</strong></summary>
+
+<h3>Quick Diagnostics You Can Run</h3>
+
+<pre>
+-- Check active connections
+SELECT count(*) FROM pg_stat_activity;
+
+-- Check for long-running queries
+SELECT pid, now() - query_start AS duration, query
+FROM pg_stat_activity
+WHERE state = 'active'
+ORDER BY duration DESC;
+
+-- Check database size
+SELECT pg_size_pretty(pg_database_size(current_database()));
+</pre>
+
+<h3>Contact Us</h3>
+
+<p><strong>Email:</strong> jeremy@intentsolutions.io</p>
+<p><strong>Subject:</strong> "P1 - Performance Issue - [Your Company Name]"</p>
+
+<p><strong>Include:</strong></p>
+<ul>
+<li>When did slowness start?</li>
+<li>Which queries are slow? (EXPLAIN output if available)</li>
+<li>Did anything change recently? (code deploy, data import, etc.)</li>
+<li>Current connection count (from query above)</li>
+</ul>
+
+<h3>What We'll Do</h3>
+
+<ol>
+<li>Review slow query log</li>
+<li>Check for missing indexes</li>
+<li>Analyze connection pool saturation</li>
+<li>Review disk I/O and memory usage</li>
+<li>Provide optimization recommendations</li>
+</ol>
+
+<p><strong>Expected Resolution Time:</strong> 2-4 hours</p>
+</details>
+
+<details>
+<summary><strong>Scenario 4: Need to Restore from Backup (P0)</strong></summary>
+
+<h3>Backup Restoration Scenarios</h3>
+
+<ul>
+<li>Accidental data deletion (DROP TABLE, DELETE without WHERE)</li>
+<li>Application bug corrupted data</li>
+<li>Need to recover to specific point in time</li>
+</ul>
+
+<h3>Contact Us</h3>
+
+<p><strong>Email:</strong> jeremy@intentsolutions.io</p>
+<p><strong>Subject:</strong> "P0 - Backup Restoration Needed - [Your Company Name]"</p>
+
+<p><strong>Include:</strong></p>
+<ul>
+<li>What happened? (exactly what was deleted/corrupted)</li>
+<li>When did it happen? (exact timestamp if known)</li>
+<li>Restore to when? (date/time you want to restore to)</li>
+<li>Can we do this during your maintenance window? (yes/no, when?)</li>
+</ul>
+
+<h3>What We'll Do</h3>
+
+<ol>
+<li><strong>Option A - Point-in-Time Recovery (7 days):</strong>
+   <ul>
+   <li>Restore database to exact timestamp you specify</li>
+   <li>Downtime: 30-60 minutes depending on database size</li>
+   <li>Available for: Last 7 days</li>
+   </ul>
+</li>
+<li><strong>Option B - Full Backup Restoration (30 days):</strong>
+   <ul>
+   <li>Restore from daily backup (2am UTC snapshot)</li>
+   <li>Downtime: 30-90 minutes</li>
+   <li>Available for: Last 30 days</li>
+   </ul>
+</li>
+<li><strong>Option C - Table-Level Export (if available):</strong>
+   <ul>
+   <li>We restore to temporary database, you export specific table</li>
+   <li>Zero downtime for your production database</li>
+   <li>You merge data manually</li>
+   </ul>
+</li>
+</ol>
+
+<p><strong>Backup Schedule:</strong></p>
+<ul>
+<li>Full backup: Weekly (Sundays 2am UTC)</li>
+<li>Incremental: Daily (2am UTC)</li>
+<li>WAL archiving: Continuous (every 30 minutes)</li>
+</ul>
+</details>
+
+<hr>
+
+<h2>Emergency Backup Operator System</h2>
+
+<p><strong>What happens if primary operator (Jeremy) is unavailable?</strong></p>
+
+<h3>Dead Man's Switch</h3>
+
+<p>We use open source monitoring tools to ensure continuity:</p>
+
+<ul>
+<li><strong>Healthchecks.io:</strong> Primary operator checks in twice daily (8am, 8pm)</li>
+<li><strong>Uptime Kuma:</strong> Monitors all database services 24/7</li>
+<li><strong>Automated Alerts:</strong> If no check-in for 24 hours, Emergency Backup Operator (EBO) is notified</li>
+<li><strong>EBO Activation:</strong> After 48 hours, EBO receives emergency credentials and access</li>
+</ul>
+
+<h3>EBO Emergency Access</h3>
+
+<pre>
+NORMAL OPERATIONS (Read-Only)
+├─ EBO can monitor infrastructure health
+├─ EBO can view backup status
+├─ EBO can see alert dashboards
+└─ EBO CANNOT access customer data or make changes
+
+EMERGENCY MODE (Dead Man's Switch Activated)
+├─ EBO receives full credentials from secure vault
+├─ EBO can restart databases, restore from backups
+├─ EBO can respond to security incidents
+├─ EBO notifies customers of incident and status
+└─ All EBO actions logged and auditable
+</pre>
+
+<h3>Your Protections</h3>
+
+<ul>
+<li>✅ EBO is bound by Non-Disclosure Agreement</li>
+<li>✅ All EBO access is logged (you can request audit logs)</li>
+<li>✅ EBO only accesses customer data when necessary for incident resolution</li>
+<li>✅ You're notified immediately when EBO activates</li>
+<li>✅ All credentials rotated after incident resolved</li>
+</ul>
+
+<p><strong>Full Details:</strong> <a href="/transparency/">Transparency Hub</a> → Emergency Procedures</p>
+
+<hr>
+
+<h2>Open Source Emergency Tools</h2>
+
+<p>CostPlusDB uses industry-standard, open source tools for emergency management:</p>
+
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+<th>Why We Use It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://healthchecks.io" target="_blank">Healthchecks.io</a></td>
+<td>Dead man's switch / cron monitoring</td>
+<td>Open source, self-hosted, 10k+ users. Free alternative to Dead Man's Snitch.</td>
+</tr>
+<tr>
+<td><a href="https://uptime.kuma.pet" target="_blank">Uptime Kuma</a></td>
+<td>Service monitoring dashboard</td>
+<td>40k+ GitHub stars, beautiful UI, free alternative to UptimeRobot.</td>
+</tr>
+<tr>
+<td><a href="https://bitwarden.com" target="_blank">Bitwarden</a></td>
+<td>Emergency credential vault</td>
+<td>Open source, millions of users, emergency access feature built-in.</td>
+</tr>
+<tr>
+<td><a href="https://grafana.com/oss/oncall/" target="_blank">Grafana OnCall</a></td>
+<td>Alert routing & escalation</td>
+<td>Enterprise-grade alerting, free tier, integrates with everything.</td>
+</tr>
+<tr>
+<td><a href="https://prometheus.io" target="_blank">Prometheus</a></td>
+<td>Metrics & monitoring</td>
+<td>Industry standard, CNCF graduated project, used by Google/AWS.</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Why Open Source?</strong></p>
+
+<ul>
+<li>✅ Free (no vendor lock-in)</li>
+<li>✅ Transparent (you can audit the code)</li>
+<li>✅ Battle-tested (millions of users worldwide)</li>
+<li>✅ Self-hosted (we control the data)</li>
+<li>✅ Community support (massive ecosystems)</li>
+</ul>
+
+<details>
+<summary><strong>Our Emergency Monitoring Stack (Self-Hosted)</strong></summary>
+
+<h3>1. Healthchecks.io (Dead Man's Switch)</h3>
+
+<pre>
+Setup:
+- Self-hosted on VPS (https://github.com/healthchecks/healthchecks)
+- Cron jobs ping every 12 hours
+- If ping missed >24 hours → Alert sent to Jeremy + EBO
+
+Cost: $0 (self-hosted)
+Alternative: Dead Man's Snitch ($5/mo)
+</pre>
+
+<h3>2. Uptime Kuma (Service Monitoring)</h3>
+
+<pre>
+Setup:
+- Self-hosted monitoring dashboard
+- Checks: PostgreSQL (port 5432), HTTP health endpoint, disk space
+- Alert destinations: Email, Slack, webhook
+
+Cost: $0 (self-hosted)
+Alternative: Betterstack ($10/mo), UptimeRobot ($7/mo)
+</pre>
+
+<h3>3. Bitwarden (Emergency Credentials)</h3>
+
+<pre>
+Setup:
+- Self-hosted Bitwarden vault (or Bitwarden cloud free tier)
+- Stores: VPS passwords, PostgreSQL credentials, API keys
+- Emergency Access: EBO can request, auto-granted after 48 hours
+
+Cost: $0 (free tier) or $10/year (premium)
+Alternative: 1Password Teams ($20/mo), KeePassXC (offline, free)
+</pre>
+
+<h3>4. Grafana + Prometheus (Metrics)</h3>
+
+<pre>
+Setup:
+- Prometheus scrapes metrics from PostgreSQL (postgres_exporter)
+- Grafana visualizes performance, connections, query times
+- Alertmanager sends alerts to Grafana OnCall
+
+Cost: $0 (all open source, self-hosted)
+Alternative: Datadog ($15/mo), New Relic ($25/mo)
+</pre>
+</details>
+
+<hr>
+
+<h2>Status Page</h2>
+
+<p><strong>Real-time service status:</strong> <a href="https://status.costplusdb.dev" target="_blank">status.costplusdb.dev</a></p>
+
+<p>Check here first for:</p>
+<ul>
+<li>System-wide outages</li>
+<li>Scheduled maintenance windows</li>
+<li>Historical uptime data</li>
+<li>Incident reports</li>
+</ul>
+
+<p><em>Status page powered by <a href="https://github.com/louislam/uptime-kuma" target="_blank">Uptime Kuma</a> (open source)</em></p>
+
+<hr>
+
+<h2>Incident Post-Mortems</h2>
+
+<p>We publish detailed incident reports for all P0/P1 incidents:</p>
+
+<ul>
+<li>Root cause analysis</li>
+<li>Timeline of events</li>
+<li>Actions taken</li>
+<li>Prevention measures implemented</li>
+</ul>
+
+<p><strong>Recent Incidents:</strong> <a href="/transparency/incidents/">View all incident reports</a></p>
+
+<p><em>No incidents yet (service launched October 2025)</em></p>
+
+<hr>
+
+<h2>Escalation Path</h2>
+
+<pre>
+┌─────────────────────────────────────────────────────────┐
+│ CUSTOMER REPORTS ISSUE                                  │
+│ Email: jeremy@intentsolutions.io                        │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ PRIMARY OPERATOR RESPONSE                               │
+│ Expected: Within 30 minutes (first 5 customers)         │
+│ Action: Acknowledge, diagnose, resolve                  │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+           NO RESPONSE AFTER 30 MINUTES?
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ AUTOMATED RETRY                                         │
+│ System re-sends alert to primary operator              │
+│ Notification sent to EBO (informational only)          │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+           NO RESPONSE AFTER 2 HOURS?
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ DEAD MAN'S SWITCH CHECK                                │
+│ EBO verifies: When was last check-in?                  │
+│ If <24 hours: Wait and monitor                         │
+│ If >24 hours: Proceed to emergency activation          │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│ EMERGENCY BACKUP OPERATOR ACTIVATED                     │
+│ EBO receives credentials, resolves incident             │
+│ Customer notified: "EBO is responding to your issue"    │
+└─────────────────────────────────────────────────────────┘
+</pre>
+
+<hr>
+
+<h2>Customer Self-Service Emergency Tools</h2>
+
+<h3>Emergency Database Export (pg_dump)</h3>
+
+<p>If you need to migrate away immediately:</p>
+
+<pre>
+# Export your entire database
+pg_dump -h YOUR_HOST -p 5432 -U YOUR_USER -d YOUR_DB \
+  -F c -f backup.dump
+
+# Export specific table
+pg_dump -h YOUR_HOST -p 5432 -U YOUR_USER -d YOUR_DB \
+  -t table_name -F c -f table_backup.dump
+
+# Export as SQL (human-readable)
+pg_dump -h YOUR_HOST -p 5432 -U YOUR_USER -d YOUR_DB \
+  -f backup.sql
+</pre>
+
+<p><strong>You always have superuser access</strong> - You can export your data anytime, no permission needed from us.</p>
+
+<h3>Emergency Read-Only Mode (If Database Corrupting)</h3>
+
+<pre>
+-- Make database read-only temporarily
+ALTER DATABASE your_database_name SET default_transaction_read_only = on;
+
+-- Revert to read-write
+ALTER DATABASE your_database_name SET default_transaction_read_only = off;
+</pre>
+
+<p>This prevents further damage while we diagnose the issue.</p>
+
+<hr>
+
+<h2>Legal & Compliance</h2>
+
+<h3>Data Breach Notification (GDPR/CCPA)</h3>
+
+<p>If we detect unauthorized access to customer data:</p>
+
+<ol>
+<li><strong>0-4 hours:</strong> We notify you immediately via email (P0 priority)</li>
+<li><strong>Within 24 hours:</strong> We provide preliminary incident report</li>
+<li><strong>Within 72 hours:</strong> We provide full forensic report for your compliance filing</li>
+</ol>
+
+<p><strong>Your Responsibilities:</strong></p>
+<ul>
+<li>GDPR: Notify your customers within 72 hours if their personal data accessed</li>
+<li>CCPA: Notify California residents without unreasonable delay</li>
+<li>We provide breach notification template and assistance</li>
+</ul>
+
+<h3>Business Associate Agreement (BAA) - HIPAA</h3>
+
+<p><strong>Not available yet</strong> (Month 12+ roadmap)</p>
+
+<p>If you handle healthcare data:</p>
+<ul>
+<li>CostPlusDB is not HIPAA-compliant at launch</li>
+<li>Planned for Month 12+ with AWS/GCP infrastructure upgrade</li>
+<li>BAA signing available with Enterprise tier ($149/mo) + AWS upgrade (+$91/mo)</li>
+</ul>
+
+<hr>
+
+<h2>Need Help Now?</h2>
+
+<p><strong>Email:</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+
+<p><strong>Subject Line Format:</strong></p>
+<ul>
+<li>P0 CRITICAL: [Brief description]</li>
+<li>P1 HIGH: [Brief description]</li>
+<li>P2 MEDIUM: [Brief description]</li>
+</ul>
+
+<p><strong>Expected Response Times:</strong></p>
+<ul>
+<li>First 5 customers: 30 minutes, 7 days/week</li>
+<li>After scale (6+ customers): 4 hours, M-F 9am-6pm ET</li>
+<li>Critical issues (P0): Always within 30 minutes, even if scaled</li>
+</ul>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost plus</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io</p>
+<p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms of Service</a> | <a href="/acceptable-use.html">Acceptable Use</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a> | <a href="/emergency.html">Emergency Procedures</a></p>
+</footer>
+
+</body>
+</html>
