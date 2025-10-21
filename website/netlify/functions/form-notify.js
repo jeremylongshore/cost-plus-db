@@ -274,7 +274,7 @@ exports.handler = async (event) => {
     }
 
     console.log('📝 Form submission received:', {
-      form: payload.form_name || 'unknown',
+      form: formData['form-name'] || formData.form_name || 'unknown',
       email: formData.email,
       timestamp: new Date().toISOString()
     });
