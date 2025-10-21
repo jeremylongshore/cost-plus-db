@@ -26,20 +26,21 @@
 
 <p><a href="/">← Back to Home</a></p>
 
-<h2>Database Migration is Serious Business</h2>
+<h2>Get the Right Setup for Your Workload</h2>
 
-<p><strong>Your database is critical infrastructure.</strong> Rather than a one-size-fits-all calculator, we provide personalized consultation to ensure the right fit.</p>
+<p><strong>Your database is critical infrastructure.</strong> Rather than a one-size-fits-all calculator, we provide personalized consultation to ensure you choose the right tier and configuration.</p>
 
 <details>
 <summary><strong>Why consultation instead of instant signup?</strong></summary>
 <ul>
-<li><strong>Migration complexity:</strong> Every database has unique requirements, schemas, and performance needs</li>
 <li><strong>Right-sizing:</strong> We help you choose the tier that actually fits your workload, not oversell</li>
+<li><strong>Workload analysis:</strong> Understand your query patterns, connection count, and storage needs</li>
 <li><strong>Compatibility check:</strong> Ensure PostgreSQL 16 supports your current database features</li>
-<li><strong>Timeline planning:</strong> Migrations need coordination - we work with your schedule</li>
-<li><strong>Risk mitigation:</strong> We identify potential issues before they become production problems</li>
+<li><strong>Provisioning timeline:</strong> Confirm setup timeline works for your schedule</li>
+<li><strong>Add-on recommendations:</strong> Identify if you need HA, replicas, or enterprise features</li>
 </ul>
-<p>This 15-30 minute conversation saves days of troubleshooting later.</p>
+<p>This 15-30 minute conversation ensures you get the right setup from day one.</p>
+<p><strong>Note on migration:</strong> You handle data migration yourself using our guides. Professional migration service available for $500 if you prefer hands-off.</p>
 </details>
 
 <hr>
@@ -100,11 +101,10 @@
 <h3>What Happens Next:</h3>
 <ol>
 <li><strong>We review your request</strong> (typically within 2 hours)</li>
-<li><strong>15-30 minute consultation</strong> - We discuss your requirements, migration timeline, and technical needs</li>
-<li><strong>Custom recommendation</strong> - We recommend the right tier and add-ons for your workload</li>
+<li><strong>15-30 minute consultation</strong> - We discuss your workload and recommend the right tier</li>
 <li><strong>Approval & payment link</strong> - Upon mutual agreement, we send a secure Stripe payment link</li>
-<li><strong>Database provisioning</strong> - Payment confirmation triggers setup (1-2 hours)</li>
-<li><strong>Credentials & onboarding</strong> - Connection details, migration guides, and ongoing guidance</li>
+<li><strong>Database provisioning</strong> - Payment triggers setup (1-2 hours)</li>
+<li><strong>Credentials delivered</strong> - Connection details via email, you're ready to connect</li>
 </ol>
 
 <details style="margin-top: calc(var(--line-height) * 1);">
@@ -146,7 +146,7 @@
 <option value="enterprise">Enterprise - $149/mo (32GB RAM, 100GB storage)</option>
 </select>
 
-<label for="timeline">Migration Timeline</label>
+<label for="timeline">Desired Setup Timeline</label>
 <select id="timeline" name="timeline">
 <option value="asap">As soon as possible</option>
 <option value="1-2weeks">1-2 weeks</option>
@@ -155,7 +155,7 @@
 </select>
 
 <label for="requirements">Specific Requirements or Questions</label>
-<textarea id="requirements" name="requirements" rows="4" placeholder="Compliance needs, high availability, read replicas, migration concerns, etc."></textarea>
+<textarea id="requirements" name="requirements" rows="4" placeholder="Compliance needs, high availability, read replicas, current provider, workload details, etc."></textarea>
 
 <button type="submit">
 Request Consultation
