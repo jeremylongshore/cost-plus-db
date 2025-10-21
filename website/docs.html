@@ -105,17 +105,11 @@ Step 4: Connect your app
 
 <details open>
 <summary><strong>Do you handle data migration?</strong></summary>
-<p><strong>No - you migrate your data using standard PostgreSQL tools (pg_dump/pg_restore).</strong></p>
-<p><strong>What we provide:</strong></p>
-<ul>
-<li>Step-by-step migration guides for AWS, Heroku, Railway, Supabase</li>
-<li>Connection credentials and examples</li>
-<li>Email support during your migration</li>
-</ul>
-<p><strong>What you handle:</strong> Running the export/import commands and verifying data integrity.</p>
-<p>Most technical founders complete this in 20-60 minutes. <strong>This self-service approach is why we're $89/month instead of $280/month.</strong></p>
-<p><strong>Want hands-off migration?</strong> Professional migration service available: $500 flat fee (any database size).</p>
-<p>Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+<p><strong>Nope - you'll handle migration yourself using standard PostgreSQL tools.</strong></p>
+<p>Here's what I provide: step-by-step guides for AWS/Heroku/Railway/Supabase, your connection credentials, and email support if you get stuck.</p>
+<p>You'll run the pg_dump/pg_restore commands and verify everything transferred correctly. Most people knock this out in 20-60 minutes.</p>
+<p><strong>Why self-service?</strong> It's a big part of how we keep prices at $89/month instead of $280/month.</p>
+<p><strong>Prefer hands-off?</strong> I offer professional migration service for $500 flat fee (any database size). Just email me at <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <details>
@@ -256,7 +250,7 @@ Step 4: Connect your app
 
 <details>
 <summary><strong>Can I migrate from AWS RDS/Heroku/Supabase?</strong></summary>
-<p><strong>Yes. You handle the migration using standard PostgreSQL tools.</strong></p>
+<p><strong>Yep. You'll handle the migration yourself - it's just standard PostgreSQL.</strong></p>
 <pre>
 # From your old database
 pg_dump -h old-host -U old-user -d old-db -F c -f backup.dump
@@ -264,15 +258,9 @@ pg_dump -h old-host -U old-user -d old-db -F c -f backup.dump
 # To your new CostPlusDB instance
 pg_restore -h new-host -U new-user -d new-db backup.dump
 </pre>
-<p><strong>What we provide:</strong></p>
-<ul>
-<li>Step-by-step migration guides for common providers (AWS, Heroku, Railway, Supabase)</li>
-<li>Connection credentials and pg_dump/restore examples</li>
-<li>Email support during your migration</li>
-</ul>
-<p><strong>What you handle:</strong> Running the export/import commands and verifying data integrity.</p>
-<p>Most technical founders complete this in 20-60 minutes. This self-service approach is why we're $89/month instead of $280/month.</p>
-<p><strong>Want hands-off migration?</strong> Professional migration service available: $500 (any database size). Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+<p>I'll provide step-by-step guides for AWS/Heroku/Railway/Supabase, connection credentials, and examples. You run the commands and verify the data transferred correctly.</p>
+<p>Most folks finish this in 20-60 minutes. It's straightforward if you've used pg_dump before.</p>
+<p><strong>Need help?</strong> Email me during your migration. <strong>Want me to handle it?</strong> Migration service is $500 flat (any size). Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <details>
@@ -354,10 +342,10 @@ pg_restore -h new-host -U new-user -d new-db backup.dump
 <p>Yes. If you're coming from AWS RDS, Heroku Postgres, or another PostgreSQL provider:</p>
 <ol>
 <li>I'll provision your new database</li>
-<li>You use pg_dump/pg_restore to migrate your data</li>
-<li>I provide migration guides and answer questions via email</li>
+<li>You'll migrate your data using pg_dump/pg_restore</li>
+<li>I'll send you guides and answer questions via email if you get stuck</li>
 </ol>
-<p><strong>Migration service:</strong> Need hands-off migration? Professional service available for $500. Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+<p><strong>Want me to handle migration?</strong> $500 flat fee. Email <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
 </details>
 
 <hr>
