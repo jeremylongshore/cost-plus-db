@@ -18,16 +18,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Goal: Validate all CostPlusDB operations before first customer
   - Testing: Backups, monitoring, incident response, SOPs
 
+## [1.1.1] - 2025-10-21
+
 ### Changed
 - **Website Consistency:** Standardized support response times and table formatting across all pages
   - Support SLA now consistent: "4-hour SLA (business hours), typically 30-min response, 7 days/week"
   - Critical outages: "IMMEDIATE response" (24/7 automated alerts)
   - Removed bold tags from all table content cells (12 instances) - headers now visually distinct from content
-  - Fixed 11 instances of conflicting support response time claims (2-hour, 30-min guarantees, first-5-customer-only claims)
-  - Files updated: index.html, about.html, docs.html, activity.html, calculator.html, emergency.html
+  - Fixed 16 instances of conflicting support response time claims (2-hour, 30-min guarantees, first-5-customer-only claims)
+  - Files updated: index.html, about.html, docs.html, activity.html, calculator.html, emergency.html, ai-policy.html, thank-you.html
   - Created DISCREPANCY-REPORT.md documenting all issues before fixes
   - Conservative SLA approach: Underpromise (4-hour SLA), overdeliver (30-min typical)
 
+### Added
+- **Documentation:** Website messaging standards added to CLAUDE.md
+  - Support response time standard documented
+  - Conservative SLA approach documented
+  - Table formatting standards documented
+  - Consistency check guidelines for future changes
+
+### Fixed
+- Version number updated to v1.1.1 in website header
+- Updated date in website header to 10-21-2025
+
+## [1.1.0] - 2025-10-21 (Earlier in Day)
+
+### Changed
 - Updated cost comparisons site-wide with accurate October 2025 pricing
   - AWS RDS: $280 → $303/month (db.m5.xlarge 4 vCPU) - 2,425% markup
   - Google Cloud SQL: $275 → $403/month (db-n1-standard-4 4 vCPU) - 3,258% markup
