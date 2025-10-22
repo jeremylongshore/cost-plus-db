@@ -77,3 +77,5 @@ build/
 .DS_Store
 Thumbs.db
 desktop.ini
+testing/local-customer-databases/vertex-ai/venv/
+testing/local-customer-databases/sql-output/
