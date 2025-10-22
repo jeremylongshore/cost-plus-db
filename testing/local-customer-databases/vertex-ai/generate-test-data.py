@@ -16,70 +16,84 @@ PROJECT_ID = "cost-plus-db"
 REGION = "us-central1"
 MODEL_NAME = "gemini-2.0-flash-exp"  # Flash 2.0 - free tier eligible
 
-# Rate limiting: 1 request per second (safe, well under 60/min limit)
-RATE_LIMIT_DELAY = 1.0  # seconds between requests
+# CRITICAL FREE TIER LIMITS (2025)
+FREE_TIER_DAILY_LIMIT = 200  # Gemini 2.0 Flash: 200 requests/day
+SAFETY_STOP_AT = 190         # Stop at 190 to leave margin for errors
 
-# Database configurations
+# Rate limiting: 2 seconds per request (SAFE - well under free tier limits)
+# At 2 sec/request: 159 requests = 5.3 minutes total
+RATE_LIMIT_DELAY = 2.0  # seconds between requests
+
+# Database configurations - OPTIMIZED FOR FREE TIER
+# Total: 159 requests (41-request safety margin)
 DATABASES = {
     "customer1": {
         "name": "E-commerce Shop",
         "schema": "customer1-ecommerce.sql",
         "tables": {
-            "products": 10000,      # 10K products
-            "customers": 5000,      # 5K customers
-            "orders": 50000,        # 50K orders
-            "order_items": 100000,  # ~2 items per order
-            "addresses": 7500       # ~1.5 addresses per customer
+            "products": 2000,      # 2K products = 2 requests
+            "customers": 1500,     # 1.5K customers = 2 requests
+            "orders": 6000,        # 6K orders = 6 requests
+            "order_items": 12000,  # 12K items = 12 requests
+            "addresses": 2000      # 2K addresses = 2 requests
+            # SUBTOTAL: 24 requests
         }
     },
     "customer2": {
         "name": "SaaS Startup",
         "schema": "customer2-saas.sql",
         "tables": {
-            "users": 5000,          # 5K users
-            "subscriptions": 5000,  # 1 sub per user
-            "projects": 2000,       # ~0.4 projects per user
-            "tasks": 15000,         # ~3 tasks per project
-            "events": 100000        # 100K activity events
+            "users": 1500,         # 1.5K users = 2 requests
+            "subscriptions": 1500, # 1.5K subs = 2 requests
+            "projects": 800,       # 800 projects = 1 request
+            "tasks": 4000,         # 4K tasks = 4 requests
+            "events": 15000        # 15K events = 15 requests
+            # SUBTOTAL: 24 requests
         }
     },
     "customer3": {
         "name": "Blog/CMS",
         "schema": "customer3-cms.sql",
         "tables": {
-            "authors": 100,         # 100 authors
-            "categories": 50,       # 50 categories
-            "posts": 20000,         # 20K posts
-            "comments": 100000,     # 100K comments (~5 per post)
-            "media": 10000          # 10K media files
+            "authors": 50,         # 50 authors = 1 request
+            "categories": 30,      # 30 categories = 1 request
+            "posts": 3000,         # 3K posts = 3 requests
+            "comments": 15000,     # 15K comments = 15 requests
+            "media": 2000          # 2K media = 2 requests
+            # SUBTOTAL: 22 requests
         }
     },
     "customer4": {
         "name": "Mobile App API",
         "schema": "customer4-mobile.sql",
         "tables": {
-            "app_users": 10000,         # 10K users
-            "sessions": 50000,          # ~5 sessions per user
-            "api_logs": 500000,         # 500K API calls
-            "push_notifications": 30000, # ~3 per user
-            "user_content": 25000,      # ~2.5 items per user
-            "interactions": 75000       # ~3 interactions per content
+            "app_users": 2000,         # 2K users = 2 requests
+            "sessions": 8000,          # 8K sessions = 8 requests
+            "api_logs": 25000,         # 25K API calls = 25 requests
+            "push_notifications": 5000, # 5K notifications = 5 requests
+            "user_content": 4000,      # 4K content items = 4 requests
+            "interactions": 10000      # 10K interactions = 10 requests
+            # SUBTOTAL: 54 requests
         }
     },
     "customer5": {
         "name": "Analytics Platform",
         "schema": "customer5-analytics.sql",
         "tables": {
-            "properties": 50,           # 50 tracked properties
-            "events": 250000,           # 250K events
-            "daily_metrics": 3650,      # 10 years of daily metrics
-            "cohorts": 100,             # 100 cohorts
-            "funnel_steps": 20,         # 4 funnels × 5 steps
-            "funnel_conversions": 50000, # Conversion tracking
-            "reports": 25               # 25 saved reports
+            "properties": 25,           # 25 properties = 1 request
+            "events": 25000,            # 25K events = 25 requests
+            "daily_metrics": 730,       # 2 years daily = 1 request
+            "cohorts": 50,              # 50 cohorts = 1 request
+            "funnel_steps": 15,         # 15 funnel steps = 1 request
+            "funnel_conversions": 5000, # 5K conversions = 5 requests
+            "reports": 20               # 20 reports = 1 request
+            # SUBTOTAL: 35 requests
         }
     }
 }
+# GRAND TOTAL: 159 requests
+# FREE TIER LIMIT: 200/day
+# SAFETY MARGIN: 41 requests
 
 class VertexDataGenerator:
     def __init__(self):
@@ -90,15 +104,26 @@ class VertexDataGenerator:
         self.start_time = time.time()
 
     def rate_limited_generate(self, prompt):
-        """Generate content with rate limiting"""
-        # Wait to maintain 1 req/sec rate
+        """Generate content with rate limiting and safety checks"""
+        # SAFETY CHECK: Stop before hitting daily limit
+        if self.request_count >= SAFETY_STOP_AT:
+            raise Exception(
+                f"\n⚠️  SAFETY STOP at {self.request_count} requests!\n"
+                f"   Free tier limit: {FREE_TIER_DAILY_LIMIT}/day\n"
+                f"   Stopping at {SAFETY_STOP_AT} for safety margin.\n"
+                f"   Wait until midnight PT for quota reset."
+            )
+
+        # Wait to maintain safe rate (2 sec/request)
         time.sleep(RATE_LIMIT_DELAY)
 
         self.request_count += 1
         elapsed = time.time() - self.start_time
         rate = self.request_count / elapsed if elapsed > 0 else 0
+        remaining = FREE_TIER_DAILY_LIMIT - self.request_count
 
-        print(f"  [Request #{self.request_count}] Rate: {rate:.2f} req/sec")
+        print(f"  [Request #{self.request_count}/{FREE_TIER_DAILY_LIMIT}] "
+              f"Rate: {rate:.2f} req/sec | Remaining today: {remaining}")
 
         response = self.model.generate_content(prompt)
         return response.text
@@ -199,11 +224,16 @@ Format: INSERT INTO {table_name} (column1, column2, ...) VALUES (val1, val2, ...
         print(f"COMPLETE!")
         print(f"{'='*60}")
         print(f"Total requests: {self.request_count}")
-        print(f"Total time: {total_time/60:.1f} minutes")
+        print(f"Total time: {total_time/60:.1f} minutes ({total_time:.0f} seconds)")
         print(f"Average rate: {avg_rate:.2f} req/sec")
-        print(f"Peak rate: {1/RATE_LIMIT_DELAY} req/sec (limit)")
+        print(f"Configured rate: {1/RATE_LIMIT_DELAY} req/sec (2 sec delay)")
+        print(f"\nFree tier status:")
+        print(f"  Daily limit: {FREE_TIER_DAILY_LIMIT} requests")
+        print(f"  Used today: {self.request_count} requests")
+        print(f"  Remaining: {FREE_TIER_DAILY_LIMIT - self.request_count} requests")
+        print(f"  Safety margin: ✓ {SAFETY_STOP_AT - self.request_count} requests under safety limit")
         print(f"\nOutput saved to: sql-output/")
-        print(f"Next step: Run ./scripts/02-import-data.sh")
+        print(f"Next step: Run ../scripts/02-import-data.sh")
 
 if __name__ == "__main__":
     generator = VertexDataGenerator()

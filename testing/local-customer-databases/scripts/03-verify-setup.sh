@@ -31,11 +31,11 @@ NAMES[4]="Mobile App API"
 NAMES[5]="Analytics Platform"
 
 declare -A MIN_ROWS
-MIN_ROWS[1]=50000   # E-commerce: at least 50K rows
-MIN_ROWS[2]=100000  # SaaS: at least 100K rows (mostly events)
-MIN_ROWS[3]=100000  # CMS: at least 100K rows (mostly comments)
-MIN_ROWS[4]=500000  # Mobile: at least 500K rows (mostly API logs)
-MIN_ROWS[5]=250000  # Analytics: at least 250K rows (mostly events)
+MIN_ROWS[1]=20000   # E-commerce: at least 20K rows
+MIN_ROWS[2]=20000   # SaaS: at least 20K rows
+MIN_ROWS[3]=15000   # CMS: at least 15K rows
+MIN_ROWS[4]=50000   # Mobile: at least 50K rows
+MIN_ROWS[5]=30000   # Analytics: at least 30K rows
 
 ALL_PASS=true
 
