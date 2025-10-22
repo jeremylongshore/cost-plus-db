@@ -162,27 +162,28 @@ table tbody tr:first-child > * {
 }
 
 
-/* Table formatting - headers bold, content normal */
+/* Table formatting - headers BOLD & LARGER, content normal & smaller */
 table th {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.05rem;  /* Headers slightly larger */
+  text-transform: none;
 }
 
 table td {
-  font-weight: normal;
-  font-size: 1rem;
+  font-weight: 400;  /* Explicitly normal weight */
+  font-size: 0.95rem;  /* Content slightly smaller */
 }
 
 /* Links in tables - normal weight */
 table td a {
-  font-weight: normal;
+  font-weight: 400;
   text-decoration: underline;
 }
 
-/* Override any stray bold tags in table content */
+/* Override any stray bold tags in table content - FORCE normal weight */
 table td strong,
 table td b {
-  font-weight: normal;
+  font-weight: 400 !important;
 }
 
 .width-min {

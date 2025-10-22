@@ -42,8 +42,9 @@
 PRIMARY CONTACT (Jeremy Longshore)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Email:    jeremy@intentsolutions.io
-Response: Within 30 minutes (first 5 customers)
+Response: 4-hour SLA (business hours), typically 30-min
           7 days a week, including holidays
+          Critical outages: IMMEDIATE (automated alerts 24/7)
 
 EMERGENCY BACKUP OPERATOR (If no response >24 hours)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -67,28 +68,28 @@ You will receive notification if EBO activates
 </thead>
 <tbody>
 <tr>
-<td><strong>P0 - CRITICAL</strong></td>
+<td>P0 - CRITICAL</td>
 <td>Service down, data loss</td>
 <td>Database offline, data breach, backup failure causing data loss</td>
-<td><strong>30 minutes</strong></td>
+<td>30 minutes</td>
 </tr>
 <tr>
-<td><strong>P1 - HIGH</strong></td>
+<td>P1 - HIGH</td>
 <td>Degraded service</td>
 <td>Slow queries, disk space >90%, backup failure (data safe)</td>
-<td><strong>2 hours</strong></td>
+<td>2 hours</td>
 </tr>
 <tr>
-<td><strong>P2 - MEDIUM</strong></td>
+<td>P2 - MEDIUM</td>
 <td>Non-critical issue</td>
 <td>Configuration question, performance tuning request</td>
-<td><strong>4 hours</strong></td>
+<td>4 hours</td>
 </tr>
 <tr>
-<td><strong>P3 - LOW</strong></td>
+<td>P3 - LOW</td>
 <td>General inquiry</td>
 <td>Feature request, documentation question</td>
-<td><strong>Next business day</strong></td>
+<td>Next business day</td>
 </tr>
 </tbody>
 </table>
@@ -492,7 +493,8 @@ Alternative: Datadog ($15/mo), New Relic ($25/mo)
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │ PRIMARY OPERATOR RESPONSE                               │
-│ Expected: Within 30 minutes (first 5 customers)         │
+│ Expected: Typically 30-min (4-hour SLA business hours)  │
+│ Critical outages: IMMEDIATE (automated alerts 24/7)     │
 │ Action: Acknowledge, diagnose, resolve                  │
 └─────────────────────────────────────────────────────────┘
                           ↓
@@ -603,9 +605,9 @@ ALTER DATABASE your_database_name SET default_transaction_read_only = off;
 
 <p><strong>Expected Response Times:</strong></p>
 <ul>
-<li>First 5 customers: 30 minutes, 7 days/week</li>
-<li>After scale (6+ customers): 4 hours, M-F 9am-6pm ET</li>
-<li>Critical issues (P0): Always within 30 minutes, even if scaled</li>
+<li>Regular support: 4-hour SLA (business hours: M-F 9am-6pm ET), typically 30-min response, 7 days/week</li>
+<li>Critical issues (P0): IMMEDIATE response - automated alerts 24/7</li>
+<li>All customers receive same service level</li>
 </ul>
 
 <hr>
