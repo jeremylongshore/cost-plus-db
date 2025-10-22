@@ -484,3 +484,8 @@ label input {
     word-break: break-word;
   }
 }
+
+/* Keep headers prominent */
+th {
+  font-weight: 700;
+}
