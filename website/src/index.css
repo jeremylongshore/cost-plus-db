@@ -162,9 +162,29 @@ table tbody tr:first-child > * {
 }
 
 
-th {
+/* Table formatting - headers bold, content normal */
+table th {
   font-weight: 700;
+  font-size: 1rem;
 }
+
+table td {
+  font-weight: normal;
+  font-size: 1rem;
+}
+
+/* Links in tables - normal weight */
+table td a {
+  font-weight: normal;
+  text-decoration: underline;
+}
+
+/* Override any stray bold tags in table content */
+table td strong,
+table td b {
+  font-weight: normal;
+}
+
 .width-min {
   width: 0%;
 }
@@ -485,7 +505,3 @@ label input {
   }
 }
 
-/* Keep headers prominent */
-th {
-  font-weight: 700;
-}
