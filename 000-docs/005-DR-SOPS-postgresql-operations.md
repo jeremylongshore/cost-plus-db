@@ -2139,9 +2139,1246 @@ Before marking SOP-003 complete, verify:
 **Issues encountered:** (document for future reference)
 **Next SOP:** SOP-004: Monitoring Stack Deployment
 
+<a name="sop-004"></a>
+
+## SOP-004: Monitoring Stack Deployment
+
+**Purpose:** Deploy and configure comprehensive 24/7 monitoring infrastructure
+**When to use:** After backup system setup, before hosting any customer data
+**Time required:** 120-180 minutes
+**Frequency:** One-time per VPS (with ongoing maintenance)
+**Risk Level:** HIGH - Monitoring failures = blind to customer issues
+
+### Prerequisites
+- [ ] SOP-003 completed (Backup system working)
+- [ ] PostgreSQL 16 running and accessible
+- [ ] Valid email address for alerts
+- [ ] Credit card for monitoring services (most have free tiers)
+- [ ] Access to phone for critical alert testing
+
+### Safety Checklist
+- [ ] No customers on this VPS yet (or maintenance window scheduled)
+- [ ] You have 3 hours of uninterrupted time
+- [ ] Backup snapshot exists (from SOP-003)
+- [ ] You have password manager open
+
+### Overview: The 5-Tool Monitoring Stack
+
+**Why 5 different tools?** Each serves a specific purpose:
+
+1. **Betterstack** - External uptime monitoring (is database reachable?)
+2. **Healthchecks.io** - Cron job monitoring (are backups running?)
+3. **Uptime Kuma** - Internal service dashboard (visual status overview)
+4. **Grafana OnCall** - Alert routing & escalation (phone/email/Slack)
+5. **Prometheus** - Metrics collection & graphing (performance trends)
+
+**Total Monthly Cost:** $0-29 (all have free tiers that work for 1-5 customers)
+
 ---
 
-**Last Updated:** October 19, 2025
-**Status:** Document complete - SOP-001, SOP-002, and SOP-003 ready for production use
+### Step 1: Betterstack Uptime Monitoring
 
-**Note:** Remaining SOPs (SOP-004 through SOP-503) will be added as they are developed and tested.
+**Purpose:** External monitoring that alerts if database becomes unreachable from internet.
+
+**1.1 - Create Betterstack Account:**
+
+1. Go to https://betterstack.com/uptime
+2. Click "Start Free Trial" (no credit card required)
+3. Sign up with your email
+4. Verify email address
+5. Choose "Uptime Monitoring" product
+
+**1.2 - Create PostgreSQL Monitor:**
+
+1. In Betterstack dashboard, click "Create Monitor"
+2. Monitor type: **TCP Port Check**
+3. Configuration:
+   - **Name:** `CostPlusDB-VPS-001-PostgreSQL`
+   - **Host:** Your VPS IP address
+   - **Port:** 5432
+   - **Check frequency:** Every 1 minute (free tier allows 30 sec)
+   - **Regions:** Select 2-3 regions (US-East, US-West, Europe)
+   - **Expected response:** Port open
+   - **Timeout:** 10 seconds
+
+4. Click "Create Monitor"
+
+**1.3 - Configure Alert Policy:**
+
+1. Go to "Policies" in Betterstack
+2. Create new policy: "Critical Database Down"
+3. Settings:
+   - **Trigger after:** 2 failed checks (2 minutes down)
+   - **Alert channels:** Email (add your email)
+   - **Escalation:** After 5 minutes, send SMS (if configured)
+   - **On-call schedule:** 24/7
+
+4. Assign this policy to your PostgreSQL monitor
+
+**1.4 - Test the Monitor:**
+
+```bash
+# Test 1: Verify monitor shows "UP"
+# Check Betterstack dashboard - should show green status
+
+# Test 2: Simulate downtime
+sudo systemctl stop postgresql
+
+# Wait 3 minutes
+# Check your email - should receive alert
+
+# Test 3: Restore service
+sudo systemctl start postgresql
+
+# Check email - should receive recovery notification
+```
+
+**1.5 - Add to Dashboard:**
+
+1. Create Betterstack status page (optional): https://statuspage.betterstack.com
+2. Add monitor to public status page
+3. Save status page URL for customer communications
+
+**✅ Checkpoint 1:** Betterstack monitoring active and tested?
+
+**Save credentials:**
+- Login: your-email@example.com
+- Password: (save in password manager as "Betterstack-CostPlusDB")
+- Status page URL: (save in notes)
+
+---
+
+### Step 2: Healthchecks.io (Dead Man's Switch)
+
+**Purpose:** Ensure cron jobs (backups, health checks) are running on schedule.
+
+**2.1 - Create Healthchecks.io Account:**
+
+1. Go to https://healthchecks.io
+2. Click "Sign Up" (free tier: 20 checks)
+3. Verify email
+4. Log in to dashboard
+
+**2.2 - Create Backup Check:**
+
+1. Click "Add Check"
+2. Configuration:
+   - **Name:** `CostPlusDB Backup (Full)`
+   - **Schedule:** Once per week (Sunday 2:00 AM)
+   - **Grace time:** 30 minutes
+   - **Description:** Weekly full backup via pgBackRest
+
+3. Click "Save"
+4. Copy the **Ping URL** (looks like: `https://hc-ping.com/xxxxxxxxxx`)
+
+**2.3 - Create Daily Differential Backup Check:**
+
+1. Click "Add Check"
+2. Configuration:
+   - **Name:** `CostPlusDB Backup (Differential)`
+   - **Schedule:** Daily at 2:00 AM
+   - **Grace time:** 30 minutes
+
+3. Save and copy Ping URL
+
+**2.4 - Create Health Check Monitor:**
+
+1. Click "Add Check"
+2. Configuration:
+   - **Name:** `CostPlusDB Health Check`
+   - **Schedule:** Every 5 minutes
+   - **Grace time:** 10 minutes
+
+3. Save and copy Ping URL
+
+**2.5 - Integrate with Backup Scripts:**
+
+Edit backup script to ping Healthchecks.io:
+
+```bash
+sudo vim /opt/costplusdb/scripts/pgbackrest-backup.sh
+```
+
+Add after successful backup (around line 1789):
+
+```bash
+# Healthchecks.io ping (success)
+HEALTHCHECK_URL="https://hc-ping.com/YOUR-BACKUP-CHECK-UUID"
+
+if [ "$BACKUP_TYPE" = "full" ]; then
+    # Ping full backup check
+    curl -fsS -m 10 --retry 5 "$HEALTHCHECK_URL" > /dev/null
+else
+    # Ping differential backup check
+    DIFF_URL="https://hc-ping.com/YOUR-DIFF-BACKUP-CHECK-UUID"
+    curl -fsS -m 10 --retry 5 "$DIFF_URL" > /dev/null
+fi
+```
+
+Add before `exit 1` on failure (around line 1797):
+
+```bash
+# Healthchecks.io ping (failure)
+curl -fsS -m 10 --retry 5 "$HEALTHCHECK_URL/fail" > /dev/null
+```
+
+**2.6 - Integrate with Health Check Script:**
+
+Edit health check script:
+
+```bash
+sudo vim /opt/costplusdb/scripts/pg-health-check.sh
+```
+
+Add at the end (after line 1032):
+
+```bash
+# Healthchecks.io ping
+HEALTH_CHECK_URL="https://hc-ping.com/YOUR-HEALTH-CHECK-UUID"
+curl -fsS -m 10 --retry 3 "$HEALTH_CHECK_URL" > /dev/null
+```
+
+**2.7 - Test Healthchecks.io:**
+
+```bash
+# Test backup monitoring
+sudo -u postgres /opt/costplusdb/scripts/pgbackrest-backup.sh
+
+# Check Healthchecks.io dashboard - should show green checkmark
+
+# Test health check monitoring
+/opt/costplusdb/scripts/pg-health-check.sh
+
+# Verify ping received in Healthchecks.io dashboard
+```
+
+**2.8 - Configure Alerts:**
+
+1. In Healthchecks.io, go to "Integrations"
+2. Add Email integration (your email)
+3. Test integration - send test alert
+4. Verify email received
+
+**✅ Checkpoint 2:** Healthchecks.io monitoring backup/health check jobs?
+
+---
+
+### Step 3: Uptime Kuma (Self-Hosted Dashboard)
+
+**Purpose:** Visual dashboard for all service statuses (PostgreSQL, pgBouncer, disk space, etc.)
+
+**3.1 - Install Uptime Kuma:**
+
+```bash
+# 3.1.1 - Install Node.js (required)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# 3.1.2 - Verify Node.js installed
+node --version
+npm --version
+
+# 3.1.3 - Create directory for Uptime Kuma
+sudo mkdir -p /opt/uptime-kuma
+sudo chown admin:admin /opt/uptime-kuma
+
+# 3.1.4 - Clone Uptime Kuma
+cd /opt/uptime-kuma
+git clone https://github.com/louislam/uptime-kuma.git .
+
+# 3.1.5 - Install dependencies (takes 5-10 minutes)
+npm ci --production
+
+# 3.1.6 - Build the application
+npm run build
+```
+
+**3.2 - Configure Uptime Kuma as Service:**
+
+```bash
+# 3.2.1 - Create systemd service file
+sudo vim /etc/systemd/system/uptime-kuma.service
+```
+
+Add this content:
+
+```ini
+[Unit]
+Description=Uptime Kuma Service Monitoring Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/opt/uptime-kuma
+ExecStart=/usr/bin/node server/server.js
+Restart=always
+RestartSec=10
+
+Environment=NODE_ENV=production
+Environment=PORT=3001
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# 3.2.2 - Save and reload systemd
+sudo systemctl daemon-reload
+
+# 3.2.3 - Start Uptime Kuma
+sudo systemctl start uptime-kuma
+
+# 3.2.4 - Enable on boot
+sudo systemctl enable uptime-kuma
+
+# 3.2.5 - Check status
+sudo systemctl status uptime-kuma
+# Should show: "active (running)"
+```
+
+**3.3 - Configure Firewall for Dashboard:**
+
+```bash
+# Allow port 3001 for Uptime Kuma dashboard
+sudo ufw allow 3001/tcp comment 'Uptime Kuma'
+
+# Verify
+sudo ufw status
+```
+
+**3.4 - Access Dashboard & Initial Setup:**
+
+1. Open browser: `http://YOUR-VPS-IP:3001`
+2. First-time setup:
+   - Create admin username: `admin`
+   - Create strong password (save in password manager: "Uptime-Kuma-Admin")
+3. Click "Create"
+
+**3.5 - Add Monitors:**
+
+**Monitor 1: PostgreSQL (TCP)**
+1. Click "Add New Monitor"
+2. Settings:
+   - Monitor Type: **TCP Port**
+   - Friendly Name: `PostgreSQL-5432`
+   - Hostname: `localhost`
+   - Port: `5432`
+   - Heartbeat Interval: 60 seconds
+   - Retries: 3
+3. Click "Save"
+
+**Monitor 2: pgBouncer (TCP)**
+1. Add New Monitor
+2. Settings:
+   - Monitor Type: **TCP Port**
+   - Friendly Name: `pgBouncer-6432`
+   - Hostname: `localhost`
+   - Port: `6432`
+   - Heartbeat Interval: 60 seconds
+3. Click "Save"
+
+**Monitor 3: Disk Space**
+1. Add New Monitor
+2. Settings:
+   - Monitor Type: **HTTP(s)**
+   - Friendly Name: `Disk-Space-Check`
+   - URL: Script that returns disk usage JSON
+   - Method: GET
+   - Heartbeat Interval: 300 seconds (5 min)
+   - Expected Status Code: 200
+3. Click "Save"
+
+**Monitor 4: Database Connections**
+1. Add New Monitor
+2. Settings:
+   - Monitor Type: **HTTP(s)**
+   - Friendly Name: `DB-Connection-Count`
+   - URL: Script that returns connection count
+   - Heartbeat Interval: 60 seconds
+3. Click "Save"
+
+**3.6 - Configure Notifications:**
+
+1. Go to Settings → Notifications
+2. Add Email notification:
+   - Type: SMTP Email
+   - SMTP Host: (your email provider)
+   - SMTP Port: 587
+   - From Address: monitoring@yourdomain.com
+   - To Address: your-email@example.com
+3. Save and test
+
+**3.7 - Create Status Page:**
+
+1. Go to "Status Pages"
+2. Click "Create New Status Page"
+3. Settings:
+   - Title: `CostPlusDB System Status`
+   - Description: `Real-time status of CostPlusDB infrastructure`
+   - Add all monitors to the page
+4. Save and get public URL
+
+**✅ Checkpoint 3:** Uptime Kuma dashboard accessible and monitoring services?
+
+---
+
+### Step 4: Prometheus (Metrics Collection)
+
+**Purpose:** Collect and graph PostgreSQL performance metrics over time.
+
+**4.1 - Install Prometheus:**
+
+```bash
+# 4.1.1 - Create prometheus user
+sudo useradd --no-create-home --shell /bin/false prometheus
+
+# 4.1.2 - Download Prometheus
+cd /tmp
+PROM_VERSION="2.45.0"
+wget https://github.com/prometheus/prometheus/releases/download/v${PROM_VERSION}/prometheus-${PROM_VERSION}.linux-amd64.tar.gz
+
+# 4.1.3 - Extract
+tar xzf prometheus-${PROM_VERSION}.linux-amd64.tar.gz
+cd prometheus-${PROM_VERSION}.linux-amd64
+
+# 4.1.4 - Copy binaries
+sudo cp prometheus /usr/local/bin/
+sudo cp promtool /usr/local/bin/
+sudo chown prometheus:prometheus /usr/local/bin/prometheus
+sudo chown prometheus:prometheus /usr/local/bin/promtool
+
+# 4.1.5 - Create directories
+sudo mkdir -p /etc/prometheus
+sudo mkdir -p /var/lib/prometheus
+sudo chown prometheus:prometheus /etc/prometheus
+sudo chown prometheus:prometheus /var/lib/prometheus
+
+# 4.1.6 - Copy console files
+sudo cp -r consoles /etc/prometheus
+sudo cp -r console_libraries /etc/prometheus
+sudo chown -R prometheus:prometheus /etc/prometheus
+```
+
+**4.2 - Install PostgreSQL Exporter:**
+
+```bash
+# 4.2.1 - Download postgres_exporter
+cd /tmp
+EXPORTER_VERSION="0.13.2"
+wget https://github.com/prometheus-community/postgres_exporter/releases/download/v${EXPORTER_VERSION}/postgres_exporter-${EXPORTER_VERSION}.linux-amd64.tar.gz
+
+# 4.2.2 - Extract and install
+tar xzf postgres_exporter-${EXPORTER_VERSION}.linux-amd64.tar.gz
+cd postgres_exporter-${EXPORTER_VERSION}.linux-amd64
+sudo cp postgres_exporter /usr/local/bin/
+sudo chown prometheus:prometheus /usr/local/bin/postgres_exporter
+```
+
+**4.3 - Configure PostgreSQL Exporter:**
+
+```bash
+# 4.3.1 - Create monitoring user in PostgreSQL
+sudo -u postgres psql << EOF
+CREATE USER prometheus_exporter WITH PASSWORD 'STRONG_PASSWORD_HERE';
+GRANT pg_monitor TO prometheus_exporter;
+GRANT CONNECT ON DATABASE postgres TO prometheus_exporter;
+EOF
+
+# Save password in password manager as "Prometheus-PostgreSQL-Exporter"
+
+# 4.3.2 - Create connection string file
+sudo mkdir -p /etc/postgres_exporter
+sudo vim /etc/postgres_exporter/postgres_exporter.env
+```
+
+Add:
+
+```bash
+DATA_SOURCE_NAME="postgresql://prometheus_exporter:STRONG_PASSWORD_HERE@localhost:5432/postgres?sslmode=require"
+```
+
+```bash
+# 4.3.3 - Set permissions
+sudo chown prometheus:prometheus /etc/postgres_exporter/postgres_exporter.env
+sudo chmod 600 /etc/postgres_exporter/postgres_exporter.env
+```
+
+**4.4 - Create Systemd Services:**
+
+**PostgreSQL Exporter Service:**
+
+```bash
+sudo vim /etc/systemd/system/postgres_exporter.service
+```
+
+Add:
+
+```ini
+[Unit]
+Description=PostgreSQL Exporter for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+User=prometheus
+EnvironmentFile=/etc/postgres_exporter/postgres_exporter.env
+ExecStart=/usr/local/bin/postgres_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Prometheus Service:**
+
+```bash
+sudo vim /etc/systemd/system/prometheus.service
+```
+
+Add:
+
+```ini
+[Unit]
+Description=Prometheus Monitoring System
+After=network.target
+
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/var/lib/prometheus/ \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.console.libraries=/etc/prometheus/console_libraries
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**4.5 - Configure Prometheus:**
+
+```bash
+sudo vim /etc/prometheus/prometheus.yml
+```
+
+Add:
+
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['localhost:9187']
+        labels:
+          instance: 'costplusdb-vps-001'
+          customer: 'internal'
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+```
+
+```bash
+# Set ownership
+sudo chown prometheus:prometheus /etc/prometheus/prometheus.yml
+```
+
+**4.6 - Install Node Exporter (System Metrics):**
+
+```bash
+cd /tmp
+NODE_EXPORTER_VERSION="1.6.1"
+wget https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
+
+tar xzf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
+cd node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64
+sudo cp node_exporter /usr/local/bin/
+sudo chown prometheus:prometheus /usr/local/bin/node_exporter
+```
+
+**Node Exporter Service:**
+
+```bash
+sudo vim /etc/systemd/system/node_exporter.service
+```
+
+Add:
+
+```ini
+[Unit]
+Description=Node Exporter for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**4.7 - Start All Services:**
+
+```bash
+# Reload systemd
+sudo systemctl daemon-reload
+
+# Start and enable services
+sudo systemctl start postgres_exporter
+sudo systemctl enable postgres_exporter
+sudo systemctl start node_exporter
+sudo systemctl enable node_exporter
+sudo systemctl start prometheus
+sudo systemctl enable prometheus
+
+# Verify all running
+sudo systemctl status postgres_exporter
+sudo systemctl status node_exporter
+sudo systemctl status prometheus
+```
+
+**4.8 - Configure Firewall:**
+
+```bash
+# Prometheus dashboard
+sudo ufw allow 9090/tcp comment 'Prometheus'
+
+# PostgreSQL exporter
+sudo ufw allow 9187/tcp comment 'PostgreSQL Exporter'
+
+# Node exporter
+sudo ufw allow 9100/tcp comment 'Node Exporter'
+```
+
+**4.9 - Verify Metrics Collection:**
+
+```bash
+# Test PostgreSQL exporter
+curl http://localhost:9187/metrics | grep pg_up
+# Should show: pg_up 1
+
+# Test Node exporter
+curl http://localhost:9100/metrics | grep node_cpu
+# Should show CPU metrics
+
+# Access Prometheus dashboard
+# Open browser: http://YOUR-VPS-IP:9090
+```
+
+**4.10 - Create Basic Queries:**
+
+In Prometheus dashboard (http://YOUR-VPS-IP:9090):
+
+1. **Database connections:**
+   ```
+   pg_stat_database_numbackends{datname="postgres"}
+   ```
+
+2. **Query rate:**
+   ```
+   rate(pg_stat_database_xact_commit{datname="postgres"}[5m])
+   ```
+
+3. **Disk usage:**
+   ```
+   node_filesystem_avail_bytes{mountpoint="/"}
+   ```
+
+4. **CPU usage:**
+   ```
+   100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+   ```
+
+**✅ Checkpoint 4:** Prometheus collecting PostgreSQL and system metrics?
+
+---
+
+### Step 5: Grafana OnCall (Alert Routing)
+
+**Purpose:** Centralized alert routing with phone/SMS escalation for critical issues.
+
+**5.1 - Create Grafana Cloud Account:**
+
+1. Go to https://grafana.com/products/cloud/
+2. Click "Sign Up for Free"
+3. Choose "Grafana Cloud Free" plan
+4. Create account and verify email
+
+**5.2 - Enable OnCall:**
+
+1. Log into Grafana Cloud
+2. Go to "Apps" → "OnCall"
+3. Click "Enable OnCall"
+4. Wait for provisioning (1-2 minutes)
+
+**5.3 - Create Integration with Prometheus:**
+
+1. In OnCall, go to "Integrations"
+2. Click "Add Integration"
+3. Choose "Webhook"
+4. Name: `CostPlusDB Prometheus`
+5. Copy the webhook URL
+6. Save
+
+**5.4 - Configure Prometheus Alertmanager:**
+
+```bash
+# Install Alertmanager
+cd /tmp
+ALERTMANAGER_VERSION="0.26.0"
+wget https://github.com/prometheus/alertmanager/releases/download/v${ALERTMANAGER_VERSION}/alertmanager-${ALERTMANAGER_VERSION}.linux-amd64.tar.gz
+
+tar xzf alertmanager-${ALERTMANAGER_VERSION}.linux-amd64.tar.gz
+cd alertmanager-${ALERTMANAGER_VERSION}.linux-amd64
+
+sudo cp alertmanager /usr/local/bin/
+sudo cp amtool /usr/local/bin/
+sudo chown prometheus:prometheus /usr/local/bin/alertmanager
+sudo chown prometheus:prometheus /usr/local/bin/amtool
+
+sudo mkdir -p /etc/alertmanager
+sudo chown prometheus:prometheus /etc/alertmanager
+```
+
+**Create Alertmanager config:**
+
+```bash
+sudo vim /etc/alertmanager/alertmanager.yml
+```
+
+Add:
+
+```yaml
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'instance']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 4h
+  receiver: 'grafana-oncall'
+
+receivers:
+  - name: 'grafana-oncall'
+    webhook_configs:
+      - url: 'YOUR_GRAFANA_ONCALL_WEBHOOK_URL_HERE'
+        send_resolved: true
+```
+
+```bash
+sudo chown prometheus:prometheus /etc/alertmanager/alertmanager.yml
+```
+
+**Create Alertmanager service:**
+
+```bash
+sudo vim /etc/systemd/system/alertmanager.service
+```
+
+Add:
+
+```ini
+[Unit]
+Description=Prometheus Alertmanager
+After=network.target
+
+[Service]
+Type=simple
+User=prometheus
+ExecStart=/usr/local/bin/alertmanager \
+  --config.file=/etc/alertmanager/alertmanager.yml \
+  --storage.path=/var/lib/alertmanager
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Create storage directory
+sudo mkdir -p /var/lib/alertmanager
+sudo chown prometheus:prometheus /var/lib/alertmanager
+
+# Start service
+sudo systemctl daemon-reload
+sudo systemctl start alertmanager
+sudo systemctl enable alertmanager
+sudo systemctl status alertmanager
+```
+
+**5.5 - Add Alert Rules to Prometheus:**
+
+```bash
+sudo vim /etc/prometheus/alert_rules.yml
+```
+
+Add:
+
+```yaml
+groups:
+  - name: database_alerts
+    interval: 30s
+    rules:
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down on {{ $labels.instance }}"
+          description: "PostgreSQL has been down for more than 2 minutes"
+
+      - alert: HighDatabaseConnections
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connections on {{ $labels.instance }}"
+          description: "Database has {{ $value }} connections (>80)"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk space is below 15% ({{ $value }}%)"
+
+      - alert: HighCPU
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% (>85%)"
+
+      - alert: BackupFailed
+        expr: up{job="healthchecks"} == 0
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backup check failed on {{ $labels.instance }}"
+          description: "No backup ping received in the last hour"
+```
+
+Update prometheus.yml to include rules:
+
+```bash
+sudo vim /etc/prometheus/prometheus.yml
+```
+
+Add under `global:`:
+
+```yaml
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
+```
+
+```bash
+# Reload Prometheus
+sudo systemctl reload prometheus
+
+# Verify rules loaded
+curl http://localhost:9090/api/v1/rules | jq
+```
+
+**5.6 - Configure OnCall Escalation:**
+
+1. In Grafana OnCall dashboard, go to "Escalation Chains"
+2. Create new chain: "Critical Database Issues"
+3. Steps:
+   - Step 1: Notify via email (immediately)
+   - Step 2: Wait 5 minutes
+   - Step 3: Call phone (if no acknowledgment)
+   - Step 4: Wait 10 minutes
+   - Step 5: Repeat
+
+4. Add your contact methods:
+   - Email: your-email@example.com
+   - Phone: (add via Twilio or similar - requires setup)
+
+**5.7 - Test Alert Flow:**
+
+```bash
+# Simulate PostgreSQL down
+sudo systemctl stop postgresql
+
+# Wait 3 minutes
+
+# Check Grafana OnCall - should receive alert
+
+# Restore service
+sudo systemctl start postgresql
+
+# Check for resolution notification
+```
+
+**✅ Checkpoint 5:** Grafana OnCall receiving and routing alerts?
+
+---
+
+### Step 6: Integration Testing
+
+**Purpose:** Verify all monitoring tools work together.
+
+**6.1 - Create Monitoring Status Script:**
+
+```bash
+vim /opt/costplusdb/scripts/monitoring-status.sh
+```
+
+Add:
+
+```bash
+#!/bin/bash
+# Monitoring Stack Status Check
+
+echo "=========================================="
+echo "  CostPlusDB Monitoring Stack Status"
+echo "=========================================="
+echo ""
+
+# Check Betterstack (external check)
+echo "1. Betterstack Uptime Monitoring:"
+echo "   → https://betterstack.com/uptime"
+echo "   Status: Check dashboard manually"
+echo ""
+
+# Check Healthchecks.io
+echo "2. Healthchecks.io (Dead Man's Switch):"
+echo "   → https://healthchecks.io"
+echo "   Status: Check dashboard manually"
+echo ""
+
+# Check Uptime Kuma
+echo "3. Uptime Kuma:"
+if systemctl is-active --quiet uptime-kuma; then
+    echo "   Service: ✓ Running"
+    echo "   Dashboard: http://$(hostname -I | awk '{print $1}'):3001"
+else
+    echo "   Service: ✗ Not running"
+fi
+echo ""
+
+# Check Prometheus
+echo "4. Prometheus:"
+if systemctl is-active --quiet prometheus; then
+    echo "   Service: ✓ Running"
+    PROM_STATUS=$(curl -s http://localhost:9090/-/healthy)
+    echo "   Health: $PROM_STATUS"
+    echo "   Dashboard: http://$(hostname -I | awk '{print $1}'):9090"
+else
+    echo "   Service: ✗ Not running"
+fi
+echo ""
+
+# Check PostgreSQL Exporter
+echo "5. PostgreSQL Exporter:"
+if systemctl is-active --quiet postgres_exporter; then
+    echo "   Service: ✓ Running"
+    EXPORTER_STATUS=$(curl -s http://localhost:9187/metrics | grep -c pg_up)
+    echo "   Metrics available: $EXPORTER_STATUS lines"
+else
+    echo "   Service: ✗ Not running"
+fi
+echo ""
+
+# Check Alertmanager
+echo "6. Alertmanager:"
+if systemctl is-active --quiet alertmanager; then
+    echo "   Service: ✓ Running"
+    echo "   Dashboard: http://$(hostname -I | awk '{print $1}'):9093"
+else
+    echo "   Service: ✗ Not running"
+fi
+echo ""
+
+echo "7. Grafana OnCall:"
+echo "   → https://grafana.com/products/cloud/oncall/"
+echo "   Status: Check dashboard manually"
+echo ""
+
+echo "=========================================="
+```
+
+```bash
+chmod +x /opt/costplusdb/scripts/monitoring-status.sh
+
+# Create alias
+echo "alias monitoring-status='/opt/costplusdb/scripts/monitoring-status.sh'" >> ~/.bashrc
+source ~/.bashrc
+
+# Run it
+monitoring-status
+```
+
+**6.2 - Test Each Alert Path:**
+
+**Test 1: PostgreSQL Down Alert**
+```bash
+# Stop PostgreSQL
+sudo systemctl stop postgresql
+
+# Expected alerts (within 5 minutes):
+# - Betterstack: Email alert (port 5432 unreachable)
+# - Uptime Kuma: Dashboard shows red
+# - Prometheus: Alert fires after 2 minutes
+# - Grafana OnCall: Receives alert, sends email
+# - Healthchecks.io: No ping received (after 10 min)
+
+# Restore
+sudo systemctl start postgresql
+
+# Expected recovery notifications
+```
+
+**Test 2: Backup Failure Alert**
+```bash
+# Simulate backup failure (rename script temporarily)
+sudo mv /opt/costplusdb/scripts/pgbackrest-backup.sh /opt/costplusdb/scripts/pgbackrest-backup.sh.disabled
+
+# Wait for next scheduled backup time (or run cron manually)
+# After 30 minutes grace period:
+# - Healthchecks.io: Alert (no ping received)
+
+# Restore
+sudo mv /opt/costplusdb/scripts/pgbackrest-backup.sh.disabled /opt/costplusdb/scripts/pgbackrest-backup.sh
+```
+
+**Test 3: Disk Space Alert**
+```bash
+# Create large temporary file to simulate disk full
+# (DO NOT DO THIS IN PRODUCTION)
+# sudo dd if=/dev/zero of=/tmp/bigfile bs=1M count=50000
+
+# Wait 10 minutes
+# Expected: Prometheus disk space alert → Grafana OnCall
+
+# Clean up
+# sudo rm /tmp/bigfile
+```
+
+**6.3 - Document Alert Response Times:**
+
+Create log of test results:
+
+```bash
+vim ~/costplusdb/MONITORING-TEST-RESULTS.md
+```
+
+Document:
+- Time to detect (how long until alert fired)
+- Time to notify (how long until you received notification)
+- Recovery detection (did it detect when issue resolved?)
+- False positives (any alerts that shouldn't have fired?)
+
+**✅ Checkpoint 6:** All monitoring tools tested and working?
+
+---
+
+### Step 7: Documentation & Maintenance
+
+**7.1 - Create Monitoring Documentation:**
+
+```bash
+vim ~/costplusdb/MONITORING-CONFIG.md
+```
+
+Add:
+
+```markdown
+# Monitoring Stack Configuration - CostPlusDB
+
+## Overview
+5-tool monitoring stack providing 24/7 coverage for database infrastructure.
+
+## Tools & Access
+
+### 1. Betterstack (External Uptime)
+- Dashboard: https://betterstack.com/uptime
+- Login: your-email@example.com
+- Password: (in password manager: "Betterstack-CostPlusDB")
+- Monitors: PostgreSQL TCP port 5432
+- Check frequency: Every 1 minute
+- Alert threshold: 2 failed checks (2 minutes down)
+
+### 2. Healthchecks.io (Cron Monitoring)
+- Dashboard: https://healthchecks.io
+- Login: your-email@example.com
+- Password: (in password manager: "Healthchecks-CostPlusDB")
+- Monitors:
+  - Full backup (weekly Sunday 2 AM)
+  - Differential backup (daily 2 AM)
+  - Health check (every 5 minutes)
+
+### 3. Uptime Kuma (Internal Dashboard)
+- Dashboard: http://YOUR-VPS-IP:3001
+- Login: admin
+- Password: (in password manager: "Uptime-Kuma-Admin")
+- Monitors: PostgreSQL, pgBouncer, disk space, connections
+
+### 4. Prometheus (Metrics)
+- Dashboard: http://YOUR-VPS-IP:9090
+- No authentication (internal only)
+- Scrapes: PostgreSQL exporter, Node exporter
+- Alert rules: /etc/prometheus/alert_rules.yml
+
+### 5. Grafana OnCall (Alert Routing)
+- Dashboard: https://YOUR-ORG.grafana.net/a/grafana-oncall-app
+- Login: your-email@example.com
+- Password: (in password manager: "Grafana-Cloud")
+- Escalation chain: Critical Database Issues
+
+## Alert Flow
+
+```
+Issue Detected
+    ↓
+[Prometheus detects via metrics]
+    ↓
+[Fires alert to Alertmanager]
+    ↓
+[Alertmanager routes to Grafana OnCall]
+    ↓
+[OnCall escalates per policy]
+    ↓
+1. Email (immediate)
+2. Wait 5 min
+3. Phone call (if not acknowledged)
+4. Repeat every 10 min
+```
+
+## Maintenance Schedule
+
+- **Daily:** Review Uptime Kuma dashboard
+- **Weekly:** Check Healthchecks.io for missed pings
+- **Monthly:** Review Prometheus metrics for trends
+- **Quarterly:** Test full alert escalation chain
+
+## Common Commands
+
+```bash
+# Check all monitoring services
+monitoring-status
+
+# View Prometheus metrics
+curl http://localhost:9187/metrics | grep pg_up
+
+# Check Alertmanager status
+curl http://localhost:9093/api/v1/status
+
+# Restart services
+sudo systemctl restart prometheus
+sudo systemctl restart postgres_exporter
+sudo systemctl restart uptime-kuma
+```
+
+## Troubleshooting
+
+**Issue:** Prometheus not collecting PostgreSQL metrics
+- Check postgres_exporter: `sudo systemctl status postgres_exporter`
+- Verify connection string: `sudo cat /etc/postgres_exporter/postgres_exporter.env`
+- Test manually: `curl http://localhost:9187/metrics`
+
+**Issue:** Healthchecks.io not receiving pings
+- Check backup script has curl commands
+- Verify URL is correct in script
+- Test ping manually: `curl https://hc-ping.com/YOUR-UUID`
+
+**Issue:** Uptime Kuma shows all services down
+- Check if Uptime Kuma service is running
+- Verify monitors are configured with correct targets
+- Check firewall isn't blocking internal connections
+
+## Notes
+- All monitoring tools have free tiers sufficient for 1-5 customers
+- Total cost: $0-29/month depending on features used
+- Phone alerts require Twilio integration (additional cost)
+```
+
+**7.2 - Update VPS Inventory:**
+
+```bash
+echo "" >> ~/costplusdb/VPS-INVENTORY.md
+echo "## Monitoring Configuration" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Monitoring Stack: Deployed (see MONITORING-CONFIG.md)" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Betterstack: Active" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Healthchecks.io: Active (3 checks)" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Uptime Kuma: Running on port 3001" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Prometheus: Running on port 9090" >> ~/costplusdb/VPS-INVENTORY.md
+echo "- Grafana OnCall: Configured" >> ~/costplusdb/VPS-INVENTORY.md
+```
+
+**7.3 - Add to Health Check Routine:**
+
+Add monitoring stack checks to morning routine (future SOP-101):
+
+```bash
+vim /opt/costplusdb/scripts/morning-health-check.sh
+```
+
+Include checks for:
+- All 5 monitoring services running
+- No critical alerts in last 24 hours
+- Healthchecks.io shows all green
+- Betterstack uptime percentage
+
+---
+
+### Completion Checklist
+
+Before marking SOP-004 complete, verify:
+
+- [ ] Betterstack account created and monitoring PostgreSQL
+- [ ] Healthchecks.io monitoring backup and health check jobs
+- [ ] Uptime Kuma installed and running as systemd service
+- [ ] Prometheus collecting PostgreSQL and system metrics
+- [ ] PostgreSQL exporter configured and scraping
+- [ ] Node exporter installed for system metrics
+- [ ] Alertmanager configured and routing alerts
+- [ ] Grafana OnCall receiving and escalating alerts
+- [ ] Alert rules created for critical conditions
+- [ ] All monitoring tools tested with simulated failures
+- [ ] Alert notification paths tested (email, phone)
+- [ ] Recovery notifications tested
+- [ ] Monitoring status script created
+- [ ] Documentation complete (MONITORING-CONFIG.md)
+- [ ] All credentials saved in password manager
+- [ ] Firewall rules configured for monitoring services
+- [ ] All monitoring services set to start on boot
+
+---
+
+### 🎉 SOP-004 Complete!
+
+**Time to complete:** _____ minutes
+**Issues encountered:** (document for future reference)
+**Next SOP:** SOP-101: Morning Health Check Routine (or SOP-102: Customer Onboarding)
+
+---
+
+**Last Updated:** October 22, 2025
+**Status:** SOP-001 through SOP-004 complete and production-ready
+
+**Note:** Remaining SOPs (SOP-101, SOP-102, SOP-201, etc.) will be added based on operational priorities.

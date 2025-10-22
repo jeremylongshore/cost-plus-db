@@ -27,6 +27,10 @@
 
 <p><a href="/">← Back to Home</a></p>
 
+<div style="background: var(--accent-2); color: var(--bg); padding: 1.5em; margin: 2em 0; border: 3px solid var(--accent-2);">
+<p style="margin: 0;"><strong>🚨 Database Down Right Now?</strong> Skip this page and go straight to <a href="/incident-response.html" style="color: var(--bg); text-decoration: underline; font-weight: 700;">Incident Response →</a></p>
+</div>
+
 <h2>How We Keep Your Database Running</h2>
 
 <p>We're reliable. Not five-nines reliable. Not automatic-failover-in-seconds reliable. But your-database-stays-up-and-we-can-recover-from-disasters reliable.</p>
@@ -84,59 +88,6 @@ Stack:
 </pre>
 
 <p>Any PostgreSQL expert can understand our setup. You can export and migrate anytime. No lock-in.</p>
-
-<hr>
-
-<h2>When Things Break: Recovery Scenarios</h2>
-
-<h3>VPS Hardware Failure</h3>
-<pre>
-What happens:     Server dies
-Detection:        5 minutes (monitoring)
-Response:         Restore to new VPS
-Downtime:         1-2 hours
-Data loss:        &lt;24 hours (last backup)
-Your action:      None
-</pre>
-
-<h3>Accidental Data Deletion</h3>
-<pre>
-What happens:     You ran DROP TABLE
-Detection:        You email us
-Response:         Point-in-time recovery
-Downtime:         30-60 minutes
-Data loss:        None (if within 7 days)
-Your action:      Tell us when it happened
-</pre>
-
-<h3>Database Corruption</h3>
-<pre>
-What happens:     PostgreSQL won't start
-Detection:        Automated checks
-Response:         Restore last good backup
-Downtime:         1-2 hours
-Data loss:        &lt;24 hours
-Your action:      None
-</pre>
-
-<h3>Datacenter Outage</h3>
-<pre>
-What happens:     Contabo regional failure
-Detection:        Immediate
-Response:         Restore to different provider
-Downtime:         2-4 hours
-Data loss:        &lt;24 hours
-Your action:      Update connection string
-</pre>
-
-<h3>Founder Unavailable</h3>
-<pre>
-What happens:     I'm incapacitated 48+ hours
-Detection:        Dead man's switch
-Response:         Backup operator activates
-Downtime:         None (databases keep running)
-Your action:      You have credentials to export
-</pre>
 
 <hr>
 
@@ -366,20 +317,18 @@ Updates:     Automatic security patches
 <hr>
 
 <footer>
-<p><strong>CostPlusDB</strong> - Database hosting at cost plus</p>
+<p style="text-align: center;"><strong>CostPlusDB</strong></p>
 
-<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström</p>
+<p>Jeremy owns and operates <a href="https://intentsolutions.io">intent solutions io</a>, which created and manages:</p>
 
-<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
-<a href="https://startaitools.com">startaitools.com</a> |
-<a href="https://intentsolutions.io">intentsolutions.io</a> |
-<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<p><a href="https://diagnosticpro.io">diagnosticpro.io</a> |
 <a href="https://hustlestats.io">hustlestats.io</a> |
-<a href="https://github.com/jeremylongshore">GitHub</a></p>
+<a href="https://startaitools.com">startaitools.com</a></p>
 
-<p>&copy; 2025 intent solutions io</p>
 <p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms of Service</a> | <a href="/acceptable-use.html">Acceptable Use</a></p>
-<p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a> | <a href="/emergency.html">Emergency Procedures</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security</a> | <a href="/reliability.html">Reliability</a> | <a href="/incident-response.html">Incident Response</a> | <a href="/emergency.html">Emergency</a> | <a href="/about.html">About</a> | <a href="/sitemap.html">Site Map</a></p>
+
+<p>&copy; 2025 Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström | <a href="https://github.com/jeremylongshore">GitHub</a></p>
 </footer>
 
 </body>

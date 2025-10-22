@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Incident Response - CostPlusDB</title>
+  <meta name="description" content="Database down? Performance issues? Start here for immediate help.">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Incident Response</h1>
+      <span class="subtitle">Database down? Start here.</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<p><a href="/">← Back to Home</a></p>
+
+<div style="background: var(--accent-2); color: var(--bg); padding: 1.5em; margin: 2em 0; border: 3px solid var(--accent-2);">
+<h2 style="margin-top: 0;">🚨 Contact Information</h2>
+<pre style="background: var(--bg); color: var(--fg); padding: 1em; margin: 0.5em 0;">
+Email:    jeremy@intentsolutions.io
+Response: Within 30 minutes (typically)
+Critical: IMMEDIATE response - automated 24/7 alerts
+</pre>
+<p style="margin-bottom: 0;"><strong>I'll see your message.</strong> For P0 critical issues, my phone alerts automatically.</p>
+</div>
+
+<h2>Is This an Emergency?</h2>
+
+<p>Use this page if you're experiencing an active issue right now. If you're just reading about our reliability practices, check out <a href="/reliability.html">Reliability & Recovery</a> instead.</p>
+
+<hr>
+
+<h2>Severity Levels</h2>
+
+<p>How we classify incidents:</p>
+
+<table style="margin: 2em auto;">
+<thead>
+<tr>
+<th>Level</th>
+<th>What It Means</th>
+<th>Examples</th>
+<th>Response Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0 - CRITICAL</strong></td>
+<td>Service down or data at risk</td>
+<td>Database offline, data loss, security breach, backup failure causing data loss</td>
+<td>30 minutes</td>
+</tr>
+<tr>
+<td><strong>P1 - HIGH</strong></td>
+<td>Severe degradation</td>
+<td>Major performance issues, backup failures (non-critical), security alerts</td>
+<td>2 hours</td>
+</tr>
+<tr>
+<td><strong>P2 - MEDIUM</strong></td>
+<td>Moderate impact</td>
+<td>Minor performance issues, non-critical errors, monitoring alerts</td>
+<td>4 hours</td>
+</tr>
+<tr>
+<td><strong>P3 - LOW</strong></td>
+<td>Minimal impact</td>
+<td>Questions, minor bugs, feature requests</td>
+<td>Next business day</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Note:</strong> Official SLA is 4-hour response during business hours (M-F 9am-6pm ET). Reality: I typically respond within 30 minutes, 7 days/week. Critical outages trigger immediate phone alerts 24/7.</p>
+
+<hr>
+
+<h2>What to Do Right Now</h2>
+
+<h3>Scenario 1: Database is Completely Down (P0)</h3>
+
+<p><strong>Symptoms:</strong> Can't connect. Application shows connection errors. All queries fail.</p>
+
+<details open>
+<summary><strong>Immediate Actions</strong></summary>
+
+<pre>
+1. Check the status page (coming soon: status.costplusdb.com)
+   For now: I'll email you if there's a known outage
+
+2. Verify it's not DNS or network:
+   ping your-host.costplusdb.com
+   (Should get a response - if not, it's DNS/network)
+
+3. Test the connection:
+   psql "postgresql://user@host:5432/db?sslmode=require"
+
+   If you get "Connection refused" → Database is down (P0)
+   If you get "Timeout" → Network issue (check your firewall)
+   If you get authentication error → Database is up, wrong credentials
+
+4. Email me immediately: jeremy@intentsolutions.io
+   Subject: "P0: Database Down - [your company]"
+   Include: Error messages, when it started, any recent changes
+</pre>
+</details>
+
+<details>
+<summary><strong>What I'm Doing</strong></summary>
+
+<pre>
+You don't need to tell me the database is down.
+
+Automated alerts already notified me:
+- Betterstack detected the outage within 1 minute
+- My phone alerted me immediately
+- I'm already investigating or working on it
+
+What happens next:
+1. I diagnose the issue (5-15 minutes)
+   - Check if PostgreSQL is running
+   - Review system logs
+   - Check disk space, memory, CPU
+
+2. I fix or restore (15-90 minutes depending on cause)
+   - Simple fix: Restart services, clear locks
+   - Complex: Restore from backup, migrate to new VPS
+
+3. I notify you when resolved
+   - Email with incident summary
+   - Explanation of what happened
+   - Steps to prevent recurrence
+</pre>
+</details>
+
+<details>
+<summary><strong>Expected Timeline</strong></summary>
+
+<table>
+<tr><th>Event</th><th>Time</th></tr>
+<tr><td>Detection (automated)</td><td>1-5 minutes</td></tr>
+<tr><td>My response</td><td>Immediate (phone alert)</td></tr>
+<tr><td>Diagnosis</td><td>5-15 minutes</td></tr>
+<tr><td>Resolution</td><td>30-120 minutes</td></tr>
+</table>
+
+<p><strong>Data loss:</strong> Maximum 24 hours (last backup). Usually zero if it's a service issue, not data corruption.</p>
+</details>
+
+<hr>
+
+<h3>Scenario 2: Slow Performance / Connection Issues (P1)</h3>
+
+<p><strong>Symptoms:</strong> Queries are slow. Connection timeouts. Application feels sluggish.</p>
+
+<details>
+<summary><strong>Quick Diagnostics You Can Run</strong></summary>
+
+<p>These queries help us diagnose faster:</p>
+
+<pre>
+-- Check active connections
+SELECT count(*) FROM pg_stat_activity;
+
+-- Look for long-running queries
+SELECT pid, now() - query_start AS duration, state, query
+FROM pg_stat_activity
+WHERE state = 'active'
+  AND now() - query_start > interval '1 minute'
+ORDER BY duration DESC;
+
+-- Check for locks
+SELECT pid, mode, granted, query
+FROM pg_locks
+JOIN pg_stat_activity USING (pid)
+WHERE NOT granted;
+</pre>
+
+<p>Send me the results when you email. It speeds up diagnosis significantly.</p>
+</details>
+
+<details>
+<summary><strong>Common Causes</strong></summary>
+
+<ul>
+<li><strong>Too many connections:</strong> Check if you're hitting max_connections limit</li>
+<li><strong>Long-running query:</strong> One slow query blocking others</li>
+<li><strong>Missing index:</strong> Sequential scan on large table</li>
+<li><strong>Disk space:</strong> Running low on storage</li>
+<li><strong>Memory:</strong> Shared buffers exhausted</li>
+</ul>
+
+<p>I'll check all of these when you contact me.</p>
+</details>
+
+<details>
+<summary><strong>Contact Me</strong></summary>
+
+<pre>
+Email: jeremy@intentsolutions.io
+Subject: "P1: Performance Issues - [your company]"
+
+Include:
+- When did it start?
+- How much slower? (e.g., "queries taking 10x longer")
+- Any recent changes? (new feature, traffic spike)
+- Results of diagnostic queries above (if you ran them)
+</pre>
+</details>
+
+<hr>
+
+<h3>Scenario 3: Suspected Data Loss or Corruption (P0)</h3>
+
+<p><strong>Symptoms:</strong> Missing records. Incorrect values. Data doesn't match expectations.</p>
+
+<details>
+<summary><strong>⚠️ STOP - Do NOT Do These Things</strong></summary>
+
+<pre>
+❌ Do NOT run DELETE or UPDATE statements to "fix" it
+❌ Do NOT attempt to restore backups yourself
+❌ Do NOT restart the database
+❌ Do NOT run VACUUM FULL
+
+Why? You might overwrite the data we need to recover.
+</pre>
+</details>
+
+<details>
+<summary><strong>✅ DO These Things Immediately</strong></summary>
+
+<pre>
+1. Document what you observe:
+   - Which records are missing/wrong?
+   - When did you notice it?
+   - When was the data last correct? (approximate time)
+   - What operations were running? (imports, updates, deletes)
+
+2. If possible, export the current state:
+   pg_dump -h host -U user -d db -F c -f emergency-$(date +%Y%m%d).dump
+
+   This preserves what's there now, before we restore.
+
+3. Email me IMMEDIATELY:
+   Subject: "P0: DATA LOSS - [your company]"
+   Mark as urgent.
+</pre>
+</details>
+
+<details>
+<summary><strong>What I'll Do</strong></summary>
+
+<pre>
+Recovery process:
+
+1. Assess the scope (10-20 minutes)
+   - What data is affected?
+   - When did corruption occur?
+   - What's the best recovery point?
+
+2. Point-in-time recovery (30-90 minutes)
+   - Restore from backup to specific timestamp
+   - Replay WAL logs to exact recovery point
+   - Verify data integrity
+
+3. Validation (15-30 minutes)
+   - Confirm data is restored correctly
+   - Run sanity checks
+   - Test application connections
+
+4. Cutover (5-10 minutes)
+   - Switch your application to restored database
+   - Verify everything works
+   - Monitor for issues
+
+Total time: 1-2.5 hours typically
+</pre>
+</details>
+
+<hr>
+
+<h3>Scenario 4: Security Concern (P0)</h3>
+
+<p><strong>Symptoms:</strong> Unauthorized access attempts. Suspicious activity. Unusual queries.</p>
+
+<details>
+<summary><strong>Signs of a Security Incident</strong></summary>
+
+<ul>
+<li>Failed authentication attempts from unknown IPs (check logs)</li>
+<li>Unusual queries in pg_stat_activity (e.g., attempts to read pg_user)</li>
+<li>Unexpected connections from unfamiliar locations</li>
+<li>Sudden performance degradation (could be malicious queries)</li>
+<li>Your team didn't make changes but something changed</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>What to Do</strong></summary>
+
+<pre>
+1. Do NOT investigate further
+   (Preserve evidence, don't tip off attacker)
+
+2. Note the time and what you observed:
+   - What suspicious activity did you see?
+   - When did you notice it?
+   - Were there any unusual access patterns?
+
+3. Email me immediately:
+   Subject: "P0: SECURITY INCIDENT - [your company]"
+
+4. If you suspect credentials are compromised:
+   - Don't change them yet (wait for my guidance)
+   - I need to review logs first
+</pre>
+</details>
+
+<details>
+<summary><strong>My Response</strong></summary>
+
+<pre>
+Security incident protocol:
+
+1. Immediate assessment (5-15 minutes)
+   - Review PostgreSQL logs
+   - Check authentication logs (/var/log/auth.log)
+   - Analyze fail2ban blocks
+   - Check firewall logs (UFW)
+
+2. Containment (15-30 minutes)
+   - Block suspicious IPs
+   - Rotate credentials if compromised
+   - Update firewall rules
+   - Enable additional logging
+
+3. Investigation (30-60 minutes)
+   - Determine attack vector
+   - Assess data access
+   - Check for data exfiltration
+   - Review all recent connections
+
+4. Remediation (varies)
+   - Patch vulnerabilities
+   - Update security policies
+   - Implement additional monitoring
+   - Notify you of findings
+
+I take security very seriously. I'll give you a full incident report.
+</pre>
+</details>
+
+<hr>
+
+<h3>Scenario 5: Backup or Recovery Issues (P0 if data at risk)</h3>
+
+<p><strong>Symptoms:</strong> Backup failed. Can't restore. Backup verification alert.</p>
+
+<details>
+<summary><strong>What You Might See</strong></summary>
+
+<ul>
+<li>Email from Healthchecks.io: "Backup check failed"</li>
+<li>Email from me: "Backup verification failed"</li>
+<li>You need to restore data but backup is missing/corrupt</li>
+</ul>
+
+<p><strong>Important:</strong> Backup failures are P0 if they put data at risk. If your database is still running normally, it's P1 (I'll fix the backup system).</p>
+</details>
+
+<details>
+<summary><strong>Contact Me</strong></summary>
+
+<pre>
+Email: jeremy@intentsolutions.io
+Subject: "P0: Backup Issue - [your company]"
+
+Tell me:
+- Did you receive a backup failure alert?
+- Do you need to restore something right now? (urgent)
+- Is your database still running? (if yes, less urgent)
+
+If you need an emergency backup while waiting:
+pg_dump -h host -U user -d db -F c -f backup-$(date +%Y%m%d).dump
+</pre>
+</details>
+
+<hr>
+
+<h2>Self-Service Emergency Tools</h2>
+
+<h3>Emergency Database Export</h3>
+
+<p>If you need an immediate backup while waiting for support:</p>
+
+<pre>
+# Compressed format (recommended)
+pg_dump -h your-host.costplusdb.com \
+        -U your-username \
+        -d your-database \
+        -F c \
+        -f emergency-backup-$(date +%Y%m%d-%H%M%S).dump
+
+# Plain SQL format (easier to inspect)
+pg_dump -h your-host.costplusdb.com \
+        -U your-username \
+        -d your-database \
+        -F p \
+        -f emergency-backup-$(date +%Y%m%d-%H%M%S).sql
+</pre>
+
+<p>This creates a backup you can restore independently if needed.</p>
+
+<h3>Connection Test</h3>
+
+<p>Test if your database is reachable:</p>
+
+<pre>
+psql "postgresql://user@host.costplusdb.com:5432/dbname?sslmode=require"
+
+Success:  You see the psql prompt → Database is up
+Failure:  "Connection refused" → Database is down (P0)
+Timeout:  Network/DNS issue → Check your firewall, verify hostname
+</pre>
+
+<h3>Quick Health Check Queries</h3>
+
+<pre>
+-- Check database size
+SELECT pg_size_pretty(pg_database_size(current_database()));
+
+-- Check active connections
+SELECT count(*) FROM pg_stat_activity;
+
+-- Check replication lag (if applicable)
+SELECT EXTRACT(EPOCH FROM (now() - pg_last_xact_replay_timestamp()));
+
+-- Check for bloat
+SELECT schemaname, tablename,
+       pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+FROM pg_tables
+WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
+LIMIT 10;
+</pre>
+
+<hr>
+
+<h2>Escalation Path</h2>
+
+<p>How to reach me if I'm not responding:</p>
+
+<pre>
+Step 1: Email jeremy@intentsolutions.io
+        (I check email constantly)
+        ↓
+        Wait 30 minutes for P0/P1
+        Wait 2 hours for P2
+        ↓
+Step 2: Slack channel (if enabled in your plan)
+        Pro/Enterprise: Included
+        Shared/Dedicated: +$29/month
+        ↓
+        Wait 1 hour for P0
+        ↓
+Step 3: Automated phone alert triggers
+        (Happens automatically for P0 database down)
+        My phone rings until I acknowledge
+        ↓
+        Wait 2 hours
+        ↓
+Step 4: Emergency Backup Operator system activates
+        (See: /emergency.html#emergency-backup-operator)
+        Automated access to credentials if I'm unreachable
+</pre>
+
+<p><strong>Reality check:</strong> I've never needed Steps 3-4. I respond quickly. But it's there if needed.</p>
+
+<hr>
+
+<h2>After the Incident</h2>
+
+<p>What happens after we resolve the issue:</p>
+
+<h3>Incident Report</h3>
+
+<p>You'll get a written summary:</p>
+
+<pre>
+- What happened (root cause)
+- When it happened (timeline)
+- What I did to fix it
+- Why it happened
+- How we'll prevent it next time
+</pre>
+
+<p>For significant incidents (P0/P1), I publish detailed post-mortems in <a href="/emergency.html#post-mortems">incident history</a>.</p>
+
+<h3>Follow-Up Actions</h3>
+
+<p>If the incident revealed systemic issues, I'll:</p>
+
+<ul>
+<li>Update monitoring to catch it earlier next time</li>
+<li>Add automated alerts for similar conditions</li>
+<li>Update SOPs with lessons learned</li>
+<li>Implement preventive measures</li>
+</ul>
+
+<p>I learn from every incident. Your database gets more reliable over time.</p>
+
+<hr>
+
+<h2>Not an Active Incident?</h2>
+
+<p>If you're not experiencing an issue right now:</p>
+
+<ul>
+<li><a href="/reliability.html">Reliability & Recovery</a> - How we prevent failures and recover from disasters</li>
+<li><a href="/emergency.html">Emergency Procedures</a> - Detailed technical procedures, backup operator system, incident history</li>
+<li><a href="/docs.html">Documentation</a> - Setup guides, API docs, operational procedures</li>
+</ul>
+
+<hr>
+
+<footer>
+<p style="text-align: center;"><strong>CostPlusDB</strong></p>
+
+<p>Jeremy owns and operates <a href="https://intentsolutions.io">intent solutions io</a>, which created and manages:</p>
+
+<p><a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://startaitools.com">startaitools.com</a></p>
+
+<p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms of Service</a> | <a href="/acceptable-use.html">Acceptable Use</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security</a> | <a href="/reliability.html">Reliability</a> | <a href="/incident-response.html">Incident Response</a> | <a href="/emergency.html">Emergency</a> | <a href="/about.html">About</a> | <a href="/sitemap.html">Site Map</a></p>
+
+<p>&copy; 2025 Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström | <a href="https://github.com/jeremylongshore">GitHub</a></p>
+</footer>
+
+</body>
+</html>
