@@ -10,9 +10,9 @@
 
 ---
 
-## 📍 Current Development Status (2025-10-21)
+## 📍 Current Development Status (2025-10-22)
 
-**Latest Release:** v1.1.0 - Base + Add-Ons Pricing Model ([CHANGELOG](CHANGELOG.md))
+**Latest Release:** v1.2.0 - Incident Response Navigation Restructure ([CHANGELOG](CHANGELOG.md))
 
 **Current Work:** Building comprehensive testing infrastructure (IN PROGRESS)
 - ✅ Created GCP project `cost-plus-db` for Vertex AI
@@ -29,6 +29,13 @@
 - **Testing:** Backups, monitoring, incident response, SOPs validation
 
 **Recent Milestones:**
+- ✅ Website navigation restructure (2025-10-22) - 3-page incident response pattern
+  - Created dedicated incident-response.html (clear crisis guide)
+  - Created sitemap.html (visual navigation tree)
+  - Removed "When Things Break" confusion from reliability.html
+  - Added SOP-004: Monitoring Stack Deployment (1,243 lines)
+  - Completed website claims vs SOPs audit (064-DR-AUDIT, 065-DR-AUDIT)
+  - Standardized all footers across website
 - ✅ Website consistency overhaul (2025-10-21) - Standardized all messaging
   - Support SLA consistent across all pages: "4-hour SLA, typically 30-min"
   - Fixed 16 instances of conflicting response time claims

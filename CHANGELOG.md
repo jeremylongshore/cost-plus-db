@@ -18,6 +18,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Goal: Validate all CostPlusDB operations before first customer
   - Testing: Backups, monitoring, incident response, SOPs
 
+## [1.2.0] - 2025-10-22
+
+### Added
+- **Incident Response Page:** New dedicated crisis response page (`website/incident-response.html`)
+  - Clear "database down RIGHT NOW" destination
+  - P0/P1/P2/P3 severity levels with response times
+  - 5 detailed incident scenarios with immediate action steps
+  - Self-service diagnostic tools (emergency backup export, connection tests)
+  - Clear escalation path
+  - Eliminates confusion between planning docs and active incident response
+- **Site Navigation:** Visual sitemap page (`website/sitemap.html`)
+  - ASCII tree navigation showing all pages
+  - Quick navigation by use case (emergency, evaluating, customer docs, operations, legal)
+  - Example customer journeys (database down, evaluating service)
+  - External links to GitHub and related projects
+- **Documentation:** Complete audit documentation
+  - 064-DR-AUDIT: Website claims vs SOPs comprehensive audit
+  - 065-DR-AUDIT: Website structure analysis and navigation confusion findings
+  - SOP-004: Monitoring Stack Deployment (1,243 lines)
+    - Betterstack, Healthchecks.io, Uptime Kuma, Prometheus, Grafana OnCall
+    - Complete setup procedures, configurations, alert rules
+
+### Changed
+- **Website Structure:** 3-page incident response pattern for clarity
+  - **reliability.html** - Refocused on pre-sale trust building only
+    - Removed "When Things Break: Recovery Scenarios" section (moved to incident-response.html)
+    - Added prominent emergency banner linking to incident response page
+    - Kept all trust-building content (how we think, what you get, verification testing)
+  - **incident-response.html** - NEW dedicated active incident guide
+    - Purpose: Guide customers through database emergencies RIGHT NOW
+    - Audience: Customers experiencing active outages or performance issues
+    - Content: Immediate actions, diagnostic tools, contact information
+  - **emergency.html** - Remains technical deep dive (unchanged in this release)
+    - Purpose: Detailed procedures, EBO system, post-mortems
+- **Navigation:** Updated all page navigation to include incident-response.html
+  - index.html updated with new navigation links
+  - All footers standardized to match homepage footer
+  - Consistent Info section links across all pages
+
+### Fixed
+- Navigation confusion between reliability planning and active incident response
+- Missing clear entry point for customers experiencing database emergencies
+- Inconsistent footers across new and existing pages
+- Website-advertised monitoring features (Betterstack, Healthchecks.io, Uptime Kuma, Prometheus, Grafana OnCall) now fully documented in SOP-004
+
+### Technical
+- Created git rollback tag: `pre-incident-response-restructure` (safe rollback point)
+- Updated 3 HTML files, created 2 new HTML files, created 2 audit documents
+- Added 1,243 lines of monitoring stack deployment procedures to SOP-004
+- Deployed via Netlify from GitHub main branch
+- Commit: 1cf5b0d
+
 ## [1.1.1] - 2025-10-21
 
 ### Changed
