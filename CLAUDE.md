@@ -132,11 +132,17 @@ Configuration is in `website/netlify.toml` including security headers, redirects
 
 ### Updating Pricing
 
-To update pricing in the calculator:
+**CURRENT PRICING (v1.1.0 - October 2025):**
+- Shared: $59/month
+- Dedicated: $119/month
+- Pro: $179/month
+- Enterprise: $299/month
+
+To update pricing:
 1. Edit the JavaScript in `website/calculator.html`
-2. Look for the tier configurations and cost constants
-3. Tiers are: Shared ($49), Dedicated ($89), Pro ($129), Enterprise ($149)
-4. After editing, test locally before deploying
+2. Update pricing across ALL pages (use grep to find instances)
+3. Update CHANGELOG.md with pricing changes
+4. Test locally before deploying
 
 ### Design System
 
@@ -144,6 +150,47 @@ To update pricing in the calculator:
 - Uses system fonts (monospace)
 - Custom theme colors defined in `src/theme.css`
 - Responsive tables and character-based layout
+
+### Website Messaging Standards (CRITICAL)
+
+**CONSISTENCY IS PARAMOUNT** - All pages must use identical messaging for core policies.
+
+**Support Response Time Standard:**
+```
+Regular support: 4-hour SLA (business hours: M-F 9am-6pm ET), typically 30-min response, 7 days/week
+Critical outages: IMMEDIATE response (automated alerts 24/7)
+```
+
+**Conservative SLA Approach:**
+- **Promise:** 4-hour SLA (business hours)
+- **Deliver:** Typically 30-min, 7 days/week
+- **Never guarantee** "30 minutes" or "2 hours" as official SLA
+- **Never use** "first 5 customers only" language - all customers receive same service level
+
+**Table Formatting Standards:**
+```css
+/* Headers must be visually distinct from content */
+table th {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+table td {
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+/* NO bold tags in table content cells */
+table td strong { font-weight: 400 !important; }
+```
+
+**When making website changes:**
+1. Check ALL pages for consistency (use grep)
+2. Never create conflicting messaging
+3. Update DISCREPANCY-REPORT.md if you find inconsistencies
+4. Test visual hierarchy: headers must look different from content
+
+**Reference:** `website/DISCREPANCY-REPORT.md` for complete messaging audit
 
 ## Backend Development
 

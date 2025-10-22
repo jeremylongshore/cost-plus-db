@@ -29,6 +29,11 @@
 - **Testing:** Backups, monitoring, incident response, SOPs validation
 
 **Recent Milestones:**
+- ✅ Website consistency overhaul (2025-10-21) - Standardized all messaging
+  - Support SLA consistent across all pages: "4-hour SLA, typically 30-min"
+  - Fixed 16 instances of conflicting response time claims
+  - Removed 12 bold tags from table cells (visual hierarchy enforced)
+  - Created DISCREPANCY-REPORT.md for full audit trail
 - ✅ v1.1.0 pricing model deployed (2025-10-21)
 - ✅ Updated all cost comparisons with Oct 2025 pricing (AWS $303, GCP $403)
 - ✅ Created rollback points and GitHub release (v1.1.0, v1.1.0-rollback)
