@@ -10,6 +10,33 @@
 
 ---
 
+## 📍 Current Development Status (2025-10-21)
+
+**Latest Release:** v1.1.0 - Base + Add-Ons Pricing Model ([CHANGELOG](CHANGELOG.md))
+
+**Current Work:** Building comprehensive testing infrastructure (IN PROGRESS)
+- ✅ Created GCP project `cost-plus-db` for Vertex AI
+- ✅ Installed Google Cloud SDK
+- 🔄 Setting up 5 local PostgreSQL databases (Shared tier simulations)
+- 🔄 Configuring Vertex AI Flash 2.0 for test data generation (free tier)
+- 📋 Each database simulates different use case:
+  1. E-commerce shop (products, orders, customers)
+  2. SaaS startup (users, subscriptions, events)
+  3. Blog/CMS (posts, comments, media)
+  4. Mobile app API (users, sessions, logs)
+  5. Analytics platform (events, metrics, reports)
+- **Goal:** Prove CostPlusDB operations work with realistic data before first customer
+- **Testing:** Backups, monitoring, incident response, SOPs validation
+
+**Recent Milestones:**
+- ✅ v1.1.0 pricing model deployed (2025-10-21)
+- ✅ Updated all cost comparisons with Oct 2025 pricing (AWS $303, GCP $403)
+- ✅ Created rollback points and GitHub release (v1.1.0, v1.1.0-rollback)
+- ✅ Testing infrastructure directory created: `testing/local-customer-databases/`
+- ✅ Backend 85% production-ready
+
+---
+
 ## 🚀 Quick Start for Developers
 
 **Just joining this project? Start here:**
@@ -17,6 +44,7 @@
 1. **Read the session handoff:** [000-docs/061-PM-HAND-session-handoff-2025-10-20.md](000-docs/061-PM-HAND-session-handoff-2025-10-20.md)
 2. **Read the security audit:** [000-docs/059-DR-AUDIT-comprehensive-security-audit.md](000-docs/059-DR-AUDIT-comprehensive-security-audit.md)
 3. **Check CLAUDE.md** for updated backend documentation
+4. **Test infrastructure:** [testing/local-customer-databases/](testing/local-customer-databases/) - 5 database testing setup
 
 **Backend is 85% production-ready.** Missing: Resend API key, UptimeRobot setup, production secrets.
 
@@ -37,8 +65,8 @@ cd backend
 ### The Problem
 
 Cloud database services charge massive markups with zero transparency:
-- AWS RDS charges $280/month for infrastructure that costs them $12
-- That's a **2,233% markup**
+- AWS RDS charges $303/month for infrastructure that costs them $12
+- That's a **2,425% markup**
 - Complex pricing calculators hide the real costs
 - Surprise charges and hidden fees are standard practice
 
@@ -53,15 +81,15 @@ We show you exactly what we pay. You pay that + 25%. That's it.
 ```
 Example: 8GB RAM, 200GB Storage, 4 vCPU PostgreSQL Database
 
-AWS RDS Equivalent:        $280/month
-Heroku Postgres Standard:  $200/month
+AWS RDS Equivalent:        $303/month
+Google Cloud SQL:          $403/month
 DigitalOcean Managed DB:   $120/month
 
 Our Infrastructure Cost:    $12/month
-Your Price:                 $89/month
-Our Margin:                 $77/month
+Your Price:                 $119/month
+Our Margin:                 $107/month
 
-You Save:                   $191/month (68% vs AWS)
+You Save:                   $184/month (61% vs AWS)
 ```
 
 **The difference?** We show our costs. They don't.
@@ -98,10 +126,10 @@ We offer four tiers with transparent pricing:
 
 | Tier | Storage | RAM | Price | Our Cost | Margin |
 |------|---------|-----|-------|----------|--------|
-| **Shared** | 5GB | 2GB | $49/mo | ~$2/mo | $47/mo |
-| **Dedicated** | 25GB | 8GB | $89/mo | ~$12/mo | $77/mo |
-| **Pro** | 50GB | 16GB | $129/mo | ~$20/mo | $109/mo |
-| **Enterprise** | 100GB | 32GB | $149/mo | ~$30/mo | $119/mo |
+| **Shared** | 5GB | 2GB | $59/mo | ~$2/mo | $57/mo |
+| **Dedicated** | 25GB | 8GB | $119/mo | ~$12/mo | $107/mo |
+| **Pro** | 50GB | 16GB | $179/mo | ~$20/mo | $159/mo |
+| **Enterprise** | 100GB | 32GB | $299/mo | ~$30/mo | $269/mo |
 
 **All tiers include:**
 - PostgreSQL 16 managed hosting
@@ -111,8 +139,8 @@ We offer four tiers with transparent pricing:
 - No hidden fees, no surprise charges
 
 **Compare to AWS RDS equivalent:**
-- Dedicated Tier (8GB RAM, 200GB): **AWS charges $280/mo** vs our $89/mo
-- That's **$191/month savings** or **$2,292/year**
+- Dedicated Tier (8GB RAM, 200GB): **AWS charges $303/mo** vs our $119/mo
+- That's **$184/month savings** or **$2,208/year**
 
 ---
 

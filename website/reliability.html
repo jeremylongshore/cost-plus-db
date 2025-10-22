@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jeremy Longshore">
+  <title>Reliability & Recovery - CostPlusDB</title>
+  <meta name="description" content="How we keep your database running and recover from disasters">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/reset.css">
+  <link rel="stylesheet" href="src/index.css">
+  <link rel="stylesheet" href="src/theme.css">
+</head>
+<body>
+
+<table class="header">
+  <tr>
+    <td colspan="2" rowspan="2" class="width-auto">
+      <h1 class="title">Reliability & Recovery</h1>
+      <span class="subtitle">How we keep your database running</span>
+    </td>
+    <th>Page</th>
+    <td class="width-min"><a href="/">← Home</a></td>
+  </tr>
+</table>
+
+<p><a href="/">← Back to Home</a></p>
+
+<h2>How We Keep Your Database Running</h2>
+
+<p>We're reliable. Not five-nines reliable. Not automatic-failover-in-seconds reliable. But your-database-stays-up-and-we-can-recover-from-disasters reliable.</p>
+
+<p>Here's exactly what you get at $59-299/month from a bootstrapped service.</p>
+
+<hr>
+
+<h2>How We Think About Reliability</h2>
+
+<p>Three principles guide everything:</p>
+
+<h3>Isolation</h3>
+
+<p>Each customer gets dedicated or isolated infrastructure.</p>
+
+<pre>
+Dedicated tier ($119/mo):
+Customer A → Contabo VPS #1
+Customer B → Contabo VPS #2
+Customer C → Contabo VPS #3
+
+Shared tier ($59/mo):
+Customers A, B, C → Same VPS
+├─ Separate PostgreSQL databases
+├─ Connection limits per customer
+└─ Resource monitoring per database
+</pre>
+
+<p>Your slow query doesn't crash someone else's database. Dedicated tier gets hardware-level isolation. Shared tier gets database-level isolation.</p>
+
+<h3>Redundancy</h3>
+
+<p>Daily backups. Offsite storage. Weekly verification.</p>
+
+<pre>
+Your database
+├─ Daily backup → Wasabi S3 (encrypted)
+├─ WAL archives → Continuous
+└─ Retention: 7-30 days (tier dependent)
+</pre>
+
+<p>We can restore to any point within your retention window. Backups tested weekly to verify they work.</p>
+
+<h3>Simplicity</h3>
+
+<p>Standard PostgreSQL. Proven tools. No proprietary systems.</p>
+
+<pre>
+Stack:
+├─ PostgreSQL 16 (standard, not forked)
+├─ pgBackRest (backup)
+├─ pgBouncer (connection pooling)
+└─ Standard pg_dump exports
+</pre>
+
+<p>Any PostgreSQL expert can understand our setup. You can export and migrate anytime. No lock-in.</p>
+
+<hr>
+
+<h2>When Things Break: Recovery Scenarios</h2>
+
+<h3>VPS Hardware Failure</h3>
+<pre>
+What happens:     Server dies
+Detection:        5 minutes (monitoring)
+Response:         Restore to new VPS
+Downtime:         1-2 hours
+Data loss:        &lt;24 hours (last backup)
+Your action:      None
+</pre>
+
+<h3>Accidental Data Deletion</h3>
+<pre>
+What happens:     You ran DROP TABLE
+Detection:        You email us
+Response:         Point-in-time recovery
+Downtime:         30-60 minutes
+Data loss:        None (if within 7 days)
+Your action:      Tell us when it happened
+</pre>
+
+<h3>Database Corruption</h3>
+<pre>
+What happens:     PostgreSQL won't start
+Detection:        Automated checks
+Response:         Restore last good backup
+Downtime:         1-2 hours
+Data loss:        &lt;24 hours
+Your action:      None
+</pre>
+
+<h3>Datacenter Outage</h3>
+<pre>
+What happens:     Contabo regional failure
+Detection:        Immediate
+Response:         Restore to different provider
+Downtime:         2-4 hours
+Data loss:        &lt;24 hours
+Your action:      Update connection string
+</pre>
+
+<h3>Founder Unavailable</h3>
+<pre>
+What happens:     I'm incapacitated 48+ hours
+Detection:        Dead man's switch
+Response:         Backup operator activates
+Downtime:         None (databases keep running)
+Your action:      You have credentials to export
+</pre>
+
+<hr>
+
+<h2>What You Get</h2>
+
+<h3>Uptime & Response</h3>
+<ul>
+<li>99.9% uptime SLA (~43 minutes/month allowed downtime)</li>
+<li>24/7 automated monitoring</li>
+<li><strong>Critical outages (database down):</strong> IMMEDIATE response - automated phone alerts 24/7</li>
+<li><strong>Regular support (questions, requests):</strong> 4-hour SLA (business hours: M-F 9am-6pm ET)</li>
+<li><strong>Reality:</strong> I typically respond to everything within 30 minutes, 7 days/week</li>
+<li>Recovery time: 1-2 hours typical</li>
+</ul>
+
+<h3>Backup & Recovery</h3>
+<ul>
+<li>Daily automated backups</li>
+<li>Continuous WAL archiving</li>
+<li>Encrypted offsite storage (Wasabi S3)</li>
+<li>7-day retention (Shared/Dedicated)</li>
+<li>30-day retention (Pro/Enterprise)</li>
+<li>Weekly backup verification tests</li>
+<li>Point-in-time recovery (7 days)</li>
+</ul>
+
+<h3>Support</h3>
+<ul>
+<li>Direct email: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></li>
+<li><strong>Critical outages:</strong> IMMEDIATE (automated alerts to my phone 24/7)</li>
+<li><strong>Regular support:</strong> 4-hour SLA (business hours: M-F 9am-6pm ET)</li>
+<li><strong>Typical response:</strong> 30 minutes for everything, 7 days/week</li>
+<li>Slack support: +$29/mo (free with Pro/Enterprise)</li>
+<li>Incident updates via email</li>
+<li>Post-incident reports for outages</li>
+</ul>
+
+<h3>Data Portability</h3>
+<ul>
+<li>Standard PostgreSQL (pg_dump)</li>
+<li>Export anytime</li>
+<li>Restore anywhere</li>
+<li>No vendor lock-in</li>
+</ul>
+
+<hr>
+
+<h2>What We Don't Do</h2>
+
+<h3>No Automatic Failover</h3>
+
+<p>We don't provide sub-minute automatic failover.</p>
+
+<p><strong>Why:</strong> Requires hot standby servers (2x cost), real-time replication, and constant monitoring. Enterprise solutions offering this start at $300-500/month.</p>
+
+<p><strong>Our approach:</strong> Fast manual recovery. Alerted → restore from backup → back up in 1-2 hours.</p>
+
+<h3>No 99.999% Uptime</h3>
+
+<p>We guarantee 99.9%, not 99.999%.</p>
+
+<p><strong>Why:</strong> Five nines means &lt;5 minutes downtime per year. Requires redundant everything and ops teams on-call 24/7. Enterprise infrastructure starting at $500-1,000/month.</p>
+
+<p><strong>Our approach:</strong> 99.9% allows 43 minutes/month. Most months we hit 99.95%+ with zero unplanned downtime.</p>
+
+<h3>No Multi-Region</h3>
+
+<p>We don't run your database in multiple regions simultaneously.</p>
+
+<p><strong>Why:</strong> 3x infrastructure cost, complex replication, significant operational overhead. Makes sense for global apps, not most startups.</p>
+
+<p><strong>Our approach:</strong> Single region (you choose Germany or US), offsite backups in separate region.</p>
+
+<h3>No 24/7 Phone Support</h3>
+
+<p>We don't provide phone support.</p>
+
+<p><strong>Why:</strong> Solo founder. Email gives you written record of support interactions and allows for thoughtful responses.</p>
+
+<p><strong>Our approach:</strong> Email for support. <strong>Critical outages = IMMEDIATE response</strong> (automated alerts to my phone 24/7). Regular support = 4-hour SLA (business hours), but I typically respond within 30 minutes, 7 days/week.</p>
+
+<hr>
+
+<h2>Want Better Than Baseline?</h2>
+
+<h3>Slack Support: +$29/month</h3>
+<p><em>(Included with Pro/Enterprise)</em></p>
+
+<pre>
+├─ Private channel with founder
+├─ Real-time chat, 7 days/week
+├─ Same 4-hour SLA (typically 30-min)
+└─ Faster back-and-forth troubleshooting
+</pre>
+
+<h3>Extended Backups: +$15/month</h3>
+<p><em>(Included with Pro/Enterprise)</em></p>
+
+<pre>
+├─ 30-day retention instead of 7-day
+├─ More recovery points
+└─ Longer point-in-time recovery window
+</pre>
+
+<p><em>Note: For true enterprise HA with automatic failover and five-nines uptime, expect $250-500/month minimum. We focus on reliable, affordable service for startups.</em></p>
+
+<hr>
+
+<h2>How We Verify It Works</h2>
+
+<h3>Weekly Backup Verification (Automated)</h3>
+
+<pre>
+Every Sunday:
+├─ Restore random customer backup
+├─ Verify PostgreSQL starts
+├─ Run queries to confirm data integrity
+├─ Measure restoration time
+└─ Alert if anything fails
+</pre>
+
+<h3>Monthly Recovery Drill</h3>
+
+<pre>
+First Sunday each month:
+├─ Full disaster recovery test
+├─ Restore to brand new VPS
+├─ Verify application connectivity
+└─ Document timing and process
+</pre>
+
+<h3>Quarterly Cross-Provider Test</h3>
+
+<pre>
+Every 3 months:
+├─ Restore to different hosting provider
+├─ Confirm no vendor lock-in
+├─ Test catastrophic failure recovery
+└─ Update disaster recovery procedures
+</pre>
+
+<p>Results available on request. Email: <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a></p>
+
+<hr>
+
+<h2>Technical Stack</h2>
+
+<h3>Infrastructure</h3>
+<pre>
+Hosting:     Contabo VPS (Germany) / Hetzner (Germany/US)
+OS:          Ubuntu 24.04 LTS
+Storage:     NVMe SSD
+Cost:        $10.35/month (we're transparent about this)
+</pre>
+
+<h3>Database</h3>
+<pre>
+PostgreSQL:  16.x (latest stable)
+Pooling:     pgBouncer 1.21+
+Config:      Production-proven defaults
+</pre>
+
+<h3>Backup</h3>
+<pre>
+Tool:        pgBackRest 2.51+
+Method:      Daily full + continuous WAL
+Storage:     Wasabi S3 (encrypted)
+Encryption:  AES-256-CBC
+</pre>
+
+<h3>Monitoring</h3>
+<pre>
+Health:      Every 5 minutes
+Metrics:     pg_stat_statements
+Alerts:      Email + phone (critical)
+Uptime:      Betterstack monitoring
+</pre>
+
+<h3>Security</h3>
+<pre>
+Firewall:    UFW (PostgreSQL + SSH only)
+Intrusion:   fail2ban (auto-ban)
+SSL/TLS:     Enforced
+Updates:     Automatic security patches
+</pre>
+
+<p>Standard, proven tools. Any PostgreSQL DBA can understand this stack.</p>
+
+<hr>
+
+<h2>The Bottom Line</h2>
+
+<p>We're a $59-299/month database service run by one person. We're reliable for what we are. We're not pretending to be AWS.</p>
+
+<p><strong>You get:</strong></p>
+<ul>
+<li>Solid infrastructure</li>
+<li>Daily verified backups</li>
+<li>Fast manual recovery (1-2 hours)</li>
+<li>Direct founder access (IMMEDIATE for outages, 4-hour SLA for support, typically 30-min for everything)</li>
+<li>Standard PostgreSQL (no lock-in)</li>
+</ul>
+
+<p><strong>You don't get:</strong></p>
+<ul>
+<li>Automatic failover</li>
+<li>Sub-minute recovery</li>
+<li>99.999% uptime</li>
+<li>Phone support</li>
+</ul>
+
+<p>If that works for your business, we're a good fit.</p>
+
+<p style="text-align: center; margin-top: calc(var(--line-height) * 2);">
+<a href="/calculator.html"><strong>See Pricing</strong></a> |
+<a href="/security.html"><strong>Security Documentation</strong></a> |
+<a href="mailto:jeremy@intentsolutions.io"><strong>Email Questions</strong></a>
+</p>
+
+<hr>
+
+<p><strong>Questions?</strong> <a href="mailto:jeremy@intentsolutions.io">jeremy@intentsolutions.io</a><br>
+<strong>Critical outages:</strong> IMMEDIATE (automated alerts 24/7)<br>
+<strong>Regular support:</strong> 4-hour SLA (business hours: M-F 9am-6pm ET)<br>
+<strong>Reality:</strong> I typically respond to everything within 30 minutes, 7 days/week.</p>
+
+<hr>
+
+<footer>
+<p><strong>CostPlusDB</strong> - Database hosting at cost plus</p>
+
+<p>Built with <a href="https://github.com/owickstrom/the-monospace-web">The Monospace Web</a> by Oskar Wickström</p>
+
+<p><a href="https://jeremylongshore.com">jeremylongshore.com</a> |
+<a href="https://startaitools.com">startaitools.com</a> |
+<a href="https://intentsolutions.io">intentsolutions.io</a> |
+<a href="https://diagnosticpro.io">diagnosticpro.io</a> |
+<a href="https://hustlestats.io">hustlestats.io</a> |
+<a href="https://github.com/jeremylongshore">GitHub</a></p>
+
+<p>&copy; 2025 intent solutions io</p>
+<p><strong>Legal:</strong> <a href="/privacy.html">Privacy Policy</a> | <a href="/terms.html">Terms of Service</a> | <a href="/acceptable-use.html">Acceptable Use</a></p>
+<p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a> | <a href="/emergency.html">Emergency Procedures</a></p>
+</footer>
+
+</body>
+</html>

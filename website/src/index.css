@@ -477,3 +477,10 @@ label input {
 .debug-toggle-label {
   text-align: right;
 }
+
+/* Table content wraps properly on small screens */
+@media (max-width: 600px) {
+  tbody td {
+    word-break: break-word;
+  }
+}

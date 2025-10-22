@@ -371,3 +371,145 @@ pm2 restart costplusdb-backend
 pm2 stop costplusdb-backend
 pm2 logs costplusdb-backend
 ```
+
+---
+
+## Testing Infrastructure (Current Development)
+
+**Status:** IN PROGRESS (2025-10-21)
+
+### Overview
+
+Building comprehensive testing environment with 5 local PostgreSQL databases to validate CostPlusDB operations before acquiring first customer.
+
+### 5 Test Customer Databases (Shared Tier)
+
+All databases simulate **Shared tier** ($59/mo) customers with different workload patterns:
+
+| Database | Use Case | Schema Focus | Data Volume |
+|----------|----------|--------------|-------------|
+| `costplusdb_customer1` | E-commerce Shop | Products, Orders, Customers | 10K products, 50K orders |
+| `costplusdb_customer2` | SaaS Startup | Users, Subscriptions, Events | 5K users, 100K events |
+| `costplusdb_customer3` | Blog/CMS | Posts, Comments, Media | 20K posts, 100K comments |
+| `costplusdb_customer4` | Mobile App API | Users, Sessions, Logs | 10K users, 500K API calls |
+| `costplusdb_customer5` | Analytics Platform | Events, Metrics, Reports | 250K events |
+
+### Test Data Generation
+
+**Using Vertex AI Flash 2.0 (Free Tier):**
+- No Claude Code tokens used for data generation
+- Realistic schemas and data generated via Google Cloud
+- GCP Project: `cost-plus-db`
+- Region: us-central1
+- Free tier limit: 2M tokens/month
+- Estimated usage: ~500K tokens
+
+### Directory Structure
+
+```
+testing/local-customer-databases/
+├── README.md                    # Setup guide and overview
+├── GCP-PROJECT-SETUP.md        # Google Cloud project setup instructions
+├── scripts/
+│   ├── 01-setup-databases.sh   # Creates 5 local PostgreSQL databases
+│   ├── 02-import-data.sh       # Imports generated SQL data
+│   └── 03-verify-setup.sh      # Verifies all databases are ready
+├── schemas/
+│   ├── customer1-ecommerce.sql
+│   ├── customer2-saas.sql
+│   ├── customer3-cms.sql
+│   ├── customer4-mobile.sql
+│   └── customer5-analytics.sql
+├── vertex-ai/
+│   ├── generate-test-data.py   # Vertex AI script to generate data
+│   └── requirements.txt        # Python dependencies
+└── sql-output/
+    └── (Generated SQL files go here)
+```
+
+### Setup Progress
+
+- ✅ GCP project `cost-plus-db` created
+- ✅ Google Cloud SDK installed
+- ✅ Testing directory structure created
+- 🔄 Configuring Vertex AI authentication
+- 🔄 Creating database schemas
+- 📋 Generating test data with Vertex AI
+- 📋 Setting up local PostgreSQL databases
+- 📋 Importing test data
+- 📋 Validating backups/restores
+- 📋 Testing monitoring setup
+
+### What Will Be Tested
+
+Once setup is complete:
+
+1. **Backup/Restore Procedures**
+   - pgBackRest full backups
+   - Point-in-time recovery (PITR)
+   - Wasabi S3 integration
+   - Multi-database backup orchestration
+
+2. **Monitoring & Alerting**
+   - Betterstack uptime monitoring
+   - pg_stat_statements query analysis
+   - Database health checks
+   - Alert notification delivery
+
+3. **Performance**
+   - Query performance under load
+   - Connection pooling (pgBouncer)
+   - Resource usage tracking
+   - Storage growth patterns
+
+4. **Operations**
+   - Customer onboarding workflow
+   - Database provisioning
+   - Migration procedures
+   - Incident response
+
+5. **SOPs Validation**
+   - 005-DR-SOPS-postgresql-operations.md procedures
+   - Security implementation
+   - Compliance workflows
+
+### Cost
+
+- **Local PostgreSQL:** $0 (uses local machine)
+- **Vertex AI:** $0 (free tier)
+- **Total:** $0
+
+### Quick Start (For Future Reference)
+
+```bash
+# 1. Setup GCP authentication
+gcloud auth login
+gcloud config set project cost-plus-db
+
+# 2. Generate test data
+cd testing/local-customer-databases/vertex-ai
+python generate-test-data.py
+
+# 3. Create local databases
+cd ..
+./scripts/01-setup-databases.sh
+
+# 4. Import generated data
+./scripts/02-import-data.sh
+
+# 5. Verify setup
+./scripts/03-verify-setup.sh
+```
+
+### Next Steps After Testing
+
+1. Validate all SOPs work with realistic data
+2. Document any gaps or improvements needed
+3. Practice incident response scenarios
+4. Create customer demo environments
+5. Move to Dedicated/Pro/Enterprise tier testing
+
+---
+
+**See:** `testing/local-customer-databases/README.md` for complete setup instructions.
+

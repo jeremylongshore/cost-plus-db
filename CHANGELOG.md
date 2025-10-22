@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- **Testing Infrastructure:** Building comprehensive testing environment
+  - ✅ Created GCP project `cost-plus-db` for Vertex AI
+  - ✅ Installed Google Cloud SDK
+  - ✅ Created testing directory structure: `testing/local-customer-databases/`
+  - 🔄 Setting up 5 local PostgreSQL databases (Shared tier simulations)
+  - 🔄 Configuring Vertex AI Flash 2.0 for realistic test data generation (free tier)
+  - Testing scenarios: e-commerce, SaaS, CMS, mobile API, analytics
+  - Goal: Validate all CostPlusDB operations before first customer
+  - Testing: Backups, monitoring, incident response, SOPs
+
+### Changed
+- Updated cost comparisons site-wide with accurate October 2025 pricing
+  - AWS RDS: $280 → $303/month (db.m5.xlarge 4 vCPU) - 2,425% markup
+  - Google Cloud SQL: $275 → $403/month (db-n1-standard-4 4 vCPU) - 3,258% markup
+  - Updated savings vs CostPlusDB: $184/month (61% savings vs AWS)
+  - Maintained monospace ASCII formatting throughout
+  - Files updated: index.html, docs.html, about.html, business-overview.html, pricing-structure.html
+  - Commit: ced80ae
+
 ## [1.1.0] - 2025-10-21
 
 ### Changed
