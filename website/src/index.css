@@ -164,14 +164,22 @@ table tbody tr:first-child > * {
 
 /* Table formatting - headers BOLD & LARGER, content normal & smaller */
 table th {
-  font-weight: 700;
-  font-size: 1.05rem;  /* Headers slightly larger */
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;  /* Headers slightly larger */
   text-transform: none;
 }
 
 table td {
-  font-weight: 400;  /* Explicitly normal weight */
-  font-size: 0.95rem;  /* Content slightly smaller */
+  font-weight: 400 !important;  /* Explicitly normal weight */
+  font-size: 0.95rem !important;  /* Content slightly smaller - SAME for all columns */
+}
+
+/* Force consistent sizing for ALL columns */
+table td:first-child,
+table td:last-child,
+table td:nth-child(2) {
+  font-size: 0.95rem !important;
+  font-weight: 400 !important;
 }
 
 /* Links in tables - normal weight */
