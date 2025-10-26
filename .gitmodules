@@ -1,0 +1,3 @@
+[submodule "testing/benchmarks/sysbench-tpcc"]
+	path = testing/benchmarks/sysbench-tpcc
+	url = https://github.com/Percona-Lab/sysbench-tpcc.git
