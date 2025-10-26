@@ -10,7 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### In Progress
 - Ongoing operational improvements and documentation
 
-## [1.3.0] - 2025-10-25
+## [1.3.0] - 2025-10-26
+
+### Added
+- **Form Anti-Phishing & Anti-Spam Security:** 8-layer protection system
+  - Layer 1: Netlify built-in spam filtering (Akismet)
+  - Layer 2: Honeypot anti-bot field with tabindex/autocomplete blocking
+  - Layer 3: reCAPTCHA v2 integration (requires Netlify dashboard setup)
+  - Layer 4: Time-based validation (3-second minimum submission time)
+  - Layer 5: Disposable email blocking (20 common providers)
+  - Layer 6: Spam content detection (regex patterns for phishing, XSS, spam keywords)
+  - Layer 7: Input validation & sanitization (name/email format, character limits)
+  - Layer 8: Client-side rate limiting (60-second cooldown between submissions)
+  - Documentation: 077-WA-SECR-form-anti-phishing-anti-spam-security.md
 
 ### Added
 - **Benchmark Transparency Page:** Published brutally honest multi-tenant performance results
@@ -50,12 +62,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Transparency:** Published first-run results with no cherry-picking
 - **Trade-offs:** 72% TPS reduction when sharing with 4 neighbors (documented honestly)
 
+### Fixed
+- **Deployment Failure (2025-10-26):** Fixed broken Netlify auto-deploy
+  - Incident: Site frozen at v1.2.0 (Oct 22), benchmarks page 404, no auto-deploys since Oct 22
+  - Root Cause #1: Missing `.gitmodules` file for sysbench-tpcc submodule → "fatal: No url found for submodule"
+  - Root Cause #2: Double base directory (dashboard: `base=website`, netlify.toml: `base=website`) → tried `website/website/`
+  - Fix #1: Created `.gitmodules` with proper submodule URL configuration
+  - Fix #2: Changed netlify.toml to relative paths (`publish="."`, `functions="netlify/functions"`)
+  - Resolution: Cleared Netlify cache, manual deploy succeeded
+  - Postmortem: 078-PM-INCI-netlify-deployment-failure-2025-10-26.md
+  - Duration: 4 days (Oct 22-26) - site served stale content during benchmarks launch
+
 ### Technical
 - Security: Removed `001-security/config/backup/pgbackrest.conf` from git tracking (contained exposed S3 credentials)
 - Template remains: `pgbackrest.conf.template` with placeholders for safe public sharing
-- Git commit: 6126155
+- Git commits: 6126155 (benchmarks), 42eb0a6 (form security), 76ceb07 (gitmodules), d18f760 (paths fix)
 - Deployed via Netlify from GitHub main branch
-- Benchmark results published to: https://costplusdb.dev/benchmarks/
+- Benchmark results published to: https://costplusdb.dev/benchmarks/ (live 2025-10-26)
 
 ### Philosophy
 From the benchmark report:
