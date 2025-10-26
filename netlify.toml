@@ -9,7 +9,7 @@
 # NETLIFY FUNCTIONS
 # ============================================================================
 [functions]
-  directory = "netlify/functions"
+  directory = "website/netlify/functions"
 
 # ============================================================================
 # FORM NOTIFICATIONS (via Netlify Event + Resend API + Slack)
