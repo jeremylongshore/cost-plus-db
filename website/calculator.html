@@ -119,17 +119,21 @@
 <p>This process typically takes 1-2 hours. Most requests are approved same-day. If we cannot accommodate your needs, we'll recommend alternative providers.</p>
 </details>
 
-<form name="consultation-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+<form name="consultation-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true" action="/thank-you.html" onsubmit="return validateForm(event)">
 
+<!-- Honeypot (invisible anti-bot field) -->
 <p class="hidden">
-<label>Don't fill this out: <input name="bot-field"></label>
+<label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
 </p>
 
+<!-- Time-based validation (hidden timestamp) -->
+<input type="hidden" name="form-start-time" id="form-start-time" value="">
+
 <label for="name">Name *</label>
-<input type="text" id="name" name="name" required>
+<input type="text" id="name" name="name" required minlength="2" maxlength="100" pattern="[A-Za-z\s\-']+" title="Please enter a valid name">
 
 <label for="email">Email Address *</label>
-<input type="email" id="email" name="email" required>
+<input type="email" id="email" name="email" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="Please enter a valid email address">
 
 <label for="company">Company Name (optional)</label>
 <input type="text" id="company" name="company">
@@ -155,11 +159,16 @@
 </select>
 
 <label for="requirements">Specific Requirements or Questions</label>
-<textarea id="requirements" name="requirements" rows="4" placeholder="Compliance needs, high availability, read replicas, current provider, workload details, etc."></textarea>
+<textarea id="requirements" name="requirements" rows="4" maxlength="2000" placeholder="Compliance needs, high availability, read replicas, current provider, workload details, etc."></textarea>
 
-<button type="submit">
+<!-- reCAPTCHA v2 widget (Netlify integration) -->
+<div data-netlify-recaptcha="true"></div>
+
+<button type="submit" id="submit-btn">
 Request Consultation
 </button>
+
+<p id="form-message" style="display:none; color: #d33; margin-top: 1em;"></p>
 
 <p><strong>No payment required.</strong> This is a consultation request. We'll review your information and reach out within 2 hours to schedule a brief call.</p>
 
@@ -184,6 +193,117 @@ Request Consultation
 <p><strong>Info:</strong> <a href="/security.html">Security Practices</a> | <a href="/about.html">About</a></p>
 </footer>
 
+<script>
+// ============================================================================
+// FORM SECURITY & ANTI-SPAM VALIDATION
+// ============================================================================
+
+// Set form start timestamp (detects instant bot submissions)
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('form-start-time').value = Date.now();
+});
+
+// Disposable email domains blocklist (common temporary email providers)
+const disposableEmailDomains = [
+  'tempmail.com', 'guerrillamail.com', '10minutemail.com', 'mailinator.com',
+  'trashmail.com', 'throwaway.email', 'maildrop.cc', 'temp-mail.org',
+  'yopmail.com', 'getnada.com', 'sharklasers.com', 'guerrillamail.info',
+  'grr.la', 'guerrillamailblock.com', 'pokemail.net', 'spam4.me',
+  'tempail.com', 'mohmal.com', 'fakeinbox.com', 'discard.email'
+];
+
+// Spam keyword patterns (common in phishing/scam submissions)
+const spamPatterns = [
+  /\b(viagra|cialis|casino|lottery|prize|winner|claim now)\b/i,
+  /\b(crypto|bitcoin|investment opportunity|guaranteed returns)\b/i,
+  /\b(click here|verify account|urgent action required)\b/i,
+  /http:\/\/bit\.ly|http:\/\/tinyurl/i, // Suspicious shortened URLs
+  /<script|javascript:|onclick=/i // XSS attempts
+];
+
+function validateForm(event) {
+  const messageEl = document.getElementById('form-message');
+  messageEl.style.display = 'none';
+
+  // 1. Time-based validation (must spend at least 3 seconds on form)
+  const formStartTime = parseInt(document.getElementById('form-start-time').value);
+  const formDuration = Date.now() - formStartTime;
+
+  if (formDuration < 3000) { // Less than 3 seconds
+    showError('Please take a moment to fill out the form completely.');
+    event.preventDefault();
+    return false;
+  }
+
+  // 2. Email domain validation (block disposable emails)
+  const email = document.getElementById('email').value.toLowerCase();
+  const emailDomain = email.split('@')[1];
+
+  if (disposableEmailDomains.includes(emailDomain)) {
+    showError('Please use a permanent email address. Temporary email services are not accepted.');
+    event.preventDefault();
+    return false;
+  }
+
+  // 3. Spam content detection
+  const name = document.getElementById('name').value;
+  const requirements = document.getElementById('requirements').value;
+  const combined = (name + ' ' + requirements).toLowerCase();
+
+  for (let pattern of spamPatterns) {
+    if (pattern.test(combined)) {
+      showError('Your submission contains suspicious content. Please remove marketing language or URLs.');
+      event.preventDefault();
+      return false;
+    }
+  }
+
+  // 4. Validate email format (additional check beyond HTML5)
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    showError('Please enter a valid email address.');
+    event.preventDefault();
+    return false;
+  }
+
+  // 5. Name validation (reject obvious fake names)
+  const nameLower = name.toLowerCase();
+  if (nameLower === 'test' || nameLower === 'asdf' || nameLower.length < 2) {
+    showError('Please enter your real name.');
+    event.preventDefault();
+    return false;
+  }
+
+  // 6. Check for excessive length in text fields (spam often uses huge blocks)
+  if (requirements.length > 2000) {
+    showError('Requirements field is too long. Please keep it under 2000 characters.');
+    event.preventDefault();
+    return false;
+  }
+
+  // All validations passed
+  return true;
+}
+
+function showError(message) {
+  const messageEl = document.getElementById('form-message');
+  messageEl.textContent = message;
+  messageEl.style.display = 'block';
+  messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Rate limiting (client-side): Prevent multiple submissions within 60 seconds
+let lastSubmitTime = 0;
+document.querySelector('form[name="consultation-request"]').addEventListener('submit', function(e) {
+  const now = Date.now();
+  if (now - lastSubmitTime < 60000) {
+    showError('Please wait 60 seconds before submitting again.');
+    e.preventDefault();
+    return false;
+  }
+  lastSubmitTime = now;
+});
+</script>
 
 </body>
 </html>
