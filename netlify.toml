@@ -1,14 +1,17 @@
 # Netlify configuration for CostPlusDB
 # This file must be at the root of the repository
+# NOTE: Netlify dashboard has base directory = "website"
+# So this publish path is relative to that base
 
 [build]
-  publish = "website"
+  publish = "."
 
 # ============================================================================
 # NETLIFY FUNCTIONS
 # ============================================================================
+# NOTE: Relative to base directory (website/)
 [functions]
-  directory = "website/netlify/functions"
+  directory = "netlify/functions"
 
 # ============================================================================
 # FORM NOTIFICATIONS (via Netlify Event + Resend API + Slack)
