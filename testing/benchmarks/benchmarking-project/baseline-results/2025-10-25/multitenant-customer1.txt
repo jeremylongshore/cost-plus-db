@@ -1,0 +1,14 @@
+pgbench (16.10 (Ubuntu 16.10-1.pgdg24.04+1))
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 10
+query mode: simple
+number of clients: 2
+number of threads: 1
+maximum number of tries: 1
+duration: 60 s
+number of transactions actually processed: 20856
+number of failed transactions: 0 (0.000%)
+latency average = 5.754 ms
+initial connection time = 26.118 ms
+tps = 347.592150 (without initial connection time)
