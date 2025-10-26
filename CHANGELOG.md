@@ -8,15 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### In Progress
-- **Testing Infrastructure:** Building comprehensive testing environment
-  - ✅ Created GCP project `cost-plus-db` for Vertex AI
-  - ✅ Installed Google Cloud SDK
-  - ✅ Created testing directory structure: `testing/local-customer-databases/`
-  - 🔄 Setting up 5 local PostgreSQL databases (Shared tier simulations)
-  - 🔄 Configuring Vertex AI Flash 2.0 for realistic test data generation (free tier)
-  - Testing scenarios: e-commerce, SaaS, CMS, mobile API, analytics
-  - Goal: Validate all CostPlusDB operations before first customer
-  - Testing: Backups, monitoring, incident response, SOPs
+- Ongoing operational improvements and documentation
+
+## [1.3.0] - 2025-10-25
+
+### Added
+- **Benchmark Transparency Page:** Published brutally honest multi-tenant performance results
+  - New page: `/benchmarks/` with complete test methodology and results
+  - Educational content explaining pgbench, TPC-B, and how to interpret metrics
+  - Downloadable raw data (5 customer results + benchmark script)
+  - Cloud provider comparisons (AWS RDS, DigitalOcean, Google Cloud SQL)
+  - Links to official PostgreSQL docs and industry benchmarking resources
+- **Testing Infrastructure:** Complete 5-database testing environment
+  - Created 5 local PostgreSQL databases (Shared tier simulations)
+  - Each database simulates realistic use case (e-commerce, SaaS, CMS, mobile API, analytics)
+  - Industry-standard pgbench tests (TPC-B workload)
+  - Multi-tenant concurrent load testing
+- **Documentation:** Comprehensive benchmarking documentation (4 new files)
+  - 073-TQ-TEST: PostgreSQL benchmarking standards (dual-benchmark strategy)
+  - 074-TQ-TEST: Benchmark execution plan (industry-standard methodology)
+  - 075-TQ-TEST: Shared tier multi-tenant benchmark methodology
+  - 076-TQ-TEST: Full benchmark results report (500+ lines, brutally honest)
+- **Infrastructure:** Testing scripts and automation
+  - `testing/benchmarks/run-multitenant-benchmark.sh` - Concurrent benchmark script
+  - All baseline results archived in `testing/benchmarks/benchmarking-project/baseline-results/2025-10-25/`
+
+### Changed
+- **SLA Revision:** Updated performance promises based on real testing
+  - OLD: 500 TPS minimum for Shared tier
+  - NEW: 300 TPS minimum for Shared tier
+  - Reason: Real multi-tenant testing showed 297 TPS per customer (all 5 concurrent)
+  - Brutal honesty: Changed promise to match reality rather than miss estimates
+- **Website Navigation:** Added benchmarks link to main navigation
+  - New navigation item: `/benchmarks/` - "Real multi-tenant performance, brutally honest"
+  - Updated all pages with benchmark link
+
+### Results
+- **Single Database Baseline (Best Case):** 1,077 TPS @ 9.23ms latency
+- **Multi-Tenant (5 Concurrent, Real Case):** 297 TPS each @ 13.45ms latency
+- **Consistency:** All 5 customers got essentially identical performance (fair resource sharing)
+- **Transparency:** Published first-run results with no cherry-picking
+- **Trade-offs:** 72% TPS reduction when sharing with 4 neighbors (documented honestly)
+
+### Technical
+- Security: Removed `001-security/config/backup/pgbackrest.conf` from git tracking (contained exposed S3 credentials)
+- Template remains: `pgbackrest.conf.template` with placeholders for safe public sharing
+- Git commit: 6126155
+- Deployed via Netlify from GitHub main branch
+- Benchmark results published to: https://costplusdb.dev/benchmarks/
+
+### Philosophy
+From the benchmark report:
+> "We'd rather promise 300 TPS and deliver 297 than promise 500 TPS and miss it.
+> Because honesty > marketing."
 
 ## [1.2.0] - 2025-10-22
 
