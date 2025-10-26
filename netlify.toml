@@ -2,8 +2,7 @@
 # This file must be at the root of the repository
 
 [build]
-  base = "website"
-  publish = "."
+  publish = "website"
 
 # ============================================================================
 # NETLIFY FUNCTIONS
